@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bykk4hu8cfy4"]
+
+[ext_resource type="Script" uid="uid://ch2fttxq2mu77" path="res://Scripts/Player3D.cs" id="1_player"]
+[ext_resource type="Script" uid="uid://bs6lqo6nqiaij" path="res://addons/CoreComponents/MovementComponent.cs" id="2_movement"]
+[ext_resource type="Script" uid="uid://c01ushqlajy1a" path="res://addons/CoreComponents/PlayerInputComponent.cs" id="3_input"]
+[ext_resource type="Script" uid="uid://cayvcox1eoy8a" path="res://addons/CoreComponents/AnimationControllerComponent.cs" id="4_animation"]
+[ext_resource type="PackedScene" uid="uid://djlw4y8gso2b3" path="res://Scenes/Kuno1.02/kuno_1_02.tscn" id="5_kuno"]
+[ext_resource type="Resource" uid="uid://cwx7kss3kbl0g" path="res://Animations/Player_CharacterAnimationConfig.tres" id="5_ykoex"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gep6n"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_spring"]
+
+[node name="Player3D" type="CharacterBody3D" unique_id=25344383]
+script = ExtResource("1_player")
+metadata/_edit_group_ = true
+
+[node name="MovementComponent" type="Node" parent="." unique_id=658748861]
+script = ExtResource("2_movement")
+
+[node name="PlayerInputComponent" type="Node" parent="." unique_id=851278383]
+script = ExtResource("3_input")
+
+[node name="AnimationControllerComponent" type="Node" parent="." unique_id=1140034643]
+script = ExtResource("4_animation")
+AnimationBlendTime = 0.3
+AnimConfig = ExtResource("5_ykoex")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1023033183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_gep6n")
+
+[node name="KunoSkin" parent="." unique_id=1098897115 instance=ExtResource("5_kuno")]
+
+[node name="CameraPivot" type="Node3D" parent="." unique_id=806558171]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.09, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot" unique_id=913553522]
+transform = Transform3D(-1, 2.1052e-08, -1.40279e-07, -3.23484e-08, 0.929023, 0.370022, 1.38112e-07, 0.370022, -0.929023, 0, 0.34, 0)
+shape = SubResource("SphereShape3D_spring")
+spring_length = 8.0
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D" unique_id=533002724]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1487963, -1.4547964)
+current = true
+fov = 50.0

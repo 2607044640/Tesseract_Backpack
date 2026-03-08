@@ -1,0 +1,108 @@
+# ===== Godot 4 C# 项目 - 只上传代码 =====
+
+# Godot 生成的文件夹
+.godot/
+.import/
+.mono/
+data_*/
+
+# 导入文件（自动生成）
+*.import
+
+# ===== 资源文件（不上传） =====
+
+# 图片和纹理
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.tga
+*.dds
+*.exr
+*.hdr
+
+# 音频
+*.wav
+*.mp3
+*.ogg
+*.opus
+
+# 3D 模型
+*.glb
+*.gltf
+*.fbx
+*.obj
+*.dae
+*.blend
+*.blend1
+
+# 字体
+*.ttf
+*.otf
+*.woff
+*.woff2
+
+# 视频
+*.mp4
+*.avi
+*.mov
+*.webm
+
+# Godot 资源文件（二进制）
+*.res
+
+# 着色器缓存
+*.spv
+
+# ===== C# 构建输出 =====
+bin/
+obj/
+*.dll
+*.pdb
+*.mdb
+
+# ===== IDE 文件 =====
+.vs/
+.idea/
+*.csproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sln.DotSettings.user
+
+# ===== 操作系统文件 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+.nomedia
+
+# ===== 临时和备份文件 =====
+*.tmp
+*.temp
+*.log
+*.stackdump
+*.bak
+*.backup
+*~
+
+# ===== Godot 导出配置 =====
+export.cfg
+export_credentials.cfg
+export_presets.cfg
+
+# ===== 其他 =====
+*.translation
+mono_crash.*.json
+
+# ===== 保留的文件类型（会被上传） =====
+# .cs - C# 代码
+# .tscn - Godot 场景文件（文本格式）
+# .tres - Godot 资源文件（文本格式，如 AnimationSet）
+# .godot - 项目配置
+# .csproj - C# 项目文件
+# .sln - Visual Studio 解决方案文件
+# .md - 文档文件
+# .gitignore - Git 配置
+# .gitattributes - Git 属性
+# .editorconfig - 编辑器配置
