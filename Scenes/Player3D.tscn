@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bykk4hu8cfy4"]
 
-[ext_resource type="Script" uid="uid://ch2fttxq2mu77" path="res://Scripts/Player3D.cs" id="1_player"]
-[ext_resource type="Script" uid="uid://bs6lqo6nqiaij" path="res://addons/CoreComponents/MovementComponent.cs" id="2_movement"]
-[ext_resource type="Script" uid="uid://c01ushqlajy1a" path="res://addons/CoreComponents/PlayerInputComponent.cs" id="3_input"]
-[ext_resource type="Script" uid="uid://cayvcox1eoy8a" path="res://addons/CoreComponents/AnimationControllerComponent.cs" id="4_animation"]
+[ext_resource type="Script" uid="uid://yhmx8fery0rh" path="res://Scripts/Player3D.cs" id="1_player"]
+[ext_resource type="Script" uid="uid://d3p4hcdw648ah" path="res://addons/CoreComponents/MovementComponent.cs" id="2_movement"]
+[ext_resource type="Script" uid="uid://rsqf1fe43hno" path="res://addons/CoreComponents/PlayerInputComponent.cs" id="3_input"]
+[ext_resource type="Script" uid="uid://7xt4lw7fgw6r" path="res://addons/CoreComponents/AnimationControllerComponent.cs" id="4_animation"]
 [ext_resource type="PackedScene" uid="uid://djlw4y8gso2b3" path="res://Scenes/Kuno1.02/kuno_1_02.tscn" id="5_kuno"]
 [ext_resource type="Resource" uid="uid://cwx7kss3kbl0g" path="res://Animations/Player_CharacterAnimationConfig.tres" id="5_ykoex"]
 [ext_resource type="Script" uid="uid://cu08gpa84apih" path="res://addons/CoreComponents/CharacterRotationComponent.cs" id="6_rotation"]
@@ -28,10 +28,10 @@ script = ExtResource("4_animation")
 AnimationBlendTime = 0.3
 AnimConfig = ExtResource("5_ykoex")
 
-[node name="CharacterRotationComponent" type="Node" parent="."]
+[node name="CharacterRotationComponent" type="Node" parent="." unique_id=1956804117]
 script = ExtResource("6_rotation")
 
-[node name="CameraControlComponent" type="Node" parent="."]
+[node name="CameraControlComponent" type="Node" parent="." unique_id=910192160]
 script = ExtResource("7_camera")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1023033183]

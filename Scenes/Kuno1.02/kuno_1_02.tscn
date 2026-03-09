@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://djlw4y8gso2b3"]
 
 [ext_resource type="PackedScene" uid="uid://xxhfxr6ofo6u" path="res://Scenes/Kuno1.02/Kuno1.02.fbx" id="1_ahwvb"]
-[ext_resource type="Animation" uid="uid://chr3gceqbfbup" path="res://Animations/AnimationRes/fast_run.res" id="2_amuq4"]
+[ext_resource type="Animation" path="res://Animations/AnimationRes/fast_run.res" id="2_amuq4"]
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_amuq4"]
 _data = {

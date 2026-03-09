@@ -2,9 +2,6 @@
 
 [ext_resource type="PackedScene" uid="uid://b7tj281abbry8" path="res://Scenes/csg_combiner.tscn" id="1_oaaoo"]
 [ext_resource type="PackedScene" uid="uid://bykk4hu8cfy4" path="res://Scenes/Player3D.tscn" id="2_t0ae4"]
-[ext_resource type="Animation" uid="uid://brfiyip5l6f4j" path="res://Animations/AnimationRes/ninja_idle.res" id="3_4a8wd"]
-[ext_resource type="Animation" uid="uid://chr3gceqbfbup" path="res://Animations/AnimationRes/fast_run.res" id="3_4mcxs"]
-[ext_resource type="Animation" uid="uid://bdsluma0tqoke" path="res://Animations/AnimationRes/jump.res" id="5_4a8wd"]
 
 [node name="Node3D" type="Node3D" unique_id=775918063]
 
@@ -17,12 +14,6 @@ transform = Transform3D(1, 0, 0, 0, 1.9260569, 0, 0, 0, 2.3893514, 0, 0.38452387
 
 [node name="CharacterBody3D" parent="." unique_id=1927585716 instance=ExtResource("2_t0ae4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6539233, 1.1352715, 0)
-IdleAnimation = ExtResource("3_4a8wd")
-RunAnimation = ExtResource("3_4mcxs")
-SprintAnimation = ExtResource("3_4mcxs")
-JumpAnimation = ExtResource("5_4a8wd")
-SprintAnimSpeed = 1.5
-JumpAnimSpeed = 0.7999999999999999
 
 [node name="CSGBox3D3_Ground" type="CSGBox3D" parent="." unique_id=1513348533]
 transform = Transform3D(17.040285, 0, 0, 0, 1, 0, 0, 0, 16.052887, 0, -1.4887823, 0)

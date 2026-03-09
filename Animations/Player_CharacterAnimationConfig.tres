@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="CharacterAnimationConfig" format=3 uid="uid://cwx7kss3kbl0g"]
 
-[ext_resource type="Script" uid="uid://dippcs72jvnr2" path="res://Scripts/Animation/CharacterAnimationConfig.cs" id="1_0veki"]
-[ext_resource type="Script" uid="uid://b8quvaxkliga3" path="res://Scripts/Animation/AnimationSet.cs" id="1_tkhp1"]
-[ext_resource type="Animation" uid="uid://b8jwdyxvi51uq" path="res://Animations/AnimationRes/breathing_idle.res" id="1_v3cbf"]
-[ext_resource type="Animation" uid="uid://bdsluma0tqoke" path="res://Animations/AnimationRes/jump.res" id="2_v3cbf"]
-[ext_resource type="Animation" uid="uid://chr3gceqbfbup" path="res://Animations/AnimationRes/fast_run.res" id="3_1w2ty"]
+[ext_resource type="Script" uid="uid://dippcs72jvnr2" path="res://addons/CoreComponents/Animation/CharacterAnimationConfig.cs" id="1_0veki"]
+[ext_resource type="Animation" uid="uid://brfiyip5l6f4j" path="res://Animations/AnimationRes/ninja_idle.res" id="1_mx5s2"]
+[ext_resource type="Script" uid="uid://b8quvaxkliga3" path="res://addons/CoreComponents/Animation/AnimationSet.cs" id="1_tkhp1"]
+[ext_resource type="Animation" uid="uid://bo7rhbmaadjfa" path="res://Animations/AnimationRes/jump.res" id="2_x3irc"]
+[ext_resource type="Animation" uid="uid://chr3gceqbfbup" path="res://Animations/AnimationRes/fast_run.res" id="3_jgaf4"]
 
 [sub_resource type="Animation" id="Animation_7apuw"]
 resource_name = "mixamo_com"
@@ -383,9 +383,9 @@ tracks/52/keys = PackedFloat32Array(0, 1, 0.13492443, -0.0036600828, -9.262562e-
 
 [sub_resource type="Resource" id="Resource_tkhp1"]
 script = ExtResource("1_tkhp1")
-IdleAnimation = ExtResource("1_v3cbf")
-RunAnimation = ExtResource("3_1w2ty")
-JumpStartAnimation = ExtResource("2_v3cbf")
+IdleAnimation = ExtResource("1_mx5s2")
+RunAnimation = ExtResource("3_jgaf4")
+JumpStartAnimation = ExtResource("2_x3irc")
 JumpStartAnimationSpeed = 0.6
 JumpLoopAnimation = SubResource("Animation_7apuw")
 JumpLoopAnimationSpeed = 0.6
