@@ -122,61 +122,61 @@ public partial class AnimationControllerComponent : Node
         if (!parent.IsOnFloor())
         {
             // 在空中 - 尝试多种跳跃动画名称
-            if (_animPlayer.HasAnimation("JumpStart"))
+            if (_animPlayer.HasAnimation(AnimationNames.JumpStart))
             {
-                targetAnim = "JumpStart";
+                targetAnim = AnimationNames.JumpStart;
             }
-            else if (_animPlayer.HasAnimation("Jump Start"))
+            else if (_animPlayer.HasAnimation(AnimationNames.JumpStartAlt))
             {
-                targetAnim = "Jump Start";
+                targetAnim = AnimationNames.JumpStartAlt;
             }
-            else if (_animPlayer.HasAnimation("JumpLoop"))
+            else if (_animPlayer.HasAnimation(AnimationNames.JumpLoop))
             {
-                targetAnim = "JumpLoop";
+                targetAnim = AnimationNames.JumpLoop;
             }
-            else if (_animPlayer.HasAnimation("Jump Loop"))
+            else if (_animPlayer.HasAnimation(AnimationNames.JumpLoopAlt))
             {
-                targetAnim = "Jump Loop";
+                targetAnim = AnimationNames.JumpLoopAlt;
             }
-            else if (_animPlayer.HasAnimation("Jump"))
+            else if (_animPlayer.HasAnimation(AnimationNames.Jump))
             {
-                targetAnim = "Jump";
+                targetAnim = AnimationNames.Jump;
             }
         }
         else if (isMoving)
         {
             // 移动中
-            if (isSprinting && _animPlayer.HasAnimation("Sprint"))
+            if (isSprinting && _animPlayer.HasAnimation(AnimationNames.Sprint))
             {
-                targetAnim = "Sprint";
+                targetAnim = AnimationNames.Sprint;
             }
-            else if (isSprinting && _animPlayer.HasAnimation("Sprint Animation"))
+            else if (isSprinting && _animPlayer.HasAnimation(AnimationNames.SprintAlt))
             {
-                targetAnim = "Sprint Animation";
+                targetAnim = AnimationNames.SprintAlt;
             }
-            else if (isSprinting && _animPlayer.HasAnimation("FastRun"))
+            else if (isSprinting && _animPlayer.HasAnimation(AnimationNames.FastRun))
             {
-                targetAnim = "FastRun";
+                targetAnim = AnimationNames.FastRun;
             }
-            else if (_animPlayer.HasAnimation("Run"))
+            else if (_animPlayer.HasAnimation(AnimationNames.Run))
             {
-                targetAnim = "Run";
+                targetAnim = AnimationNames.Run;
             }
-            else if (_animPlayer.HasAnimation("Run Animation"))
+            else if (_animPlayer.HasAnimation(AnimationNames.RunAlt))
             {
-                targetAnim = "Run Animation";
+                targetAnim = AnimationNames.RunAlt;
             }
         }
         else
         {
             // 静止
-            if (_animPlayer.HasAnimation("Idle"))
+            if (_animPlayer.HasAnimation(AnimationNames.Idle))
             {
-                targetAnim = "Idle";
+                targetAnim = AnimationNames.Idle;
             }
-            else if (_animPlayer.HasAnimation("Idle Animation"))
+            else if (_animPlayer.HasAnimation(AnimationNames.IdleAlt))
             {
-                targetAnim = "Idle Animation";
+                targetAnim = AnimationNames.IdleAlt;
             }
         }
         

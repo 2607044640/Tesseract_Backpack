@@ -3,10 +3,11 @@ using Godot.Composition;
 
 /// <summary>
 /// 角色旋转组件 - 负责让角色模型面向移动方向
+/// 依赖抽象的 BaseInputComponent，可复用于玩家和 AI
 /// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
-[ComponentDependency(typeof(PlayerInputComponent))]
+[ComponentDependency(typeof(BaseInputComponent))]
 public partial class CharacterRotationComponent : Node
 {
     #region Export Properties
@@ -73,8 +74,8 @@ public partial class CharacterRotationComponent : Node
     /// </summary>
     public void OnEntityReady()
     {
-        // playerInputComponent 是自动生成的魔法变量
-        playerInputComponent.OnMovementInput += HandleMovementInput;
+        // baseInputComponent 是自动生成的魔法变量
+        baseInputComponent.OnMovementInput += HandleMovementInput;
         
         GD.Print("CharacterRotationComponent: 已订阅 InputComponent 事件 ✓");
     }
@@ -87,9 +88,9 @@ public partial class CharacterRotationComponent : Node
     public override void _ExitTree()
     {
         // 取消订阅事件
-        if (playerInputComponent != null)
+        if (baseInputComponent != null)
         {
-            playerInputComponent.OnMovementInput -= HandleMovementInput;
+            baseInputComponent.OnMovementInput -= HandleMovementInput;
         }
     }
     

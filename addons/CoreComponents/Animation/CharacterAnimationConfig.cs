@@ -32,20 +32,20 @@ public partial class CharacterAnimationConfig : Resource
         var library = new AnimationLibrary();
         
         // 添加所有动画
-        AddAnimation(library, "Idle", AnimationSet.IdleAnimation);
-        AddAnimation(library, "Walk", AnimationSet.WalkAnimation);
-        AddAnimation(library, "Run", AnimationSet.RunAnimation);
-        AddAnimation(library, "Sprint", AnimationSet.SprintAnimation);
-        AddAnimation(library, "JumpStart", AnimationSet.JumpStartAnimation);
-        AddAnimation(library, "JumpLoop", AnimationSet.JumpLoopAnimation);
-        AddAnimation(library, "Fall", AnimationSet.FallAnimation);
-        AddAnimation(library, "Land", AnimationSet.LandAnimation);
-        AddAnimation(library, "Attack1", AnimationSet.Attack1Animation);
-        AddAnimation(library, "Attack2", AnimationSet.Attack2Animation);
-        AddAnimation(library, "Attack3", AnimationSet.Attack3Animation);
-        AddAnimation(library, "Dodge", AnimationSet.DodgeAnimation);
-        AddAnimation(library, "Hit", AnimationSet.HitAnimation);
-        AddAnimation(library, "Death", AnimationSet.DeathAnimation);
+        AddAnimation(library, AnimationNames.Idle, AnimationSet.IdleAnimation);
+        AddAnimation(library, AnimationNames.Walk, AnimationSet.WalkAnimation);
+        AddAnimation(library, AnimationNames.Run, AnimationSet.RunAnimation);
+        AddAnimation(library, AnimationNames.Sprint, AnimationSet.SprintAnimation);
+        AddAnimation(library, AnimationNames.JumpStart, AnimationSet.JumpStartAnimation);
+        AddAnimation(library, AnimationNames.JumpLoop, AnimationSet.JumpLoopAnimation);
+        AddAnimation(library, AnimationNames.Fall, AnimationSet.FallAnimation);
+        AddAnimation(library, AnimationNames.Land, AnimationSet.LandAnimation);
+        AddAnimation(library, AnimationNames.Attack1, AnimationSet.Attack1Animation);
+        AddAnimation(library, AnimationNames.Attack2, AnimationSet.Attack2Animation);
+        AddAnimation(library, AnimationNames.Attack3, AnimationSet.Attack3Animation);
+        AddAnimation(library, AnimationNames.Dodge, AnimationSet.DodgeAnimation);
+        AddAnimation(library, AnimationNames.Hit, AnimationSet.HitAnimation);
+        AddAnimation(library, AnimationNames.Death, AnimationSet.DeathAnimation);
         
         // 添加库到AnimationPlayer
         player.AddAnimationLibrary("", library);

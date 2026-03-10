@@ -1,39 +1,12 @@
 using Godot;
-using Godot.Composition;
-using System;
 
 /// <summary>
-/// 玩家输入组件 - 仅负责读取输入并通过事件向外广播
-/// 遵循单一职责原则：只处理输入，不处理移动逻辑
+/// 玩家输入组件 - 读取玩家键盘/手柄输入并通过事件向外广播
+/// 继承 BaseInputComponent，实现玩家特定的输入逻辑
 /// </summary>
 [GlobalClass]
-[Component(typeof(CharacterBody3D))]
-public partial class PlayerInputComponent : Node
+public partial class PlayerInputComponent : BaseInputComponent
 {
-    #region Events (向上传递信息)
-    
-    /// <summary>
-    /// 移动输入事件 (WASD/方向键)
-    /// Vector2: X = 左右 (-1 到 1), Y = 前后 (-1 到 1)
-    /// </summary>
-    public event Action<Vector2> OnMovementInput;
-    
-    /// <summary>
-    /// 跳跃按键刚按下事件
-    /// </summary>
-    public event Action OnJumpJustPressed;
-    
-    #endregion
-
-    #region Export Properties
-    
-    /// <summary>
-    /// 是否启用输入处理
-    /// </summary>
-    [Export] public bool InputEnabled { get; set; } = true;
-    
-    #endregion
-
     #region Godot Lifecycle
     
     public override void _Ready()
@@ -54,8 +27,8 @@ public partial class PlayerInputComponent : Node
             "move_backward"
         );
         
-        // 广播移动输入
-        OnMovementInput?.Invoke(inputDir);
+        // 触发移动输入事件
+        TriggerMovementInput(inputDir);
     }
     
     public override void _UnhandledInput(InputEvent @event)
@@ -66,7 +39,7 @@ public partial class PlayerInputComponent : Node
         if (Input.IsActionJustPressed("jump"))
         {
             GD.Print("PlayerInputComponent: 跳跃按键按下！");
-            OnJumpJustPressed?.Invoke();
+            TriggerJumpInput();
         }
     }
     

@@ -4,10 +4,11 @@ using Godot.Composition;
 /// <summary>
 /// 移动组件 - 仅负责物理计算与位移
 /// 遵循单一职责原则：只处理移动，不处理输入或动画
+/// 依赖抽象的 BaseInputComponent，可复用于玩家和 AI
 /// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
-[ComponentDependency(typeof(PlayerInputComponent))]
+[ComponentDependency(typeof(BaseInputComponent))]
 public partial class MovementComponent : Node
 {
     #region Export Properties
@@ -75,9 +76,9 @@ public partial class MovementComponent : Node
     /// </summary>
     public void OnEntityReady()
     {
-        // playerInputComponent 是由 Godot.Composition 自动生成的魔法变量
-        playerInputComponent.OnMovementInput += HandleMovementInput;
-        playerInputComponent.OnJumpJustPressed += HandleJumpInput;
+        // baseInputComponent 是由 Godot.Composition 自动生成的魔法变量
+        baseInputComponent.OnMovementInput += HandleMovementInput;
+        baseInputComponent.OnJumpJustPressed += HandleJumpInput;
         
         GD.Print("MovementComponent: 已订阅 InputComponent 事件 ✓");
     }
@@ -90,10 +91,10 @@ public partial class MovementComponent : Node
     public override void _ExitTree()
     {
         // 取消订阅事件
-        if (playerInputComponent != null)
+        if (baseInputComponent != null)
         {
-            playerInputComponent.OnMovementInput -= HandleMovementInput;
-            playerInputComponent.OnJumpJustPressed -= HandleJumpInput;
+            baseInputComponent.OnMovementInput -= HandleMovementInput;
+            baseInputComponent.OnJumpJustPressed -= HandleJumpInput;
         }
     }
     

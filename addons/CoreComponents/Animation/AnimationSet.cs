@@ -88,20 +88,20 @@ public partial class AnimationSet : Resource
     {
         return animationName switch
         {
-            "Idle" => IdleAnimationSpeed,
-            "Walk" => WalkAnimationSpeed,
-            "Run" => RunAnimationSpeed,
-            "Sprint" => SprintAnimationSpeed,
-            "JumpStart" => JumpStartAnimationSpeed,
-            "JumpLoop" => JumpLoopAnimationSpeed,
-            "Fall" => FallAnimationSpeed,
-            "Land" => LandAnimationSpeed,
-            "Attack1" => Attack1AnimationSpeed,
-            "Attack2" => Attack2AnimationSpeed,
-            "Attack3" => Attack3AnimationSpeed,
-            "Dodge" => DodgeAnimationSpeed,
-            "Hit" => HitAnimationSpeed,
-            "Death" => DeathAnimationSpeed,
+            AnimationNames.Idle => IdleAnimationSpeed,
+            AnimationNames.Walk => WalkAnimationSpeed,
+            AnimationNames.Run => RunAnimationSpeed,
+            AnimationNames.Sprint => SprintAnimationSpeed,
+            AnimationNames.JumpStart => JumpStartAnimationSpeed,
+            AnimationNames.JumpLoop => JumpLoopAnimationSpeed,
+            AnimationNames.Fall => FallAnimationSpeed,
+            AnimationNames.Land => LandAnimationSpeed,
+            AnimationNames.Attack1 => Attack1AnimationSpeed,
+            AnimationNames.Attack2 => Attack2AnimationSpeed,
+            AnimationNames.Attack3 => Attack3AnimationSpeed,
+            AnimationNames.Dodge => DodgeAnimationSpeed,
+            AnimationNames.Hit => HitAnimationSpeed,
+            AnimationNames.Death => DeathAnimationSpeed,
             _ => 1.0f // 默认速度
         };
     }
