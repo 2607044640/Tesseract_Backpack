@@ -35,6 +35,16 @@ public abstract partial class BaseInputComponent : Node
     
     #endregion
 
+    #region Godot Lifecycle
+    
+    public override void _Ready()
+    {
+        InitializeComponent();
+        GD.Print($"BaseInputComponent: 已初始化 ({GetType().Name})");
+    }
+    
+    #endregion
+
     #region Protected Methods (供子类触发事件)
     
     /// <summary>

@@ -8,7 +8,6 @@ using Godot.Composition;
 /// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
-[ComponentDependency(typeof(BaseInputComponent))]
 public partial class MovementComponent : Node
 {
     #region Export Properties
@@ -43,6 +42,9 @@ public partial class MovementComponent : Node
     // 是否请求跳跃
     private bool _jumpRequested = false;
     
+    // 输入组件引用（手动查找）
+    private BaseInputComponent _inputComponent;
+    
     #endregion
 
     #region Godot Lifecycle
@@ -76,11 +78,27 @@ public partial class MovementComponent : Node
     /// </summary>
     public void OnEntityReady()
     {
-        // baseInputComponent 是由 Godot.Composition 自动生成的魔法变量
-        baseInputComponent.OnMovementInput += HandleMovementInput;
-        baseInputComponent.OnJumpJustPressed += HandleJumpInput;
+        // 手动查找 BaseInputComponent（支持多态）
+        foreach (var child in parent.GetChildren())
+        {
+            if (child is BaseInputComponent inputComp)
+            {
+                _inputComponent = inputComp;
+                break;
+            }
+        }
         
-        GD.Print("MovementComponent: 已订阅 InputComponent 事件 ✓");
+        if (_inputComponent == null)
+        {
+            GD.PushError("MovementComponent: 未找到 BaseInputComponent！");
+            return;
+        }
+        
+        // 订阅事件
+        _inputComponent.OnMovementInput += HandleMovementInput;
+        _inputComponent.OnJumpJustPressed += HandleJumpInput;
+        
+        GD.Print($"MovementComponent: 已订阅 InputComponent 事件 ({_inputComponent.GetType().Name}) ✓");
     }
     
     public override void _PhysicsProcess(double delta)
@@ -91,10 +109,10 @@ public partial class MovementComponent : Node
     public override void _ExitTree()
     {
         // 取消订阅事件
-        if (baseInputComponent != null)
+        if (_inputComponent != null)
         {
-            baseInputComponent.OnMovementInput -= HandleMovementInput;
-            baseInputComponent.OnJumpJustPressed -= HandleJumpInput;
+            _inputComponent.OnMovementInput -= HandleMovementInput;
+            _inputComponent.OnJumpJustPressed -= HandleJumpInput;
         }
     }
     

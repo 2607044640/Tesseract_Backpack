@@ -7,7 +7,6 @@ using Godot.Composition;
 /// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
-[ComponentDependency(typeof(BaseInputComponent))]
 public partial class CharacterRotationComponent : Node
 {
     #region Export Properties
@@ -33,6 +32,7 @@ public partial class CharacterRotationComponent : Node
     
     private Node3D _characterModel;
     private Vector2 _currentInputDir = Vector2.Zero;
+    private BaseInputComponent _inputComponent;
     
     #endregion
 
@@ -74,10 +74,26 @@ public partial class CharacterRotationComponent : Node
     /// </summary>
     public void OnEntityReady()
     {
-        // baseInputComponent 是自动生成的魔法变量
-        baseInputComponent.OnMovementInput += HandleMovementInput;
+        // 手动查找 BaseInputComponent（支持多态）
+        foreach (var child in parent.GetChildren())
+        {
+            if (child is BaseInputComponent inputComp)
+            {
+                _inputComponent = inputComp;
+                break;
+            }
+        }
         
-        GD.Print("CharacterRotationComponent: 已订阅 InputComponent 事件 ✓");
+        if (_inputComponent == null)
+        {
+            GD.PushError("CharacterRotationComponent: 未找到 BaseInputComponent！");
+            return;
+        }
+        
+        // 订阅事件
+        _inputComponent.OnMovementInput += HandleMovementInput;
+        
+        GD.Print($"CharacterRotationComponent: 已订阅 InputComponent 事件 ({_inputComponent.GetType().Name}) ✓");
     }
     
     public override void _Process(double delta)
@@ -88,9 +104,9 @@ public partial class CharacterRotationComponent : Node
     public override void _ExitTree()
     {
         // 取消订阅事件
-        if (baseInputComponent != null)
+        if (_inputComponent != null)
         {
-            baseInputComponent.OnMovementInput -= HandleMovementInput;
+            _inputComponent.OnMovementInput -= HandleMovementInput;
         }
     }
     

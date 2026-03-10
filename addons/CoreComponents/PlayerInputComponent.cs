@@ -11,7 +11,7 @@ public partial class PlayerInputComponent : BaseInputComponent
     
     public override void _Ready()
     {
-        InitializeComponent();
+        base._Ready(); // 调用基类的 InitializeComponent
         GD.Print($"PlayerInputComponent: 已初始化，InputEnabled={InputEnabled}");
     }
     

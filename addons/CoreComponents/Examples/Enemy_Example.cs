@@ -99,7 +99,7 @@ public partial class AIInputComponent : BaseInputComponent
     
     public override void _Ready()
     {
-        InitializeComponent();
+        base._Ready(); // 调用基类的 InitializeComponent
     }
     
     public override void _Process(double delta)
