@@ -18,10 +18,10 @@ public partial class CharacterRotationComponent : Node
     public NodePath CharacterModelPath { get; set; } = "KunoSkin";
 
     /// <summary>
-    /// 相机引用（用于计算移动方向）
+    /// PhantomCamera3D 节点路径
     /// </summary>
     [Export]
-    public Camera3D Camera { get; set; }
+    public NodePath PhantomCameraPath { get; set; } = "PhantomCamera3D";
 
     /// <summary>
     /// 旋转平滑速度
@@ -36,6 +36,7 @@ public partial class CharacterRotationComponent : Node
     private Node3D _characterModel;
     private Vector2 _currentInputDir = Vector2.Zero;
     private BaseInputComponent _inputComponent;
+    private Node3D _phantomCamera;
 
     #endregion
 
@@ -56,19 +57,16 @@ public partial class CharacterRotationComponent : Node
             GD.Print("CharacterRotationComponent: 角色模型已连接 ✓");
         }
 
-        // 自动查找相机
-        if (Camera == null)
-        {
-            Camera = parent.GetNodeOrNull<Camera3D>("CameraPivot/SpringArm3D/Camera3D");
-        }
+        // 获取 PhantomCamera3D 引用
+        _phantomCamera = parent.GetNodeOrNull<Node3D>(PhantomCameraPath);
 
-        if (Camera == null)
+        if (_phantomCamera == null)
         {
-            GD.PushWarning("CharacterRotationComponent: 未找到相机，旋转功能将不可用。");
+            GD.PushWarning("CharacterRotationComponent: 未找到 PhantomCamera3D，旋转功能将不可用。");
         }
         else
         {
-            GD.Print("CharacterRotationComponent: 相机已连接 ✓");
+            GD.Print("CharacterRotationComponent: PhantomCamera3D 已连接 ✓");
         }
     }
 
@@ -113,12 +111,14 @@ public partial class CharacterRotationComponent : Node
     /// </summary>
     private void UpdateCharacterRotation(double delta)
     {
-        if (_characterModel == null || Camera == null) return;
+        if (_characterModel == null || _phantomCamera == null) return;
         if (_currentInputDir == Vector2.Zero) return;
 
-        // 基于相机方向计算移动方向
-        Vector3 forward = Camera.GlobalTransform.Basis.Z;
-        Vector3 right = Camera.GlobalTransform.Basis.X;
+        // 基于 PhantomCamera 方向计算移动方向
+        // 注意：Godot 中 -Z 是前方，X 是右方
+        // 修复：Input.GetVector 的 Y 轴是反的（forward 是负值，backward 是正值）
+        Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z;  // 使用 Z 而不是 -Z
+        Vector3 right = _phantomCamera.GlobalTransform.Basis.X;
         forward.Y = 0;
         right.Y = 0;
         forward = forward.Normalized();

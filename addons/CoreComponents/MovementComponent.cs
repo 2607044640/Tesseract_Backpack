@@ -13,9 +13,9 @@ public partial class MovementComponent : Node
     #region Export Properties
     
     /// <summary>
-    /// 相机引用（用于计算相对于相机的移动方向）
+    /// PhantomCamera3D 引用（用于计算相对于相机的移动方向）
     /// </summary>
-    [Export] public Camera3D Camera { get; set; }
+    [Export] public NodePath PhantomCameraPath { get; set; } = "PhantomCamera3D";
     
     /// <summary>
     /// 移动速度 (米/秒)
@@ -45,6 +45,9 @@ public partial class MovementComponent : Node
     // 输入组件引用（手动查找）
     private BaseInputComponent _inputComponent;
     
+    // PhantomCamera3D 引用
+    private Node3D _phantomCamera;
+    
     #endregion
 
     #region Godot Lifecycle
@@ -53,22 +56,19 @@ public partial class MovementComponent : Node
     {
         InitializeComponent();
         
-        // 自动查找相机
-        if (Camera == null)
-        {
-            Camera = parent.GetNodeOrNull<Camera3D>("CameraPivot/SpringArm3D/Camera3D");
-        }
+        // 获取 PhantomCamera3D 引用
+        _phantomCamera = parent.GetNodeOrNull<Node3D>(PhantomCameraPath);
         
         GD.Print($"MovementComponent: 已连接到 Body: {parent.Name}");
         GD.Print($"MovementComponent: Speed={Speed}, JumpVelocity={JumpVelocity}, Gravity={Gravity}");
         
-        if (Camera == null)
+        if (_phantomCamera == null)
         {
-            GD.PushWarning("MovementComponent: 未找到相机，将使用角色本地坐标系移动。");
+            GD.PushWarning("MovementComponent: 未找到 PhantomCamera3D，将使用角色本地坐标系移动。");
         }
         else
         {
-            GD.Print("MovementComponent: 相机已连接 ✓");
+            GD.Print("MovementComponent: PhantomCamera3D 已连接 ✓");
         }
     }
     
@@ -147,17 +147,30 @@ public partial class MovementComponent : Node
         // 3. 处理水平移动
         Vector3 direction;
         
-        if (Camera != null)
+        if (_phantomCamera != null)
         {
-            // 使用相机方向计算移动
-            Vector3 forward = Camera.GlobalTransform.Basis.Z;
-            Vector3 right = Camera.GlobalTransform.Basis.X;
+            // 使用 PhantomCamera 的全局变换计算移动方向
+            // 注意：Godot 中 -Z 是前方，X 是右方
+            // 修复：Input.GetVector 的 Y 轴是反的（forward 是负值，backward 是正值）
+            Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z;  // 使用 Z 而不是 -Z
+            Vector3 right = _phantomCamera.GlobalTransform.Basis.X;
             forward.Y = 0;
             right.Y = 0;
             forward = forward.Normalized();
             right = right.Normalized();
             
+            // 调试输出
+            if (_currentInputDirection != Vector2.Zero)
+            {
+                GD.Print($"[MovementComponent] Input: {_currentInputDirection}, Forward: {forward}, Right: {right}");
+            }
+            
             direction = (right * _currentInputDirection.X + forward * _currentInputDirection.Y).Normalized();
+            
+            if (_currentInputDirection != Vector2.Zero)
+            {
+                GD.Print($"[MovementComponent] Final Direction: {direction}");
+            }
         }
         else
         {

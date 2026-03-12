@@ -14,7 +14,7 @@ public partial class CameraControlComponent : Node
     /// <summary>
     /// 鼠标灵敏度
     /// </summary>
-    [Export] public float MouseSensitivity { get; set; } = 0.002f;
+    [Export] public float MouseSensitivity { get; set; } = 0.05f;
     
     /// <summary>
     /// PhantomCamera3D 节点路径
@@ -22,14 +22,24 @@ public partial class CameraControlComponent : Node
     [Export] public NodePath PCamPath { get; set; } = "PhantomCamera3D";
     
     /// <summary>
-    /// 上下视角限制（最小角度，弧度）
+    /// 最小 Pitch 角度（度数）
     /// </summary>
-    [Export] public float MinPitch { get; set; } = -Mathf.Pi / 3; // -60度
+    [Export] public float MinPitch { get; set; } = -89.9f;
     
     /// <summary>
-    /// 上下视角限制（最大角度，弧度）
+    /// 最大 Pitch 角度（度数）
     /// </summary>
-    [Export] public float MaxPitch { get; set; } = Mathf.Pi / 8; // 22.5度
+    [Export] public float MaxPitch { get; set; } = 50f;
+    
+    /// <summary>
+    /// 最小 Yaw 角度（度数）
+    /// </summary>
+    [Export] public float MinYaw { get; set; } = 0f;
+    
+    /// <summary>
+    /// 最大 Yaw 角度（度数）
+    /// </summary>
+    [Export] public float MaxYaw { get; set; } = 360f;
     
     #endregion
 
@@ -45,7 +55,7 @@ public partial class CameraControlComponent : Node
     {
         InitializeComponent();
         
-        // 先捕获鼠标（确保即使初始化失败也能捕获）
+        // 先捕获鼠标
         Input.MouseMode = Input.MouseModeEnum.Captured;
         
         // 初始化 PhantomCamera3D 引用
@@ -53,7 +63,7 @@ public partial class CameraControlComponent : Node
         if (pcamNode == null)
         {
             GD.PushError($"CameraControlComponent: PhantomCamera3D 节点未找到 (路径: {PCamPath})");
-            GD.PushError("请在 Player3D 场景中添加 PhantomCamera3D 节点，或检查 PCamPath 设置");
+            GD.PushError("请确保 Player3D 场景中有 PhantomCamera3D 节点");
             return;
         }
         
@@ -87,20 +97,23 @@ public partial class CameraControlComponent : Node
         // 处理鼠标移动
         if (@event is InputEventMouseMotion mouseMotion && Input.MouseMode == Input.MouseModeEnum.Captured)
         {
-            // 读取当前第三人称欧拉角
-            Vector3 currentRot = _pCam.GetThirdPersonRotation();
+            // 读取当前第三人称欧拉角（度数）
+            Vector3 pcamRotationDegrees = _pCam.GetThirdPersonRotationDegrees();
             
-            // 修改左右旋转（Yaw）
-            currentRot.Y -= mouseMotion.Relative.X * MouseSensitivity;
-            
-            // 修改上下旋转（Pitch）
-            currentRot.X += mouseMotion.Relative.Y * MouseSensitivity;
+            // 修改 X 轴旋转（Pitch - 上下）
+            pcamRotationDegrees.X -= mouseMotion.Relative.Y * MouseSensitivity;
             
             // 限制上下视角范围
-            currentRot.X = Mathf.Clamp(currentRot.X, MinPitch, MaxPitch);
+            pcamRotationDegrees.X = Mathf.Clamp(pcamRotationDegrees.X, MinPitch, MaxPitch);
+            
+            // 修改 Y 轴旋转（Yaw - 左右）
+            pcamRotationDegrees.Y -= mouseMotion.Relative.X * MouseSensitivity;
+            
+            // 循环 Yaw 角度（0-360度）
+            pcamRotationDegrees.Y = Mathf.Wrap(pcamRotationDegrees.Y, MinYaw, MaxYaw);
             
             // 应用新的旋转角度
-            _pCam.SetThirdPersonRotation(currentRot);
+            _pCam.SetThirdPersonRotationDegrees(pcamRotationDegrees);
         }
         
         // ESC 释放鼠标
