@@ -46,16 +46,14 @@ shape = SubResource("CapsuleShape3D_gep6n")
 [node name="KunoSkin" parent="." unique_id=1098897115 instance=ExtResource("5_kuno")]
 
 [node name="PhantomCamera3D" type="Node3D" parent="." unique_id=1486773106 node_paths=PackedStringArray("follow_target")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 4)
 script = ExtResource("8_pcam")
 priority = 10
 follow_mode = 6
 follow_target = NodePath("..")
 tween_resource = SubResource("Resource_1slkm")
+follow_offset = Vector3(0, 0.6, 0)
 follow_distance = 4.0
 spring_length = 4.0
 shape = SubResource("SphereShape3D_pcam")
 margin = 0.5
-align_transform_with_view = Callable()
-align_position_with_view = Callable()
-align_rotation_with_view = Callable()
