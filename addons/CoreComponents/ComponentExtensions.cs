@@ -1,4 +1,5 @@
 using Godot;
+using GodotStateCharts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,6 +110,120 @@ public static class ComponentExtensions
         {
             input.OnJumpJustPressed -= onJump;
         }
+    }
+
+    #endregion
+
+    #region StateChart 扩展方法
+
+    /// <summary>
+    /// 获取节点下的 StateChart（自动查找并包装）
+    /// 使用示例：var stateChart = this.GetStateChart();
+    /// </summary>
+    /// <param name="node">父节点</param>
+    /// <returns>StateChart 包装类，未找到返回 null</returns>
+    public static StateChart GetStateChart(this Node node)
+    {
+        var stateChartNode = node.GetNodeOrNull("StateChart");
+        if (stateChartNode == null)
+        {
+            // 尝试在子节点中查找
+            stateChartNode = node.GetComponentInChildren<Node>();
+            if (stateChartNode == null || stateChartNode.GetScript().As<Script>()?.ResourcePath?.Contains("state_chart.gd") != true)
+            {
+                return null;
+            }
+        }
+
+        return StateChart.Of(stateChartNode);
+    }
+
+    /// <summary>
+    /// 快速发送状态机事件
+    /// 使用示例：this.SendStateEvent("jump_pressed");
+    /// </summary>
+    /// <param name="node">包含 StateChart 的节点</param>
+    /// <param name="eventName">事件名称</param>
+    public static void SendStateEvent(this Node node, string eventName)
+    {
+        var stateChart = node.GetStateChart();
+        if (stateChart == null)
+        {
+            GD.PushWarning($"SendStateEvent: StateChart not found in {node.Name}");
+            return;
+        }
+
+        stateChart.SendEvent(eventName);
+    }
+
+    /// <summary>
+    /// 连接到指定状态的进入/退出信号
+    /// 使用示例：this.ConnectToState("Movement", isActive => _canMove = isActive);
+    /// </summary>
+    /// <param name="node">包含 StateChart 的节点</param>
+    /// <param name="stateName">状态名称（使用 % 前缀表示唯一名称）</param>
+    /// <param name="callback">回调函数，参数为 true 表示进入，false 表示退出</param>
+    public static void ConnectToState(this Node node, string stateName, Action<bool> callback)
+    {
+        // 支持唯一名称语法
+        var stateNode = stateName.StartsWith("%") 
+            ? node.GetNodeOrNull(stateName) 
+            : node.GetNodeOrNull($"StateChart/{stateName}");
+
+        if (stateNode == null)
+        {
+            GD.PushWarning($"ConnectToState: State '{stateName}' not found in {node.Name}");
+            return;
+        }
+
+        var state = StateChartState.Of(stateNode);
+
+        // 连接进入和退出信号
+        state.Connect(StateChartState.SignalName.StateEntered, Callable.From(() => callback(true)));
+        state.Connect(StateChartState.SignalName.StateExited, Callable.From(() => callback(false)));
+
+        GD.Print($"✓ 已连接到状态 '{stateName}' 的进入/退出信号");
+    }
+
+    /// <summary>
+    /// 获取指定状态节点的包装类
+    /// 使用示例：var state = this.GetState("Movement");
+    /// </summary>
+    /// <param name="node">包含 StateChart 的节点</param>
+    /// <param name="stateName">状态名称</param>
+    /// <returns>StateChartState 包装类，未找到返回 null</returns>
+    public static StateChartState GetState(this Node node, string stateName)
+    {
+        var stateNode = stateName.StartsWith("%") 
+            ? node.GetNodeOrNull(stateName) 
+            : node.GetNodeOrNull($"StateChart/{stateName}");
+
+        if (stateNode == null)
+        {
+            GD.PushWarning($"GetState: State '{stateName}' not found in {node.Name}");
+            return null;
+        }
+
+        return StateChartState.Of(stateNode);
+    }
+
+    /// <summary>
+    /// 设置状态机表达式属性
+    /// 使用示例：this.SetStateProperty("player_health", 100);
+    /// </summary>
+    /// <param name="node">包含 StateChart 的节点</param>
+    /// <param name="propertyName">属性名称</param>
+    /// <param name="value">属性值</param>
+    public static void SetStateProperty(this Node node, string propertyName, Variant value)
+    {
+        var stateChart = node.GetStateChart();
+        if (stateChart == null)
+        {
+            GD.PushWarning($"SetStateProperty: StateChart not found in {node.Name}");
+            return;
+        }
+
+        stateChart.SetExpressionProperty(propertyName, value);
     }
 
     #endregion

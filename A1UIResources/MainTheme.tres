@@ -1,0 +1,6 @@
+[gd_resource type="Theme" format=3 uid="uid://celoixcxww22c"]
+
+[resource]
+Button/colors/font_color = Color(0.50421375, 0.9650244, 0.94735473, 1)
+Label/colors/font_color = Color(0.903132, 5.2173735e-05, 0.6734788, 1)
+Label/colors/font_outline_color = Color(0.69324, 0.23787549, 0.31092137, 1)

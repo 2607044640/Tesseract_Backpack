@@ -32,6 +32,10 @@ project/assembly_name="3dPractice"
 
 enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/alignment-tool/plugin.cfg", "res://addons/asset_placer/plugin.cfg", "res://addons/mixamo_animation_retargeter/plugin.cfg", "res://addons/phantom_camera/plugin.cfg")
 
+[gui]
+
+theme/custom="uid://celoixcxww22c"
+
 [input]
 
 jump={
@@ -108,4 +112,5 @@ common/physics_interpolation=true
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"

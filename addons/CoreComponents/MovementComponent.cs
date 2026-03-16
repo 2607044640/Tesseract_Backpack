@@ -1,11 +1,10 @@
 using Godot;
 using Godot.Composition;
-using R3;
 
 /// <summary>
 /// 移动组件 - 仅负责物理计算与位移
 /// 遵循单一职责原则：只处理移动，不处理输入或动画
-/// 使用 R3 响应式编程实现现代化数据流管理
+/// 依赖抽象的 BaseInputComponent，可复用于玩家和 AI
 /// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
@@ -39,38 +38,22 @@ public partial class MovementComponent : Node
 
     #endregion
 
-    #region Reactive Properties (响应式状态)
-
-    /// <summary>
-    /// 当前是否在移动（有水平速度）
-    /// </summary>
-    public ReactiveProperty<bool> IsMoving { get; } = new(false);
-
-    /// <summary>
-    /// 当前是否在地面上
-    /// </summary>
-    public ReactiveProperty<bool> IsGrounded { get; } = new(true);
-
-    /// <summary>
-    /// 当前速度向量
-    /// </summary>
-    public ReactiveProperty<Vector3> CurrentVelocity { get; } = new(Vector3.Zero);
-
-    #endregion
-
     #region Private State
 
-    // 当前移动方向（从输入流更新）
+    // 当前移动方向
     private Vector2 _currentInputDirection = Vector2.Zero;
 
-    // 输入组件引用
+    // 是否请求跳跃
+    private bool _jumpRequested = false;
+
+    // 是否允许移动（由状态机控制）
+    private bool _canMove = true;
+
+    // 输入组件引用（手动查找）
     private BaseInputComponent _inputComponent;
 
     // PhantomCamera3D 引用
     private Node3D _phantomCamera;
-    
-    // R3 订阅管理
-    private readonly CompositeDisposable _disposables = new();
 
     #endregion
 
@@ -98,40 +81,24 @@ public partial class MovementComponent : Node
 
     /// <summary>
     /// Entity 初始化完成后自动调用
-    /// 在这里订阅 R3 响应式流
+    /// 在这里订阅 InputComponent 的事件和 StateChart 状态
     /// </summary>
     public void OnEntityReady()
     {
-        // 查找输入组件（使用扩展方法）
-        _inputComponent = parent.GetRequiredComponentInChildren<BaseInputComponent>();
-        
-        if (_inputComponent == null)
+        // 使用扩展方法：一行代码搞定查找和订阅！
+        _inputComponent = parent.FindAndSubscribeInput(
+            HandleMovementInput,
+            HandleJumpInput
+        );
+
+        // 【新增】连接到状态机的 "Movement" 状态
+        // 只有当状态机处于 Movement 状态时，才允许移动
+        // 这实现了"状态控制行为"的解耦模式
+        parent.ConnectToState("Movement", isActive =>
         {
-            GD.PushWarning("MovementComponent: 未找到 BaseInputComponent");
-            return;
-        }
-
-        // 订阅移动输入流
-        _inputComponent.MoveStream
-            .Subscribe(direction =>
-            {
-                _currentInputDirection = direction;
-            })
-            .AddTo(_disposables);
-
-        // 订阅跳跃输入流 - 直接处理跳跃逻辑
-        _inputComponent.JumpStream
-            .Where(_ => parent.IsOnFloor()) // 只在地面上时才能跳跃
-            .Subscribe(_ =>
-            {
-                var velocity = parent.Velocity;
-                velocity.Y = JumpVelocity;
-                parent.Velocity = velocity;
-                GD.Print("MovementComponent: 跳跃！");
-            })
-            .AddTo(_disposables);
-
-        GD.Print("MovementComponent: R3 响应式流已订阅 ✓");
+            _canMove = isActive;
+            GD.Print($"MovementComponent: Movement state {(isActive ? "ENABLED" : "DISABLED")}");
+        });
     }
 
     public override void _PhysicsProcess(double delta)
@@ -139,16 +106,30 @@ public partial class MovementComponent : Node
         ProcessPhysics(delta);
     }
 
-    protected override void Dispose(bool disposing)
+    public override void _ExitTree()
     {
-        if (disposing)
-        {
-            _disposables?.Dispose();
-            IsMoving?.Dispose();
-            IsGrounded?.Dispose();
-            CurrentVelocity?.Dispose();
-        }
-        base.Dispose(disposing);
+        // 使用扩展方法取消订阅
+        _inputComponent?.UnsubscribeInput(HandleMovementInput, HandleJumpInput);
+    }
+
+    #endregion
+
+    #region Event Handlers
+
+    /// <summary>
+    /// 处理移动输入
+    /// </summary>
+    private void HandleMovementInput(Vector2 inputDir)
+    {
+        _currentInputDirection = inputDir;
+    }
+
+    /// <summary>
+    /// 处理跳跃输入
+    /// </summary>
+    private void HandleJumpInput()
+    {
+        _jumpRequested = true;
     }
 
     #endregion
@@ -168,48 +149,65 @@ public partial class MovementComponent : Node
             velocity.Y -= Gravity * (float)delta;
         }
 
-        // 2. 处理水平移动
-        Vector3 direction;
-
-        if (_phantomCamera != null)
+        // 2. 处理跳跃
+        if (_jumpRequested && parent.IsOnFloor())
         {
-            // 使用 PhantomCamera 的全局变换计算移动方向
-            Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z;
-            Vector3 right = _phantomCamera.GlobalTransform.Basis.X;
-            forward.Y = 0;
-            right.Y = 0;
-            forward = forward.Normalized();
-            right = right.Normalized();
+            velocity.Y = JumpVelocity;
+            _jumpRequested = false;
+        }
+        else if (_jumpRequested && !parent.IsOnFloor())
+        {
+            _jumpRequested = false;
+        }
 
-            direction = (right * _currentInputDirection.X + forward * _currentInputDirection.Y).Normalized();
+        // 3. 处理水平移动（受状态机控制）
+        // 【关键改动】只有 _canMove 为 true 时才处理移动输入
+        if (_canMove)
+        {
+            Vector3 direction;
+
+            if (_phantomCamera != null)
+            {
+                // 使用 PhantomCamera 的全局变换计算移动方向
+                // 注意：Godot 中 -Z 是前方，X 是右方
+                // 修复：Input.GetVector 的 Y 轴是反的（forward 是负值，backward 是正值）
+                Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z; // 使用 Z 而不是 -Z
+                Vector3 right = _phantomCamera.GlobalTransform.Basis.X;
+                forward.Y = 0;
+                right.Y = 0;
+                forward = forward.Normalized();
+                right = right.Normalized();
+
+                direction = (right * _currentInputDirection.X + forward * _currentInputDirection.Y).Normalized();
+            }
+            else
+            {
+                // 没有相机时使用角色本地坐标系
+                direction = (parent.Transform.Basis * new Vector3(_currentInputDirection.X, 0, _currentInputDirection.Y))
+                    .Normalized();
+            }
+
+            if (direction != Vector3.Zero)
+            {
+                velocity.X = direction.X * Speed;
+                velocity.Z = direction.Z * Speed;
+            }
+            else
+            {
+                velocity.X = Mathf.MoveToward(velocity.X, 0, Speed);
+                velocity.Z = Mathf.MoveToward(velocity.Z, 0, Speed);
+            }
         }
         else
         {
-            // 没有相机时使用角色本地坐标系
-            direction = (parent.Transform.Basis * new Vector3(_currentInputDirection.X, 0, _currentInputDirection.Y))
-                .Normalized();
-        }
-
-        if (direction != Vector3.Zero)
-        {
-            velocity.X = direction.X * Speed;
-            velocity.Z = direction.Z * Speed;
-        }
-        else
-        {
+            // 状态机禁用移动时，快速停止
             velocity.X = Mathf.MoveToward(velocity.X, 0, Speed);
             velocity.Z = Mathf.MoveToward(velocity.Z, 0, Speed);
         }
 
-        // 3. 应用速度并移动
+        // 4. 应用速度并移动
         parent.Velocity = velocity;
         parent.MoveAndSlide();
-
-        // 4. 更新响应式状态（R3 会自动判断值是否改变）
-        Vector3 horizontalVelocity = new Vector3(velocity.X, 0, velocity.Z);
-        IsMoving.Value = horizontalVelocity.Length() > 0.1f;
-        IsGrounded.Value = parent.IsOnFloor();
-        CurrentVelocity.Value = velocity;
     }
 
     #endregion

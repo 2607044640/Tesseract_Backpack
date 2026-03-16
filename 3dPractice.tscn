@@ -8,7 +8,7 @@
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1751981658]
 physics_interpolation_mode = 1
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6539233, 1.1352715, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6539233, 1.7352716, 4)
 top_level = true
 
 [node name="PhantomCameraHost" type="Node" parent="Camera3D" unique_id=587082377]
