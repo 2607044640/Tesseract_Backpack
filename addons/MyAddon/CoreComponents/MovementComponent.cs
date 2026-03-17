@@ -46,9 +46,6 @@ public partial class MovementComponent : Node
     // 是否请求跳跃
     private bool _jumpRequested = false;
 
-    // 是否允许移动（由状态机控制）
-    private bool _canMove = true;
-
     // 输入组件引用（手动查找）
     private BaseInputComponent _inputComponent;
 
@@ -81,7 +78,7 @@ public partial class MovementComponent : Node
 
     /// <summary>
     /// Entity 初始化完成后自动调用
-    /// 在这里订阅 InputComponent 的事件和 StateChart 状态
+    /// 在这里订阅 InputComponent 的事件，并绑定到状态机
     /// </summary>
     public void OnEntityReady()
     {
@@ -91,14 +88,10 @@ public partial class MovementComponent : Node
             HandleJumpInput
         );
 
-        // 【新增】连接到状态机的 "Movement" 状态
-        // 只有当状态机处于 Movement 状态时，才允许移动
-        // 这实现了"状态控制行为"的解耦模式
-        parent.ConnectToState("Movement", isActive =>
-        {
-            _canMove = isActive;
-            GD.Print($"MovementComponent: Movement state {(isActive ? "ENABLED" : "DISABLED")}");
-        });
+        // 【核心】将组件生命周期绑定到状态机
+        // 只有当状态机进入 "Exploration" 状态时，此组件才会被唤醒
+        // 退出该状态时，组件自动休眠，无需任何内部判断！
+        this.BindComponentToState(parent, "StateChart/Root/GameFlow/Exploration");
     }
 
     public override void _PhysicsProcess(double delta)
@@ -138,6 +131,12 @@ public partial class MovementComponent : Node
 
     /// <summary>
     /// 物理帧处理
+    /// 
+    /// 【极致纯粹】此方法只包含纯粹的物理计算逻辑
+    /// 无需任何状态判断（if _canMove 等），因为：
+    /// - 组件默认休眠（SetPhysicsProcess(false)）
+    /// - 只有状态机激活对应状态时，此方法才会被调用
+    /// - 状态退出时，组件自动休眠，此方法停止调用
     /// </summary>
     private void ProcessPhysics(double delta)
     {
@@ -160,47 +159,35 @@ public partial class MovementComponent : Node
             _jumpRequested = false;
         }
 
-        // 3. 处理水平移动（受状态机控制）
-        // 【关键改动】只有 _canMove 为 true 时才处理移动输入
-        if (_canMove)
+        // 3. 处理水平移动（纯粹的物理计算，无状态判断）
+        Vector3 direction;
+
+        if (_phantomCamera != null)
         {
-            Vector3 direction;
+            // 使用 PhantomCamera 的全局变换计算移动方向
+            Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z;
+            Vector3 right = _phantomCamera.GlobalTransform.Basis.X;
+            forward.Y = 0;
+            right.Y = 0;
+            forward = forward.Normalized();
+            right = right.Normalized();
 
-            if (_phantomCamera != null)
-            {
-                // 使用 PhantomCamera 的全局变换计算移动方向
-                // 注意：Godot 中 -Z 是前方，X 是右方
-                // 修复：Input.GetVector 的 Y 轴是反的（forward 是负值，backward 是正值）
-                Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z; // 使用 Z 而不是 -Z
-                Vector3 right = _phantomCamera.GlobalTransform.Basis.X;
-                forward.Y = 0;
-                right.Y = 0;
-                forward = forward.Normalized();
-                right = right.Normalized();
-
-                direction = (right * _currentInputDirection.X + forward * _currentInputDirection.Y).Normalized();
-            }
-            else
-            {
-                // 没有相机时使用角色本地坐标系
-                direction = (parent.Transform.Basis * new Vector3(_currentInputDirection.X, 0, _currentInputDirection.Y))
-                    .Normalized();
-            }
-
-            if (direction != Vector3.Zero)
-            {
-                velocity.X = direction.X * Speed;
-                velocity.Z = direction.Z * Speed;
-            }
-            else
-            {
-                velocity.X = Mathf.MoveToward(velocity.X, 0, Speed);
-                velocity.Z = Mathf.MoveToward(velocity.Z, 0, Speed);
-            }
+            direction = (right * _currentInputDirection.X + forward * _currentInputDirection.Y).Normalized();
         }
         else
         {
-            // 状态机禁用移动时，快速停止
+            // 没有相机时使用角色本地坐标系
+            direction = (parent.Transform.Basis * new Vector3(_currentInputDirection.X, 0, _currentInputDirection.Y))
+                .Normalized();
+        }
+
+        if (direction != Vector3.Zero)
+        {
+            velocity.X = direction.X * Speed;
+            velocity.Z = direction.Z * Speed;
+        }
+        else
+        {
             velocity.X = Mathf.MoveToward(velocity.X, 0, Speed);
             velocity.Z = Mathf.MoveToward(velocity.Z, 0, Speed);
         }

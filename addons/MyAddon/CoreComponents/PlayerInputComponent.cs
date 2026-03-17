@@ -41,6 +41,14 @@ public partial class PlayerInputComponent : BaseInputComponent
             GD.Print("PlayerInputComponent: 跳跃按键按下！");
             TriggerJumpInput();
         }
+
+        // 【示例】按下 E 键触发状态转换（进入扫雷模式）
+        // 输入组件只管发送事件，不关心状态机如何处理
+        if (Input.IsActionJustPressed("interact"))
+        {
+            GetParent().SendStateEvent("start_minesweeper");
+            GD.Print("PlayerInputComponent: 发送状态事件 'start_minesweeper'");
+        }
     }
     
     #endregion

@@ -114,116 +114,82 @@ public static class ComponentExtensions
 
     #endregion
 
-    #region StateChart 扩展方法
+    #region StateChart 扩展方法 - 极致解耦
 
     /// <summary>
-    /// 获取节点下的 StateChart（自动查找并包装）
-    /// 使用示例：var stateChart = this.GetStateChart();
+    /// 核心方法1：发送状态事件（黑盒路由）
+    /// StateChart 对组件完全透明，组件只需要知道"发送事件"这个动作
     /// </summary>
-    /// <param name="node">父节点</param>
-    /// <returns>StateChart 包装类，未找到返回 null</returns>
-    public static StateChart GetStateChart(this Node node)
-    {
-        var stateChartNode = node.GetNodeOrNull("StateChart");
-        if (stateChartNode == null)
-        {
-            // 尝试在子节点中查找
-            stateChartNode = node.GetComponentInChildren<Node>();
-            if (stateChartNode == null || stateChartNode.GetScript().As<Script>()?.ResourcePath?.Contains("state_chart.gd") != true)
-            {
-                return null;
-            }
-        }
-
-        return StateChart.Of(stateChartNode);
-    }
-
-    /// <summary>
-    /// 快速发送状态机事件
-    /// 使用示例：this.SendStateEvent("jump_pressed");
-    /// </summary>
-    /// <param name="node">包含 StateChart 的节点</param>
+    /// <param name="node">实体节点（通常是 parent）</param>
     /// <param name="eventName">事件名称</param>
     public static void SendStateEvent(this Node node, string eventName)
     {
-        var stateChart = node.GetStateChart();
-        if (stateChart == null)
+        // 查找 StateChart 节点（假设在实体的子节点中）
+        var stateChartNode = node.GetNodeOrNull("StateChart");
+        if (stateChartNode == null)
         {
-            GD.PushWarning($"SendStateEvent: StateChart not found in {node.Name}");
+            GD.PushWarning($"[StateChart] StateChart not found in {node.Name}");
             return;
         }
 
+        // 使用 GodotStateCharts 插件的包装类
+        var stateChart = StateChart.Of(stateChartNode);
         stateChart.SendEvent(eventName);
     }
 
     /// <summary>
-    /// 连接到指定状态的进入/退出信号
-    /// 使用示例：this.ConnectToState("Movement", isActive => _canMove = isActive);
+    /// 核心方法2：电源开关！将组件的生命周期与特定状态强制绑定
+    /// 
+    /// 工作原理：
+    /// 1. 默认休眠组件（所有 Process 方法禁用）
+    /// 2. 状态进入时 → 通电唤醒（启用所有 Process 方法）
+    /// 3. 状态退出时 → 断电休眠（禁用所有 Process 方法）
+    /// 
+    /// 这样组件内部无需任何状态判断，纯粹执行逻辑！
     /// </summary>
-    /// <param name="node">包含 StateChart 的节点</param>
-    /// <param name="stateName">状态名称（使用 % 前缀表示唯一名称）</param>
-    /// <param name="callback">回调函数，参数为 true 表示进入，false 表示退出</param>
-    public static void ConnectToState(this Node node, string stateName, Action<bool> callback)
+    /// <param name="component">要绑定的组件（通常是 this）</param>
+    /// <param name="parentEntity">父实体节点（通常是 parent）</param>
+    /// <param name="stateNodePath">状态节点路径，例如 "StateChart/Root/GameFlow/Exploration"</param>
+    public static void BindComponentToState(this Node component, Node parentEntity, string stateNodePath)
     {
-        // 支持唯一名称语法
-        var stateNode = stateName.StartsWith("%") 
-            ? node.GetNodeOrNull(stateName) 
-            : node.GetNodeOrNull($"StateChart/{stateName}");
-
+        // 获取状态节点
+        var stateNode = parentEntity.GetNodeOrNull(stateNodePath);
         if (stateNode == null)
         {
-            GD.PushWarning($"ConnectToState: State '{stateName}' not found in {node.Name}");
+            GD.PushError($"[StateChart] 未找到状态节点: {stateNodePath} in {parentEntity.Name}");
             return;
         }
 
+        // 使用 GodotStateCharts 插件的包装类
         var state = StateChartState.Of(stateNode);
 
-        // 连接进入和退出信号
-        state.Connect(StateChartState.SignalName.StateEntered, Callable.From(() => callback(true)));
-        state.Connect(StateChartState.SignalName.StateExited, Callable.From(() => callback(false)));
+        // 【关键】默认休眠组件，等待状态机唤醒
+        component.SetProcess(false);
+        component.SetPhysicsProcess(false);
+        component.SetProcessInput(false);
+        component.SetProcessUnhandledInput(false);
 
-        GD.Print($"✓ 已连接到状态 '{stateName}' 的进入/退出信号");
-    }
+        GD.Print($"[StateChart] {component.Name} 已绑定到状态 '{stateNodePath}'（默认休眠）");
 
-    /// <summary>
-    /// 获取指定状态节点的包装类
-    /// 使用示例：var state = this.GetState("Movement");
-    /// </summary>
-    /// <param name="node">包含 StateChart 的节点</param>
-    /// <param name="stateName">状态名称</param>
-    /// <returns>StateChartState 包装类，未找到返回 null</returns>
-    public static StateChartState GetState(this Node node, string stateName)
-    {
-        var stateNode = stateName.StartsWith("%") 
-            ? node.GetNodeOrNull(stateName) 
-            : node.GetNodeOrNull($"StateChart/{stateName}");
-
-        if (stateNode == null)
+        // 状态进入：通电唤醒
+        state.Connect(StateChartState.SignalName.StateEntered, Callable.From(() =>
         {
-            GD.PushWarning($"GetState: State '{stateName}' not found in {node.Name}");
-            return null;
-        }
+            component.SetProcess(true);
+            component.SetPhysicsProcess(true);
+            component.SetProcessInput(true);
+            component.SetProcessUnhandledInput(true);
+            GD.Print($"[StateChart] ⚡ {component.Name} 已唤醒");
+        }));
 
-        return StateChartState.Of(stateNode);
-    }
-
-    /// <summary>
-    /// 设置状态机表达式属性
-    /// 使用示例：this.SetStateProperty("player_health", 100);
-    /// </summary>
-    /// <param name="node">包含 StateChart 的节点</param>
-    /// <param name="propertyName">属性名称</param>
-    /// <param name="value">属性值</param>
-    public static void SetStateProperty(this Node node, string propertyName, Variant value)
-    {
-        var stateChart = node.GetStateChart();
-        if (stateChart == null)
+        // 状态退出：断电休眠
+        state.Connect(StateChartState.SignalName.StateExited, Callable.From(() =>
         {
-            GD.PushWarning($"SetStateProperty: StateChart not found in {node.Name}");
-            return;
-        }
-
-        stateChart.SetExpressionProperty(propertyName, value);
+            component.SetProcess(false);
+            component.SetPhysicsProcess(false);
+            component.SetProcessInput(false);
+            component.SetProcessUnhandledInput(false);
+            GD.Print($"[StateChart] 💤 {component.Name} 已休眠");
+        }));
     }
 
     #endregion
