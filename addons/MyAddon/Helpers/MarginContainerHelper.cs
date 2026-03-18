@@ -5,7 +5,7 @@ using System;
 /// MarginContainer辅助脚本，简化margin参数调整
 /// 提供3种模式：统一、双轴、独立调整
 /// </summary>
-[Tool]
+[ Tool]
 [GlobalClass]
 public partial class MarginContainerHelper : MarginContainer
 {

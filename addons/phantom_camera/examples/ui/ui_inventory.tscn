@@ -3,7 +3,6 @@
 [ext_resource type="Texture2D" uid="uid://b7cs6me43ufh3" path="res://addons/phantom_camera/examples/textures/2D/inventory_container.png" id="1_pi2dp"]
 [ext_resource type="FontFile" uid="uid://c4mm3of2mc8o5" path="res://addons/phantom_camera/fonts/Nunito-Black.ttf" id="2_0rdcn"]
 [ext_resource type="StyleBox" uid="uid://bckj61d70tuqt" path="res://A1UIResources/ButtonNormal.tres" id="3_4x2kt"]
-[ext_resource type="Script" path="res://B1Scripts/MarginContainerHelper.cs" id="4_margin"]
 
 [node name="Control" type="Control" unique_id=1285555259]
 layout_mode = 3
@@ -57,20 +56,3 @@ offset_top = 29.0
 offset_right = 479.0
 offset_bottom = 181.0
 theme_override_styles/panel = ExtResource("3_4x2kt")
-
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=105299569]
-layout_mode = 0
-offset_left = 649.0
-offset_top = 9.0
-offset_right = 967.0
-offset_bottom = 209.0
-theme_override_constants/margin_left = 25
-theme_override_constants/margin_top = 25
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 25
-script = ExtResource("4_margin")
-UniformMargin = 25
-MarginTopValue = 45
-MarginRightValue = 44
-MarginBottomValue = 20
-MarginLeftValue = 25

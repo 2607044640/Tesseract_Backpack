@@ -34,6 +34,7 @@ enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/
 
 [gui]
 
+theme/default_font_multichannel_signed_distance_field=true
 theme/custom="uid://celoixcxww22c"
 
 [input]

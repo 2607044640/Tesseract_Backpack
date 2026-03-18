@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="CharacterAnimationConfig" format=3 uid="uid://cwx7kss3kbl0g"]
 
-[ext_resource type="Script" uid="uid://dippcs72jvnr2" path="res://addons/CoreComponents/Animation/CharacterAnimationConfig.cs" id="1_0veki"]
+[ext_resource type="Script" uid="uid://dippcs72jvnr2" path="res://addons/MyAddon/CoreComponents/Animation/CharacterAnimationConfig.cs" id="1_0veki"]
 [ext_resource type="Animation" uid="uid://brfiyip5l6f4j" path="res://Animations/AnimationRes/ninja_idle.res" id="1_mx5s2"]
-[ext_resource type="Script" uid="uid://b8quvaxkliga3" path="res://addons/CoreComponents/Animation/AnimationSet.cs" id="1_tkhp1"]
+[ext_resource type="Script" uid="uid://b8quvaxkliga3" path="res://addons/MyAddon/CoreComponents/Animation/AnimationSet.cs" id="1_tkhp1"]
 [ext_resource type="Animation" uid="uid://bo7rhbmaadjfa" path="res://Animations/AnimationRes/jump.res" id="2_x3irc"]
 [ext_resource type="Animation" uid="uid://chr3gceqbfbup" path="res://Animations/AnimationRes/fast_run.res" id="3_jgaf4"]
 

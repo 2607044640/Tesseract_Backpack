@@ -1,0 +1,9 @@
+[gd_resource type="Theme" format=3 uid="uid://hmuc0toe8wh0"]
+
+[resource]
+Button/colors/font_color = Color(0.50421375, 0.9650244, 0.94735473, 1)
+HBoxContainer/constants/separation = 7
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/colors/font_outline_color = Color(0.69324, 0.23787549, 0.31092137, 1)
+Label/colors/font_shadow_color = Color(1, 0.32410014, 0.25894427, 0)
+VBoxContainer/constants/separation = 20
