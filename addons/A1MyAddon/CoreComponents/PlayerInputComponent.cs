@@ -3,6 +3,11 @@ using Godot;
 /// <summary>
 /// 玩家输入组件 - 读取玩家键盘/手柄输入并通过事件向外广播
 /// 继承 BaseInputComponent，实现玩家特定的输入逻辑
+/// 
+/// 【架构原则 - 事件驱动】
+/// 1. 只负责读取输入并触发事件
+/// 2. 不判断当前状态（如是否在地面/飞行）
+/// 3. 所有状态判断由 StateChart 处理
 /// </summary>
 [GlobalClass]
 public partial class PlayerInputComponent : BaseInputComponent
@@ -35,19 +40,29 @@ public partial class PlayerInputComponent : BaseInputComponent
     {
         if (!InputEnabled) return;
         
-        // 跳跃输入
+        // 【事件驱动】跳跃/上升输入
+        // 不判断当前是地面还是飞行模式
+        // 地面模式：GroundMovementComponent 会处理跳跃
+        // 飞行模式：FlyMovementComponent 会处理上升
         if (Input.IsActionJustPressed("jump"))
         {
-            GD.Print("PlayerInputComponent: 跳跃按键按下！");
             TriggerJumpInput();
         }
 
-        // 【示例】按下 E 键触发状态转换（进入扫雷模式）
-        // 输入组件只管发送事件，不关心状态机如何处理
+        // 【事件驱动】切换飞行模式（F 键）
+        // 无脑发送 "toggle_fly" 事件给 StateChart
+        // StateChart 会根据当前状态决定是否切换
+        if (Input.IsActionJustPressed("toggle_fly"))
+        {
+            GetParent().SendStateEvent("toggle_fly");
+            GD.Print("PlayerInputComponent: 发送状态事件 'toggle_fly'");
+        }
+
+        // 【事件驱动】交互键（E 键）
         if (Input.IsActionJustPressed("interact"))
         {
-            GetParent().SendStateEvent("start_minesweeper");
-            GD.Print("PlayerInputComponent: 发送状态事件 'start_minesweeper'");
+            GetParent().SendStateEvent("interact");
+            GD.Print("PlayerInputComponent: 发送状态事件 'interact'");
         }
     }
     
