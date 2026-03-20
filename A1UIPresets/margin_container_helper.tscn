@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://1hsw62a1wapd"]
+
+[ext_resource type="Script" uid="uid://bk83ics8idr7w" path="res://addons/A1MyAddon/Helpers/MarginContainerHelper.cs" id="1_bon0b"]
+[ext_resource type="StyleBox" uid="uid://dbfc62yrw0q43" path="res://A1UIPresets/new_style_box_line.tres" id="2_1q62v"]
+
+[node name="MarginContainerHelper" type="MarginContainer" unique_id=1629534676]
+theme_override_constants/margin_left = 33
+theme_override_constants/margin_top = 33
+theme_override_constants/margin_right = 33
+theme_override_constants/margin_bottom = 33
+script = ExtResource("1_bon0b")
+UniformMargin = 33
+metadata/_custom_type_script = "uid://bk83ics8idr7w"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1223462232]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=43392036]
+layout_mode = 2
+text = "Setting"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer" unique_id=69406796]
+layout_mode = 2
+theme_override_constants/separation = 56
+theme_override_styles/separator = ExtResource("2_1q62v")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=598347793]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=677885237]
+custom_minimum_size = Vector2(410, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 41
+text = "text13243"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer/HBoxContainer" unique_id=1713224794]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 2.94
+value = 10.17
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=1872734433]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer2" unique_id=1960447821]
+custom_minimum_size = Vector2(410, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 41
+text = "text132"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer/HBoxContainer2" unique_id=1308880104]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 2.94
+value = 10.17
+
+[node name="Button" type="Button" parent="VBoxContainer" unique_id=2050653481]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "SeeMore
+"

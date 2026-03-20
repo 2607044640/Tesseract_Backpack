@@ -212,8 +212,8 @@ YourCharacter (CharacterBody3D)
 ├── CollisionShape3D
 ├── CharacterModel (Node3D)
 └── CameraPivot (Node3D)
-    └── SpringArm3D
-        └── Camera3D
+	└── SpringArm3D
+		└── Camera3D
 ```
 
 ### 2. 配置组件
@@ -246,23 +246,23 @@ YourCharacter (CharacterBody3D)
 [GlobalClass]
 public partial class HealthComponent : Node
 {
-    [Export] public float MaxHealth { get; set; } = 100f;
-    
-    public event Action OnDeath;
-    public event Action<float> OnHealthChanged;
-    
-    private float _currentHealth;
-    
-    public void TakeDamage(float amount)
-    {
-        _currentHealth -= amount;
-        OnHealthChanged?.Invoke(_currentHealth);
-        
-        if (_currentHealth <= 0)
-        {
-            OnDeath?.Invoke();
-        }
-    }
+	[Export] public float MaxHealth { get; set; } = 100f;
+	
+	public event Action OnDeath;
+	public event Action<float> OnHealthChanged;
+	
+	private float _currentHealth;
+	
+	public void TakeDamage(float amount)
+	{
+		_currentHealth -= amount;
+		OnHealthChanged?.Invoke(_currentHealth);
+		
+		if (_currentHealth <= 0)
+		{
+			OnDeath?.Invoke();
+		}
+	}
 }
 ```
 

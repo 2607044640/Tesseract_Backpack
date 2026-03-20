@@ -13,7 +13,6 @@ config_version=5
 config/name="3dPractice"
 run/main_scene="uid://duilxcd3om5ga"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
-config/icon="res://icon.svg"
 
 [autoload]
 
@@ -30,7 +29,16 @@ project/assembly_name="3dPractice"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/alignment-tool/plugin.cfg", "res://addons/asset_placer/plugin.cfg", "res://addons/mixamo_animation_retargeter/plugin.cfg", "res://addons/phantom_camera/plugin.cfg")
+enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/asset_placer/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg", "res://addons/mixamo_animation_retargeter/plugin.cfg", "res://addons/phantom_camera/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://A1UIPresets/": "blue",
+"res://A1UIResources/": "blue",
+"res://A1UIScenes/": "blue",
+"res://addons/A1MyAddon/": "blue"
+}
 
 [gui]
 

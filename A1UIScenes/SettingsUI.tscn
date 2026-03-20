@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cpurmg3xq1hd4"]
 
-[ext_resource type="Script" uid="uid://bk83ics8idr7w" path="res://addons/MyAddon/Helpers/MarginContainerHelper.cs" id="1_dsrpe"]
+[ext_resource type="Script" uid="uid://bk83ics8idr7w" path="res://addons/A1MyAddon/Helpers/MarginContainerHelper.cs" id="1_dsrpe"]
+[ext_resource type="StyleBox" uid="uid://dbfc62yrw0q43" path="res://A1UIPresets/new_style_box_line.tres" id="2_dsrpe"]
 
 [node name="Control" type="Control" unique_id=282656748]
 layout_mode = 3
@@ -58,10 +59,16 @@ layout_mode = 2
 text = "Setting"
 horizontal_alignment = 1
 
+[node name="HSeparator" type="HSeparator" parent="MarginContainerHelper/PanelContainer/MarginContainerHelper/VBoxContainer" unique_id=569965811]
+layout_mode = 2
+theme_override_constants/separation = 56
+theme_override_styles/separator = ExtResource("2_dsrpe")
+
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainerHelper/PanelContainer/MarginContainerHelper/VBoxContainer" unique_id=572368773]
 layout_mode = 2
 
 [node name="Label2" type="Label" parent="MarginContainerHelper/PanelContainer/MarginContainerHelper/VBoxContainer/HBoxContainer" unique_id=871086627]
+custom_minimum_size = Vector2(410, 0)
 layout_mode = 2
 size_flags_horizontal = 6
 theme_override_font_sizes/font_size = 41
@@ -79,10 +86,11 @@ value = 10.17
 layout_mode = 2
 
 [node name="Label2" type="Label" parent="MarginContainerHelper/PanelContainer/MarginContainerHelper/VBoxContainer/HBoxContainer2" unique_id=1413068703]
+custom_minimum_size = Vector2(410, 0)
 layout_mode = 2
 size_flags_horizontal = 6
 theme_override_font_sizes/font_size = 41
-text = "text13243"
+text = "text132"
 horizontal_alignment = 1
 
 [node name="ProgressBar" type="ProgressBar" parent="MarginContainerHelper/PanelContainer/MarginContainerHelper/VBoxContainer/HBoxContainer2" unique_id=1088605006]
@@ -92,3 +100,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 size_flags_stretch_ratio = 2.94
 value = 10.17
+
+[node name="Button" type="Button" parent="MarginContainerHelper/PanelContainer/MarginContainerHelper/VBoxContainer" unique_id=1217054756]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "SeeMore
+"

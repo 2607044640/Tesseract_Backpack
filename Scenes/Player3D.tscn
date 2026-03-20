@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://bykk4hu8cfy4"]
 
 [ext_resource type="Script" uid="uid://yhmx8fery0rh" path="res://B1Scripts/Player3D.cs" id="1_player"]
-[ext_resource type="Script" uid="uid://d3p4hcdw648ah" path="res://addons/CoreComponents/MovementComponent.cs" id="2_movement"]
-[ext_resource type="Script" uid="uid://rsqf1fe43hno" path="res://addons/CoreComponents/PlayerInputComponent.cs" id="3_input"]
-[ext_resource type="Script" uid="uid://7xt4lw7fgw6r" path="res://addons/CoreComponents/AnimationControllerComponent.cs" id="4_animation"]
+[ext_resource type="Script" uid="uid://d3p4hcdw648ah" path="res://addons/A1MyAddon/CoreComponents/MovementComponent.cs" id="2_movement"]
+[ext_resource type="Script" uid="uid://rsqf1fe43hno" path="res://addons/A1MyAddon/CoreComponents/PlayerInputComponent.cs" id="3_input"]
+[ext_resource type="Script" uid="uid://7xt4lw7fgw6r" path="res://addons/A1MyAddon/CoreComponents/AnimationControllerComponent.cs" id="4_animation"]
 [ext_resource type="PackedScene" uid="uid://djlw4y8gso2b3" path="res://Scenes/Kuno1.02/kuno_1_02.tscn" id="5_kuno"]
 [ext_resource type="Resource" uid="uid://cwx7kss3kbl0g" path="res://Animations/Player_CharacterAnimationConfig.tres" id="5_ykoex"]
-[ext_resource type="Script" uid="uid://cu08gpa84apih" path="res://addons/CoreComponents/CharacterRotationComponent.cs" id="6_rotation"]
-[ext_resource type="Script" uid="uid://u8l0r7f2nkdv" path="res://addons/CoreComponents/CameraControlComponent.cs" id="7_camera"]
+[ext_resource type="Script" uid="uid://cu08gpa84apih" path="res://addons/A1MyAddon/CoreComponents/CharacterRotationComponent.cs" id="6_rotation"]
+[ext_resource type="Script" uid="uid://u8l0r7f2nkdv" path="res://addons/A1MyAddon/CoreComponents/CameraControlComponent.cs" id="7_camera"]
 [ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="8_pcam"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="10_r8rhd"]
 
