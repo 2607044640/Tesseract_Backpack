@@ -12,6 +12,8 @@ using GodotStateCharts;
 /// </summary>
 public static class StateChartAutoBindExtensions
 {
+    #region 自动绑定方法
+
     /// <summary>
     /// 组件自动挂载：当组件作为 AtomicState 节点的直接子节点时，自动绑定生命周期
     /// 
@@ -68,6 +70,10 @@ public static class StateChartAutoBindExtensions
         }));
     }
 
+    #endregion
+
+    #region 实体查找方法
+
     /// <summary>
     /// 向上查找获取真实的实体控制器 (Player3D)
     /// 
@@ -102,4 +108,31 @@ public static class StateChartAutoBindExtensions
         GD.PushError($"[架构错误] {component.Name} 无法找到类型为 {typeof(T).Name} 的实体节点！");
         return null;
     }
+
+    #endregion
+
+    #region 状态事件方法
+
+    /// <summary>
+    /// 发送状态事件（黑盒路由）
+    /// StateChart 对组件完全透明，组件只需要知道"发送事件"这个动作
+    /// </summary>
+    /// <param name="node">实体节点</param>
+    /// <param name="eventName">事件名称</param>
+    public static void SendStateEvent(this Node node, string eventName)
+    {
+        // 查找 StateChart 节点（假设在实体的子节点中）
+        var stateChartNode = node.GetNodeOrNull("StateChart");
+        if (stateChartNode == null)
+        {
+            GD.PushWarning($"[StateChart] StateChart not found in {node.Name}");
+            return;
+        }
+
+        // 使用 GodotStateCharts 插件的包装类
+        var stateChart = StateChart.Of(stateChartNode);
+        stateChart.SendEvent(eventName);
+    }
+
+    #endregion
 }

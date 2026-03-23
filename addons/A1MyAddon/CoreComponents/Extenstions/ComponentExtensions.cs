@@ -1,5 +1,4 @@
 using Godot;
-using GodotStateCharts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +8,8 @@ using System.Linq;
 /// <summary>
 /// 组件查找扩展方法 - 简化组件依赖查找
 /// 提供类似 Unity 的 GetComponent API
+/// 
+/// 注意：StateChart 相关方法已移至 StateChartAutoBindExtensions.cs
 /// </summary>
 public static class ComponentExtensions
 {
@@ -110,86 +111,6 @@ public static class ComponentExtensions
         {
             input.OnJumpJustPressed -= onJump;
         }
-    }
-
-    #endregion
-
-    #region StateChart 扩展方法 - 极致解耦
-
-    /// <summary>
-    /// 核心方法1：发送状态事件（黑盒路由）
-    /// StateChart 对组件完全透明，组件只需要知道"发送事件"这个动作
-    /// </summary>
-    /// <param name="node">实体节点（通常是 parent）</param>
-    /// <param name="eventName">事件名称</param>
-    public static void SendStateEvent(this Node node, string eventName)
-    {
-        // 查找 StateChart 节点（假设在实体的子节点中）
-        var stateChartNode = node.GetNodeOrNull("StateChart");
-        if (stateChartNode == null)
-        {
-            GD.PushWarning($"[StateChart] StateChart not found in {node.Name}");
-            return;
-        }
-
-        // 使用 GodotStateCharts 插件的包装类
-        var stateChart = StateChart.Of(stateChartNode);
-        stateChart.SendEvent(eventName);
-    }
-
-    /// <summary>
-    /// 核心方法2：电源开关！将组件的生命周期与特定状态强制绑定
-    /// 
-    /// 工作原理：
-    /// 1. 默认休眠组件（所有 Process 方法禁用）
-    /// 2. 状态进入时 → 通电唤醒（启用所有 Process 方法）
-    /// 3. 状态退出时 → 断电休眠（禁用所有 Process 方法）
-    /// 
-    /// 这样组件内部无需任何状态判断，纯粹执行逻辑！
-    /// </summary>
-    /// <param name="component">要绑定的组件（通常是 this）</param>
-    /// <param name="parentEntity">父实体节点（通常是 parent）</param>
-    /// <param name="stateNodePath">状态节点路径，例如 "StateChart/Root/GameFlow/Exploration"</param>
-    public static void BindComponentToStateNode(this Node component, Node parentEntity, string stateNodePath)
-    {
-        // 获取状态节点
-        var stateNode = parentEntity.GetNodeOrNull(stateNodePath);
-        if (stateNode == null)
-        {
-            GD.PushError($"[StateChart] 未找到状态节点: {stateNodePath} in {parentEntity.Name}");
-            return;
-        }
-
-        // 使用 GodotStateCharts 插件的包装类
-        var state = StateChartState.Of(stateNode);
-
-        // 【关键】默认休眠组件，等待状态机唤醒
-        component.SetProcess(false);
-        component.SetPhysicsProcess(false);
-        component.SetProcessInput(false);
-        component.SetProcessUnhandledInput(false);
-
-        GD.Print($"[StateChart] {component.Name} 已绑定到状态 '{stateNodePath}'（默认休眠）");
-
-        // 状态进入：通电唤醒
-        state.Connect(StateChartState.SignalName.StateEntered, Callable.From(() =>
-        {
-            component.SetProcess(true);
-            component.SetPhysicsProcess(true);
-            component.SetProcessInput(true);
-            component.SetProcessUnhandledInput(true);
-            GD.Print($"[StateChart] ⚡ {component.Name} 已唤醒");
-        }));
-
-        // 状态退出：断电休眠
-        state.Connect(StateChartState.SignalName.StateExited, Callable.From(() =>
-        {
-            component.SetProcess(false);
-            component.SetPhysicsProcess(false);
-            component.SetProcessInput(false);
-            component.SetProcessUnhandledInput(false);
-            GD.Print($"[StateChart] 💤 {component.Name} 已休眠");
-        }));
     }
 
     #endregion

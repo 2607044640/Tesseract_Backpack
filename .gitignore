@@ -1,17 +1,20 @@
-# ===== Godot 4 C# 项目 - 只上传代码 =====
+# ===== Godot 4 C# 项目 - 纯代码与配置导向 =====
 
-# Godot 生成的文件夹
+# ===== Godot 生成的文件夹 =====
 .godot/
 .import/
 .mono/
 data_*/
+Export/
+Builds/
+build/
 
 # 导入文件（自动生成）
 *.import
 
 # ===== 资源文件（不上传） =====
 
-# 图片和纹理
+# 图片和纹理 (新增: svg, webp, ico)
 *.png
 *.jpg
 *.jpeg
@@ -20,6 +23,10 @@ data_*/
 *.dds
 *.exr
 *.hdr
+*.svg
+*.webp
+*.ico
+*.icns
 
 # 音频
 *.wav
@@ -54,12 +61,20 @@ data_*/
 # 着色器缓存
 *.spv
 
-# ===== C# 构建输出 =====
+# ===== 编译输出与底层库包 (强化) =====
+# C# 默认构建输出
 bin/
 obj/
-*.dll
 *.pdb
 *.mdb
+
+# 原生动态链接库 (针对 godot-jolt 等包含跨平台二进制的第三方插件)
+*.dll
+*.so
+*.dylib
+*.a
+*.framework/
+*.xcframework/
 
 # ===== IDE 文件 =====
 .vs/
@@ -77,7 +92,7 @@ Thumbs.db
 desktop.ini
 .nomedia
 
-# ===== 临时和备份文件 =====
+# ===== 临时、缓存和备份文件 (新增 Python 构建工具缓存) =====
 *.tmp
 *.temp
 *.log
@@ -85,24 +100,34 @@ desktop.ini
 *.bak
 *.backup
 *~
+__pycache__/
+*.pyc
 
 # ===== Godot 导出配置 =====
 export.cfg
 export_credentials.cfg
 export_presets.cfg
 
+# ===== 第三方插件过滤 (可选建议) =====
+# 如果你连第三方插件的源码都不想上传，可以在这里取消注释：
+# addons/phantom_camera/
+# addons/godot-jolt/
+# addons/godot_state_charts/
+
 # ===== 其他 =====
 *.translation
 mono_crash.*.json
 
-# ===== 保留的文件类型（会被上传） =====
-# .cs - C# 代码
-# .tscn - Godot 场景文件（文本格式）
-# .tres - Godot 资源文件（文本格式，如 AnimationSet）
-# .godot - 项目配置
-# .csproj - C# 项目文件
-# .sln - Visual Studio 解决方案文件
-# .md - 文档文件
-# .gitignore - Git 配置
-# .gitattributes - Git 属性
-# .editorconfig - 编辑器配置
+
+# =========================================================
+# ⚠️ 必定受 Git 追踪的文件类型声明（供参考，不要写排除规则）
+# =========================================================
+# .cs - C# 游戏逻辑代码
+# .gd - GDScript 代码 (插件和部分脚本用到)
+# .py - 你的外挂工具脚本 (如 ui_builder.py)
+# .tscn - Godot 场景文件（文本结构）
+# .tres - Godot 资源文件（如 AnimationSet、StyleBox）
+# .godot - 项目核心配置
+# .csproj / .sln - C# 工程文件
+# .md - 你的架构笔记与研究文档
+# .uid - Godot 4 的唯一标识符记录 (🚨极度重要，Git 必须追踪，但不需要发给 AI)

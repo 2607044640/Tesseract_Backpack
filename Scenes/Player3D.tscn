@@ -28,9 +28,6 @@ script = ExtResource("10_r8rhd")
 script = ExtResource("1_player")
 metadata/_edit_group_ = true
 
-[node name="FlyMovementComponent" type="Node" parent="." unique_id=658748862]
-script = ExtResource("2_fly_movement")
-
 [node name="PlayerInputComponent" type="Node" parent="." unique_id=851278383]
 script = ExtResource("3_input")
 
@@ -38,9 +35,6 @@ script = ExtResource("3_input")
 script = ExtResource("4_animation")
 AnimationBlendTime = 0.3
 AnimConfig = ExtResource("5_ykoex")
-
-[node name="GroundMovementComponent" type="Node" parent="." unique_id=658748861]
-script = ExtResource("2_ground_movement")
 
 [node name="CharacterRotationComponent" type="Node" parent="." unique_id=1956804117]
 script = ExtResource("6_rotation")
@@ -89,6 +83,9 @@ to = NodePath("../../FlyMode")
 event = &"toggle_fly"
 delay_in_seconds = "0.0"
 
+[node name="GroundMovementComponent" type="Node" parent="StateChart/Root/Movement/GroundMode" unique_id=658748861]
+script = ExtResource("2_ground_movement")
+
 [node name="FlyMode" type="Node" parent="StateChart/Root/Movement" unique_id=855162926]
 script = ExtResource("17_wvucv")
 
@@ -97,6 +94,9 @@ script = ExtResource("15_a8kom")
 to = NodePath("../../GroundMode")
 event = &"toggle_fly"
 delay_in_seconds = "0.0"
+
+[node name="FlyMovementComponent" type="Node" parent="StateChart/Root/Movement/FlyMode" unique_id=658748862]
+script = ExtResource("2_fly_movement")
 
 [node name="Action" type="Node" parent="StateChart/Root" unique_id=1156889959]
 script = ExtResource("14_payr2")
