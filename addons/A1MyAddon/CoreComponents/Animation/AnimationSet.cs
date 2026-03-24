@@ -9,7 +9,7 @@ public partial class AnimationSet : Resource
 {
     [Export] public new string SetName = "默认动画集"; // 支持日文
     
-    // 基础移动动画
+    [ExportGroup("基础移动动画")]
     [Export] public Animation IdleAnimation;
     [Export(PropertyHint.Range, "0.0,5.0,0.1")] public float IdleAnimationSpeed = 1.0f;
     
@@ -22,7 +22,7 @@ public partial class AnimationSet : Resource
     [Export] public Animation SprintAnimation;
     [Export(PropertyHint.Range, "0.0,5.0,0.1")] public float SprintAnimationSpeed = 1.0f;
     
-    // 跳跃和空中动画
+    [ExportGroup("跳跃和空中动画")]
     [Export] public Animation JumpStartAnimation;
     [Export(PropertyHint.Range, "0.0,5.0,0.1")] public float JumpStartAnimationSpeed = 1.0f;
     
@@ -35,7 +35,7 @@ public partial class AnimationSet : Resource
     [Export] public Animation LandAnimation;
     [Export(PropertyHint.Range, "0.0,5.0,0.1")] public float LandAnimationSpeed = 1.0f;
     
-    // 战斗动画
+    [ExportGroup("战斗动画")]
     [Export] public Animation Attack1Animation;
     [Export(PropertyHint.Range, "0.0,5.0,0.1")] public float Attack1AnimationSpeed = 1.0f;
     
@@ -45,7 +45,7 @@ public partial class AnimationSet : Resource
     [Export] public Animation Attack3Animation;
     [Export(PropertyHint.Range, "0.0,5.0,0.1")] public float Attack3AnimationSpeed = 1.0f;
     
-    // 其他动画
+    [ExportGroup("其他动画")]
     [Export] public Animation DodgeAnimation;
     [Export(PropertyHint.Range, "0.0,5.0,0.1")] public float DodgeAnimationSpeed = 1.0f;
     
