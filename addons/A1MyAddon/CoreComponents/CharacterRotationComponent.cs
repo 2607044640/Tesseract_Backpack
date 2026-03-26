@@ -75,8 +75,13 @@ public partial class CharacterRotationComponent : Node
     /// </summary>
     public void OnEntityReady()
     {
-        // 使用扩展方法：一行代码搞定！
-        _inputComponent = parent.FindAndSubscribeInput(HandleMovementInput);
+        // 直接获取InputComponent并订阅事件
+        _inputComponent = parent.GetRequiredComponentInChildren<BaseInputComponent>();
+        if (_inputComponent != null)
+        {
+            _inputComponent.OnMovementInput += HandleMovementInput;
+            GD.Print($"✓ CharacterRotationComponent 已订阅 {_inputComponent.GetType().Name} 事件");
+        }
     }
 
     public override void _Process(double delta)
@@ -86,8 +91,10 @@ public partial class CharacterRotationComponent : Node
 
     public override void _ExitTree()
     {
-        // 使用扩展方法取消订阅
-        _inputComponent?.UnsubscribeInput(HandleMovementInput);
+        if (_inputComponent != null)
+        {
+            _inputComponent.OnMovementInput -= HandleMovementInput;
+        }
     }
 
     #endregion

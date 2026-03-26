@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dpf5ovda3xlpv"]
+
+[ext_resource type="Script" uid="uid://bi3yf7y5ir5ws" path="res://addons/A1MyAddon/Helpers/ToggleComponentHelper.cs" id="1_script"]
+
+[node name="ToggleRow_HBoxContainer" type="HBoxContainer" unique_id=488235962]
+theme_override_constants/separation = 20
+script = ExtResource("1_script")
+LabelText = "开关名称:"
+
+[node name="ToggleLabel_Label" type="Label" parent="." unique_id=57531058]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "开关名称:"
+
+[node name="ToggleCheckbox_CheckBox" type="CheckBox" parent="." unique_id=1940819922]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResetButton_Button" type="Button" parent="." unique_id=423575320]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "重置"

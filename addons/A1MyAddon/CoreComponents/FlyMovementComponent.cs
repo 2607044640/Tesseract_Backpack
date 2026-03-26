@@ -43,9 +43,6 @@ public partial class FlyMovementComponent : Node
             return;
         }
 
-        // 注意：不调用 InitializeComponent()，因为父节点不是实体
-        // InitializeComponent();
-        
         _phantomCamera = _entity.GetNodeOrNull<Node3D>(PhantomCameraPath);
         
         if (_phantomCamera == null)
@@ -53,20 +50,19 @@ public partial class FlyMovementComponent : Node
             GD.PushWarning("FlyMovementComponent: PhantomCamera not found");
         }
         
-        // 订阅输入事件（直接在这里订阅，不等待OnEntityReady）
-        _inputComponent = _entity.FindAndSubscribeInput(
-            HandleMovementInput,
-            null // 飞行模式下跳跃键用于上升，不需要单独的跳跃处理
-        );
+        // 直接获取InputComponent并订阅事件
+        _inputComponent = _entity.GetRequiredComponentInChildren<BaseInputComponent>();
+        if (_inputComponent != null)
+        {
+            _inputComponent.OnMovementInput += HandleMovementInput;
+            GD.Print($"✓ FlyMovementComponent 已订阅 {_inputComponent.GetType().Name} 事件");
+        }
         
         // 【Power Switch】自动绑定到父状态节点
         this.AutoBindToParentState();
         
         GD.Print("FlyMovementComponent: 已完成初始化");
     }
-
-    // 不再需要 OnEntityReady，因为不使用 Composition 框架
-    // public void OnEntityReady() { }
 
     public override void _Process(double delta)
     {
@@ -84,7 +80,10 @@ public partial class FlyMovementComponent : Node
 
     public override void _ExitTree()
     {
-        _inputComponent?.UnsubscribeInput(HandleMovementInput, null);
+        if (_inputComponent != null)
+        {
+            _inputComponent.OnMovementInput -= HandleMovementInput;
+        }
     }
 
     #endregion

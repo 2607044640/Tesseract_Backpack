@@ -42,9 +42,6 @@ public partial class GroundMovementComponent : Node
             return;
         }
 
-        // 注意：不调用 InitializeComponent()，因为父节点不是实体
-        // InitializeComponent();
-        
         _phantomCamera = _entity.GetNodeOrNull<Node3D>(PhantomCameraPath);
         
         if (_phantomCamera == null)
@@ -52,20 +49,20 @@ public partial class GroundMovementComponent : Node
             GD.PushWarning("GroundMovementComponent: PhantomCamera not found");
         }
         
-        // 订阅输入事件（直接在这里订阅，不等待OnEntityReady）
-        _inputComponent = _entity.FindAndSubscribeInput(
-            HandleMovementInput,
-            HandleJumpInput
-        );
+        // 直接获取InputComponent并订阅事件
+        _inputComponent = _entity.GetRequiredComponentInChildren<BaseInputComponent>();
+        if (_inputComponent != null)
+        {
+            _inputComponent.OnMovementInput += HandleMovementInput;
+            _inputComponent.OnJumpJustPressed += HandleJumpInput;
+            GD.Print($"✓ GroundMovementComponent 已订阅 {_inputComponent.GetType().Name} 事件");
+        }
         
         // 【Power Switch】自动绑定到父状态节点
         this.AutoBindToParentState();
         
         GD.Print("GroundMovementComponent: 已完成初始化");
     }
-
-    // 不再需要 OnEntityReady，因为不使用 Composition 框架
-    // public void OnEntityReady() { }
 
     public override void _PhysicsProcess(double delta)
     {
@@ -76,7 +73,11 @@ public partial class GroundMovementComponent : Node
 
     public override void _ExitTree()
     {
-        _inputComponent?.UnsubscribeInput(HandleMovementInput, HandleJumpInput);
+        if (_inputComponent != null)
+        {
+            _inputComponent.OnMovementInput -= HandleMovementInput;
+            _inputComponent.OnJumpJustPressed -= HandleJumpInput;
+        }
     }
 
     #endregion

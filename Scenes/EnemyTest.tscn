@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://test_enemy_scene"]
+
+[ext_resource type="PackedScene" uid="uid://c9hm9l88349gk2" path="res://Scenes/Enemy.tscn" id="1"]
+[ext_resource type="Script" path="res://B1Scripts/EnemyTestScene.cs" id="2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_enemy"]
+size = Vector3(1, 1, 1)
+
+[node name="EnemyTestScene" type="Node3D"]
+script = ExtResource("2")
+
+[node name="Enemy" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Enemy"]
+mesh = SubResource("BoxMesh_enemy")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 5, 10)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 5, 0)
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)

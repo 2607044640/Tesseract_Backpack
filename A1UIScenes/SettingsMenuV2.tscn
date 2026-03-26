@@ -1,0 +1,153 @@
+[gd_scene format=3 uid="uid://d2k8m5n7qaq3r"]
+
+[ext_resource type="PackedScene" uid="uid://dbaix0lcy10v2" path="res://A1UIScenes/UIComponents/SliderComponent.tscn" id="1_scene"]
+[ext_resource type="PackedScene" uid="uid://dpf5ovda3xlpv" path="res://A1UIScenes/UIComponents/ToggleComponent.tscn" id="2_scene"]
+[ext_resource type="PackedScene" uid="uid://5b9ifgnj5kmv5d" path="res://A1UIScenes/UIComponents/DropdownComponent.tscn" id="3_scene"]
+
+[node name="SettingsMenuV2_Control" type="Control" unique_id=480540166]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background_ColorRect" type="ColorRect" parent="." unique_id=1633307466]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.12, 0.12, 1)
+
+[node name="MainMargin_MarginContainer" type="MarginContainer" parent="." unique_id=179320186]
+layout_mode = 1
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVBox_VBoxContainer" type="VBoxContainer" parent="MainMargin_MarginContainer" unique_id=1960884345]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Tabs_TabContainer" type="TabContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=1140248651]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Audio" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer" unique_id=1614754775]
+layout_mode = 2
+
+[node name="AudioMargin_MarginContainer" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Audio" unique_id=728397224]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="AudioContent_VBoxContainer" type="VBoxContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Audio/AudioMargin_MarginContainer" unique_id=458960135]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="MasterVolume" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Audio/AudioMargin_MarginContainer/AudioContent_VBoxContainer" instance=ExtResource("1_scene")]
+
+[node name="MusicVolume" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Audio/AudioMargin_MarginContainer/AudioContent_VBoxContainer" instance=ExtResource("1_scene")]
+
+[node name="EffectsVolume" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Audio/AudioMargin_MarginContainer/AudioContent_VBoxContainer" instance=ExtResource("1_scene")]
+
+[node name="AudioToggle" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Audio/AudioMargin_MarginContainer/AudioContent_VBoxContainer" instance=ExtResource("2_scene")]
+
+[node name="Video" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer" unique_id=1215484890]
+layout_mode = 2
+
+[node name="VideoMargin_MarginContainer" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video" unique_id=1992760177]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VideoContent_VBoxContainer" type="VBoxContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer" unique_id=1859303228]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="DisplayMode" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer/VideoContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="WindowResolution" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer/VideoContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="WindowZoom" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer/VideoContent_VBoxContainer" instance=ExtResource("1_scene")]
+
+[node name="VSync" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer/VideoContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="FPSLimit" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer/VideoContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="FPSCount" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer/VideoContent_VBoxContainer" instance=ExtResource("2_scene")]
+
+[node name="AntiAlias" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Video/VideoMargin_MarginContainer/VideoContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="Controls" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer" unique_id=1316602222]
+layout_mode = 2
+
+[node name="ControlsMargin_MarginContainer" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Controls" unique_id=86357946]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="ControlsContent_VBoxContainer" type="VBoxContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Controls/ControlsMargin_MarginContainer" unique_id=1177901093]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Placeholder_Label" type="Label" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Controls/ControlsMargin_MarginContainer/ControlsContent_VBoxContainer" unique_id=68421123]
+layout_mode = 2
+text = "Input mapping coming soon..."
+horizontal_alignment = 1
+
+[node name="Game" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer" unique_id=253528626]
+layout_mode = 2
+
+[node name="GameMargin_MarginContainer" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game" unique_id=95397958]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="GameContent_VBoxContainer" type="VBoxContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer" unique_id=456127390]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="AutoSave" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" instance=ExtResource("2_scene")]
+
+[node name="NumberFormat" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="Language" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="GameMode" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" instance=ExtResource("3_scene")]
+
+[node name="ButtonsMargin_MarginContainer" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=184188394]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 20
+
+[node name="Buttons_HBoxContainer" type="HBoxContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/ButtonsMargin_MarginContainer" unique_id=915380437]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="BackButton_Button" type="Button" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/ButtonsMargin_MarginContainer/Buttons_HBoxContainer" unique_id=100357864]
+layout_mode = 2
+text = "Back"
+size_flags_horizontal = 4
+
+[node name="ResetButton_Button" type="Button" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/ButtonsMargin_MarginContainer/Buttons_HBoxContainer" unique_id=858549782]
+layout_mode = 2
+text = "Reset"
+size_flags_horizontal = 4

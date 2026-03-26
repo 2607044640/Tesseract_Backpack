@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://ddxph7didmq"]
+
+[ext_resource type="Script" path="res://addons/A1MyAddon/Helpers/OptionComponentHelper.cs" id="1_script"]
+
+[node name="OptionRow_HBoxContainer" type="HBoxContainer" unique_id=773993998]
+layout_mode = 2
+theme_override_constants/separation = 20
+script = ExtResource("1_script")
+LabelText = "选项名称:"
+Options = PackedStringArray("选项1", "选项2", "选项3")
+DefaultIndex = 0
+
+[node name="OptionLabel_Label" type="Label" parent="." unique_id=1808165897]
+layout_mode = 2
+text = "选项名称:"
+horizontal_alignment = 0
+custom_minimum_size = Vector2(150, 0)
+size_flags_horizontal = 0
+
+[node name="OptionDropdown_Button" type="Button" parent="." unique_id=518067120]
+layout_mode = 2
+text = "选项值"
+size_flags_horizontal = 3
+
+[node name="ResetButton_Button" type="Button" parent="." unique_id=146113094]
+layout_mode = 2
+text = "重置"
+size_flags_horizontal = 4

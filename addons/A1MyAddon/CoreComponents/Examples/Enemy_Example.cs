@@ -23,7 +23,7 @@ using System;
 /// - HealthComponent - 处理生命值
 /// </summary>
 [Entity]
-public partial class Enemy : CharacterBody3D
+public partial class EnemyExample : CharacterBody3D
 {
     public override void _Ready()
     {

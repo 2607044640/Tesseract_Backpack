@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://2pbqck4qq6j"]
+
+[ext_resource type="Script" uid="uid://bk83ics8idr7w" path="res://addons/A1MyAddon/Helpers/MarginContainerHelper.cs" id="1_dsrpe"]
+[ext_resource type="PackedScene" uid="uid://ddxph7didmq" path="res://A1UIScenes/UIComponents/OptionComponent.tscn" id="2_scene"]
+[ext_resource type="PackedScene" uid="uid://dbaix0lcy10v2" path="res://A1UIScenes/UIComponents/SliderComponent.tscn" id="3_scene"]
+[ext_resource type="PackedScene" uid="uid://dpf5ovda3xlpv" path="res://A1UIScenes/UIComponents/ToggleComponent.tscn" id="4_scene"]
+
+[node name="Control_Control" type="Control" unique_id=1709722179]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background_ColorRect" type="ColorRect" parent="." unique_id=339328277]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.15, 0.15, 1)
+
+[node name="MainMargin_MarginContainer" type="MarginContainer" parent="." unique_id=1657948716]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+script = ExtResource("1_dsrpe")
+UniformMargin = 30
+VerticalMargin = 70
+HorizontalMargin = 128
+metadata/_custom_type_script = "uid://bk83ics8idr7w"
+
+[node name="MainPanel_PanelContainer" type="PanelContainer" parent="MainMargin_MarginContainer" unique_id=2121163695]
+layout_mode = 2
+
+[node name="InnerMargin_MarginContainer" type="MarginContainer" parent="MainMargin_MarginContainer/MainPanel_PanelContainer" unique_id=1256782134]
+layout_mode = 2
+theme_override_constants/margin_left = 33
+theme_override_constants/margin_top = 33
+theme_override_constants/margin_right = 33
+theme_override_constants/margin_bottom = 33
+script = ExtResource("1_dsrpe")
+UniformMargin = 33
+metadata/_custom_type_script = "uid://bk83ics8idr7w"
+
+[node name="MainVBox_VBoxContainer" type="VBoxContainer" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer" unique_id=619555486]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title_Label" type="Label" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=146982378]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "游戏设置"
+horizontal_alignment = 1
+
+[node name="TitleSep_HSeparator" type="HSeparator" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=1937363743]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="ResolutionOption" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=806370132 instance=ExtResource("2_scene")]
+Options = PackedStringArray("选项3", "选项2", "选1")
+
+[node name="MusicVolumeSlider" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=1564347109 instance=ExtResource("3_scene")]
+script = null
+
+[node name="SoundVolumeSlider" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=403378938 instance=ExtResource("3_scene")]
+script = null
+
+[node name="FullscreenToggle" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=980957342 instance=ExtResource("4_scene")]
+
+[node name="VSyncToggle" parent="MainMargin_MarginContainer/MainPanel_PanelContainer/InnerMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=649311586 instance=ExtResource("4_scene")]
+LabelText = "开启垂直同步"

@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://5b9ifgnj5kmv5d"]
+
+[node name="DropdownRow_HBoxContainer" type="HBoxContainer" unique_id=727518289]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="DropdownLabel_Label" type="Label" parent="." unique_id=628527096]
+layout_mode = 2
+text = "选项名称:"
+horizontal_alignment = 0
+custom_minimum_size = Vector2(150, 0)
+size_flags_horizontal = 0
+
+[node name="DisplayButton_Button" type="Button" parent="." unique_id=1671746343]
+layout_mode = 2
+text = "1920x1080:59"
+size_flags_horizontal = 3
+
+[node name="DropdownArrow_Button" type="Button" parent="." unique_id=2127979994]
+layout_mode = 2
+text = "▼"
+size_flags_horizontal = 4
+
+[node name="ResetButton_Button" type="Button" parent="." unique_id=11676281]
+layout_mode = 2
+text = "重置"
+size_flags_horizontal = 4
