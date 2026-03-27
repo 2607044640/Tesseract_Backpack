@@ -1,27 +1,31 @@
-[gd_scene format=3 uid="uid://5b9ifgnj5kmv5d"]
+[gd_scene format=3 uid="uid://0st2knyluaer"]
+
+[ext_resource type="Script" uid="uid://djd3xoidagqxf" path="res://addons/A1MyAddon/Helpers/DropdownComponentHelper.cs" id="1_script"]
 
 [node name="DropdownRow_HBoxContainer" type="HBoxContainer" unique_id=727518289]
-layout_mode = 2
 theme_override_constants/separation = 15
+script = ExtResource("1_script")
+LabelText = "选项名称:"
 
 [node name="DropdownLabel_Label" type="Label" parent="." unique_id=628527096]
-layout_mode = 2
-text = "选项名称:"
-horizontal_alignment = 0
 custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
 size_flags_horizontal = 0
+text = "选项名称:"
 
-[node name="DisplayButton_Button" type="Button" parent="." unique_id=1671746343]
+[node name="Dropdown_OptionButton" type="OptionButton" parent="." unique_id=1671746343]
 layout_mode = 2
-text = "1920x1080:59"
 size_flags_horizontal = 3
-
-[node name="DropdownArrow_Button" type="Button" parent="." unique_id=2127979994]
-layout_mode = 2
-text = "▼"
-size_flags_horizontal = 4
+selected = 0
+item_count = 3
+popup/item_0/text = "选项1"
+popup/item_0/id = 0
+popup/item_1/text = "选项2"
+popup/item_1/id = 1
+popup/item_2/text = "选项3"
+popup/item_2/id = 2
 
 [node name="ResetButton_Button" type="Button" parent="." unique_id=11676281]
 layout_mode = 2
-text = "重置"
 size_flags_horizontal = 4
+text = "↺"

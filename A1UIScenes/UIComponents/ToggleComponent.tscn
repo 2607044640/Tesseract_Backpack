@@ -19,5 +19,4 @@ size_flags_horizontal = 3
 
 [node name="ResetButton_Button" type="Button" parent="." unique_id=423575320]
 layout_mode = 2
-size_flags_horizontal = 4
-text = "重置"
+size_flags_horizontal = 6

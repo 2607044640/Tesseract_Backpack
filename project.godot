@@ -123,6 +123,7 @@ toggle_fly={
 
 [physics]
 
+2d/physics_engine="Rapier2D"
 3d/physics_engine="Jolt Physics"
 common/physics_interpolation=true
 
