@@ -181,7 +181,7 @@ LabelText = "Auto-save"
 
 [node name="NumberFormat" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" unique_id=601312172 instance=ExtResource("3_scene")]
 layout_mode = 2
-Items = PackedStringArray("选项2", "选项1", "选项3")
+Items = PackedStringArray("23", "43", "08293")
 LabelText = "Number Format"
 
 [node name="Language" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" unique_id=1361002897 instance=ExtResource("3_scene")]
@@ -190,7 +190,18 @@ LabelText = "Language"
 
 [node name="GameMode" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" unique_id=8274487 instance=ExtResource("3_scene")]
 layout_mode = 2
+Items = PackedStringArray("选项3", "4", "8")
 LabelText = "Game Mode"
+
+[node name="PlayerCount" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" unique_id=1992760178 instance=ExtResource("3_scene")]
+layout_mode = 2
+Items = PackedStringArray("1", "2", "3", "4")
+LabelText = "Player Count"
+
+[node name="PlayerWeapon" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer/Tabs_TabContainer/Game/GameMargin_MarginContainer/GameContent_VBoxContainer" unique_id=1992760179 instance=ExtResource("3_scene")]
+layout_mode = 2
+Items = PackedStringArray("1", "2", "3", "4")
+LabelText = "玩家武器"
 
 [node name="ButtonsMargin_MarginContainer" type="MarginContainer" parent="MainMargin_MarginContainer/MainVBox_VBoxContainer" unique_id=184188394]
 layout_mode = 2
