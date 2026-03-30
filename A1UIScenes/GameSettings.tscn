@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://clxfxcak8q1o3"]
 
+[ext_resource type="Theme" uid="uid://cxpkgwedjp8mn" path="res://A1UIResources/ThemeGen/generated/fantasy_rpg_theme.tres" id="1_khhwt"]
 [ext_resource type="PackedScene" uid="uid://0st2knyluaer" path="res://A1UIScenes/UIComponents/DropdownComponent.tscn" id="1_scene"]
 [ext_resource type="PackedScene" uid="uid://dpf5ovda3xlpv" path="res://A1UIScenes/UIComponents/ToggleComponent.tscn" id="2_scene"]
 [ext_resource type="PackedScene" uid="uid://dbaix0lcy10v2" path="res://A1UIScenes/UIComponents/SliderComponent.tscn" id="3_scene"]
@@ -11,6 +12,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_khhwt")
 
 [node name="BG_ColorRect" type="ColorRect" parent="." unique_id=29214765]
 layout_mode = 1

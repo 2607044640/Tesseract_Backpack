@@ -1,24 +1,21 @@
 # 生成所有主题
 
-由于需要在 Godot 编辑器中运行，请按照以下步骤操作：
+## 方法1: 批量生成（推荐）⚡
 
-## 方法1: 自动生成（推荐）
+**一键生成所有4个主题：**
 
-1. **确保插件已启用**
-   - 打开 Godot 编辑器
-   - Project → Project Settings → Plugins
-   - 确保 "ThemeGen Save Sync" 已勾选
+1. 在 Godot 编辑器中打开 `generate_all.gd`
+2. 按 `Ctrl+Shift+X` 运行
+3. 查看 Output 标签，所有主题会自动生成
 
-2. **打开并保存每个主题脚本**
-   - 在 Godot 中打开 `modern_game_theme.gd`
-   - 按 `Ctrl+S` 保存
-   - 主题会自动生成到 `generated/modern_game_theme.tres`
-   - 对其他3个主题重复此操作
+**就这么简单！**
 
-## 方法2: 手动运行
+## 方法2: 单独生成
 
-1. 在 Godot 编辑器中打开主题脚本
-2. 按 `Ctrl+Shift+X` 或选择 File → Run
+如果只想生成某个主题：
+
+1. 打开对应的主题脚本（如 `modern_game_theme.gd`）
+2. 按 `Ctrl+Shift+X` 运行
 3. 查看 Output 标签确认生成成功
 
 ## 主题文件列表
@@ -46,18 +43,18 @@
 extends EditorScript
 
 func _run():
-    var themes = [
-        "res://A1UIResources/ThemeGen/modern_game_theme.gd",
-        "res://A1UIResources/ThemeGen/light_minimal_theme.gd",
-        "res://A1UIResources/ThemeGen/dark_elegant_theme.gd",
+	var themes = [
+		"res://A1UIResources/ThemeGen/modern_game_theme.gd",
+		"res://A1UIResources/ThemeGen/light_minimal_theme.gd",
+		"res://A1UIResources/ThemeGen/dark_elegant_theme.gd",
         "res://A1UIResources/ThemeGen/fantasy_rpg_theme.gd"
-    ]
-    
-    for theme_path in themes:
-        var script = load(theme_path)
-        if script:
-            var instance = script.new()
-            print("Generating: ", theme_path)
+	]
+	
+	for theme_path in themes:
+		var script = load(theme_path)
+		if script:
+			var instance = script.new()
+			print("Generating: ", theme_path)
 ```
 
 保存为 `generate_all.gd` 并运行。

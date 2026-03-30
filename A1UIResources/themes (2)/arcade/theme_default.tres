@@ -1,7 +1,6 @@
 [gd_resource type="Theme" format=3 uid="uid://bo8hqd7sq8q2o"]
 
 [ext_resource type="Texture2D" uid="uid://dv8sampi4u6uh" path="res://A1UIResources/themes (2)/_assets/switch_off.svg" id="1"]
-[ext_resource type="FontFile" path="res://fonts/noto_sans_bold.ttf" id="1_rw73u"]
 [ext_resource type="Texture2D" uid="uid://bu66bo3dwxf4p" path="res://A1UIResources/themes (2)/_assets/radio_checked.svg" id="2"]
 [ext_resource type="Texture2D" uid="uid://dfyf0puvsu1n" path="res://A1UIResources/themes (2)/_assets/arrow_down.svg" id="3"]
 [ext_resource type="Texture2D" uid="uid://716wd0vu356u" path="res://A1UIResources/themes (2)/_assets/switch_on.svg" id="4"]
@@ -10,7 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://ccp3r5vxqtrpa" path="res://A1UIResources/themes (2)/_assets/radio.svg" id="7"]
 [ext_resource type="Texture2D" uid="uid://dk3l6amfakhtc" path="res://A1UIResources/themes (2)/_assets/switch_on_rtl.svg" id="7_vi0bh"]
 [ext_resource type="Texture2D" uid="uid://bamotmpa4emmq" path="res://A1UIResources/themes (2)/_assets/switch_off_rtl.svg" id="9_fqi5e"]
-[ext_resource type="StyleBox" path="res://themes/_resources/separator.tres" id="10"]
 [ext_resource type="Texture2D" uid="uid://tte1c0ua3ff8" path="res://A1UIResources/themes (2)/_assets/clear.svg" id="11"]
 [ext_resource type="StyleBox" uid="uid://c1qhj4r1owuip" path="res://A1UIResources/themes (2)/_resources/slider.tres" id="12"]
 [ext_resource type="Texture2D" uid="uid://bo6nssdxt8v1h" path="res://A1UIResources/themes (2)/_assets/slider_grabber.svg" id="13_nipit"]
@@ -19,9 +17,6 @@
 [ext_resource type="Texture2D" uid="uid://cns508de5gebq" path="res://A1UIResources/themes (2)/_assets/checkbox.svg" id="15"]
 [ext_resource type="StyleBox" uid="uid://dxrf8wya22jbr" path="res://A1UIResources/themes (2)/_resources/slider_grabber_area.tres" id="15_0p1qh"]
 [ext_resource type="StyleBox" uid="uid://clcm36y4pv0pm" path="res://A1UIResources/themes (2)/_resources/slider_grabber_area_highlight.tres" id="16_2h1mm"]
-[ext_resource type="FontFile" path="res://fonts/noto_sans_italic.ttf" id="18_hbm1c"]
-[ext_resource type="FontFile" path="res://fonts/noto_sans_regular.ttf" id="22_sojgt"]
-
 
 [sub_resource type="StyleBoxFlat" id="1"]
 content_margin_left = 8.0
@@ -383,7 +378,6 @@ content_margin_right = 16.0
 content_margin_bottom = 4.0
 
 [resource]
-default_font = ExtResource("22_sojgt")
 default_font_size = 32
 Button/colors/font_outline_color = Color(0.0588235, 0.0588235, 0.0588235, 0.490196)
 Button/constants/outline_size = 4
@@ -405,13 +399,13 @@ ButtonNegative/styles/hover = SubResource("10")
 ButtonNegative/styles/normal = SubResource("11")
 ButtonNegative/styles/pressed = SubResource("12")
 ButtonPositive/base_type = &"Button"
-ButtonPositive/fonts/font = ExtResource("1_rw73u")
+ButtonPositive/fonts/font = null
 ButtonPositive/styles/disabled = SubResource("13")
 ButtonPositive/styles/hover = SubResource("14")
 ButtonPositive/styles/normal = SubResource("15")
 ButtonPositive/styles/pressed = SubResource("16")
 ButtonPositiveHighlight/base_type = &"ButtonHighlight"
-ButtonPositiveHighlight/fonts/font = ExtResource("1_rw73u")
+ButtonPositiveHighlight/fonts/font = null
 CheckBox/icons/checked = ExtResource("14")
 CheckBox/icons/radio_checked = ExtResource("2")
 CheckBox/icons/radio_unchecked = ExtResource("7")
@@ -430,7 +424,7 @@ CheckButton/styles/pressed = SubResource("18")
 GridContainer/constants/h_separation = 8
 GridContainer/constants/v_separation = 8
 HBoxContainer/constants/separation = 8
-HSeparator/styles/separator = ExtResource("10")
+HSeparator/styles/separator = null
 HSlider/icons/grabber = ExtResource("13_nipit")
 HSlider/icons/grabber_highlight = ExtResource("14_cn3yt")
 HSlider/styles/grabber_area = ExtResource("15_0p1qh")
@@ -439,12 +433,12 @@ HSlider/styles/slider = ExtResource("12")
 Label/colors/font_outline_color = Color(0.0588235, 0.0588235, 0.0588235, 0.490196)
 Label/constants/outline_size = 4
 LabelBold/base_type = &"Label"
-LabelBold/fonts/font = ExtResource("1_rw73u")
+LabelBold/fonts/font = null
 LabelItalic/base_type = &"Label"
-LabelItalic/fonts/font = ExtResource("18_hbm1c")
+LabelItalic/fonts/font = null
 LabelTitle/base_type = &"Label"
 LabelTitle/font_sizes/font_size = 42
-LabelTitle/fonts/font = ExtResource("1_rw73u")
+LabelTitle/fonts/font = null
 LineEdit/icons/clear = ExtResource("11")
 LineEdit/styles/focus = SubResource("StyleBoxFlat_vbais")
 LineEdit/styles/normal = SubResource("23")
@@ -465,19 +459,19 @@ PopupMenu/styles/hover = SubResource("28")
 PopupMenu/styles/labeled_separator_left = SubResource("29")
 PopupMenu/styles/labeled_separator_right = SubResource("29")
 PopupMenu/styles/panel = SubResource("27")
-PopupMenu/styles/separator = ExtResource("10")
+PopupMenu/styles/separator = null
 PopupMenuPositive/base_type = &"PopupMenu"
 PopupMenuPositive/styles/hover = SubResource("31")
 PopupMenuPositive/styles/panel = SubResource("32")
 RichTextLabel/colors/font_outline_color = Color(0.0588235, 0.0588235, 0.0588235, 0.490196)
 RichTextLabel/constants/outline_size = 4
-RichTextLabel/fonts/bold_font = ExtResource("1_rw73u")
-RichTextLabel/fonts/italics_font = ExtResource("18_hbm1c")
+RichTextLabel/fonts/bold_font = null
+RichTextLabel/fonts/italics_font = null
 RichTextLabel/styles/focus = SubResource("StyleBoxFlat_vbais")
 ScrollContainer/styles/bg = SubResource("33")
 TabBar/colors/font_outline_color = Color(0.0588235, 0.0588235, 0.0588235, 0.490196)
 TabBar/constants/outline_size = 4
-TabBar/fonts/font = ExtResource("1_rw73u")
+TabBar/fonts/font = null
 TabBar/icons/decrement = ExtResource("5")
 TabBar/icons/decrement_highlight = ExtResource("5")
 TabBar/icons/increment = ExtResource("6")
@@ -487,7 +481,7 @@ TabBar/styles/tab_selected = SubResource("StyleBoxFlat_04b6k")
 TabBar/styles/tab_unselected = SubResource("StyleBoxFlat_5gkgp")
 TabContainer/colors/font_outline_color = Color(0.0588235, 0.0588235, 0.0588235, 0.490196)
 TabContainer/constants/outline_size = 4
-TabContainer/fonts/font = ExtResource("1_rw73u")
+TabContainer/fonts/font = null
 TabContainer/icons/decrement = ExtResource("5")
 TabContainer/icons/decrement_highlight = ExtResource("5")
 TabContainer/icons/increment = ExtResource("6")
@@ -501,4 +495,4 @@ VScrollBar/styles/grabber = SubResource("39")
 VScrollBar/styles/grabber_highlight = SubResource("40")
 VScrollBar/styles/grabber_pressed = SubResource("41")
 VScrollBar/styles/scroll = SubResource("42")
-VSeparator/styles/separator = ExtResource("10")
+VSeparator/styles/separator = null

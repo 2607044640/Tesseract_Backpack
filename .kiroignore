@@ -1,0 +1,24 @@
+# Kiro Ignore File - Godot Project
+
+# Godot engine cache and imports (CRITICAL - these cause indexing to hang)
+.godot/
+*.import
+
+# Version control
+.git/
+
+# Build outputs
+build/
+bin/
+obj/
+
+# IDE files
+.idea/
+*.csproj.user
+*.sln.DotSettings.user
+
+# Backup folders
+.backup_old_components/
+
+# NVIDIA cache
+NVIDIA Corporation/
