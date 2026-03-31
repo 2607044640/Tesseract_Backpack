@@ -1,6 +1,15 @@
 [gd_scene format=3 uid="uid://d0ciuelaep0l8"]
 
 [ext_resource type="Theme" uid="uid://c723peferwq7x" path="res://A1UIResources/ThemeGen/generated/modern_game_theme.tres" id="1_c4v0n"]
+[ext_resource type="PackedScene" uid="uid://jpprvv3moul0" path="res://A1UIScenes/UIComponents/ThemeSwitcherComponent.tscn" id="2_xautm"]
+[ext_resource type="Theme" uid="uid://bo8hqd7sq8q2o" path="res://A1UIResources/themes (2)/arcade/theme_default.tres" id="3_k7tyb"]
+[ext_resource type="Theme" uid="uid://jx5tg7b88pa0" path="res://A1UIResources/themes/gravity.tres" id="4_1uw8m"]
+[ext_resource type="Theme" uid="uid://dtnyhehwgxgwu" path="res://A1UIResources/themes/grow.tres" id="5_rwl28"]
+[ext_resource type="Theme" uid="uid://bhgiqje5djp63" path="res://A1UIResources/themes (2)/theme_lobby.tres" id="6_8pnwt"]
+[ext_resource type="Theme" uid="uid://d1svfjs6tmjkh" path="res://A1UIResources/themes/expedition.tres" id="7_4yoh2"]
+[ext_resource type="Theme" uid="uid://2p6glpubmhup" path="res://A1UIResources/themes/lab.tres" id="8_1wqg5"]
+[ext_resource type="Theme" uid="uid://dvw2fe07fhjwu" path="res://A1UIResources/themes/lore.tres" id="9_4fym7"]
+[ext_resource type="Theme" uid="uid://klqgh6jw46be" path="res://A1UIResources/themes/steal_this_theme.tres" id="10_edy2y"]
 
 [node name="ThemePreview" type="Control" unique_id=1263851772]
 layout_mode = 3
@@ -102,3 +111,7 @@ text = "使用方法:
 2. 在 Inspector 中设置 Theme 属性
 3. 加载 generated 文件夹中的主题文件
 4. 查看效果"
+
+[node name="ThemeSwitcherComponent" parent="." unique_id=78632023 instance=ExtResource("2_xautm")]
+layout_mode = 0
+Themes = [ExtResource("3_k7tyb"), ExtResource("4_1uw8m"), ExtResource("5_rwl28"), ExtResource("1_c4v0n"), ExtResource("6_8pnwt"), null, ExtResource("7_4yoh2"), ExtResource("8_1wqg5"), ExtResource("9_4fym7"), ExtResource("10_edy2y"), null]

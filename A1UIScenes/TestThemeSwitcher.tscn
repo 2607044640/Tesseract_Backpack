@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://twjqkjrvvdcn"]
+
+[ext_resource type="PackedScene" uid="uid://placeholder_theme_component" path="res://A1UIScenes/UIComponents/ThemeSwitcherComponent.tscn" id="1_theme_component"]
+
+[node name="Control_Control" type="Control" unique_id=660415216]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BG_ColorRect" type="ColorRect" parent="." unique_id=1923489698]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Margin_MarginContainer" type="MarginContainer" parent="." unique_id=777429779]
+layout_mode = 1
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content_VBoxContainer" type="VBoxContainer" parent="Margin_MarginContainer" unique_id=2028818957]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title_Label" type="Label" parent="Margin_MarginContainer/Content_VBoxContainer" unique_id=986197142]
+layout_mode = 2
+text = "Theme Switcher Test"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="ThemeSwitcher" parent="Margin_MarginContainer/Content_VBoxContainer" instance=ExtResource("1_theme_component")]
+layout_mode = 2
+
+[node name="SamplePanel_PanelContainer" type="PanelContainer" parent="Margin_MarginContainer/Content_VBoxContainer" unique_id=1794002609]
+layout_mode = 2
+
+[node name="Inner_MarginContainer" type="MarginContainer" parent="Margin_MarginContainer/Content_VBoxContainer/SamplePanel_PanelContainer" unique_id=1411222337]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="SampleContent_VBoxContainer" type="VBoxContainer" parent="Margin_MarginContainer/Content_VBoxContainer/SamplePanel_PanelContainer/Inner_MarginContainer" unique_id=902727145]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SampleLabel_Label" type="Label" parent="Margin_MarginContainer/Content_VBoxContainer/SamplePanel_PanelContainer/Inner_MarginContainer/SampleContent_VBoxContainer" unique_id=600667907]
+layout_mode = 2
+text = "Sample UI Elements"
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 24
+
+[node name="SampleButton1_Button" type="Button" parent="Margin_MarginContainer/Content_VBoxContainer/SamplePanel_PanelContainer/Inner_MarginContainer/SampleContent_VBoxContainer" unique_id=1467753882]
+layout_mode = 2
+text = "Button 1"
+
+[node name="SampleButton2_Button" type="Button" parent="Margin_MarginContainer/Content_VBoxContainer/SamplePanel_PanelContainer/Inner_MarginContainer/SampleContent_VBoxContainer" unique_id=1973537746]
+layout_mode = 2
+text = "Button 2"
+
+[node name="SampleCheck_CheckBox" type="CheckBox" parent="Margin_MarginContainer/Content_VBoxContainer/SamplePanel_PanelContainer/Inner_MarginContainer/SampleContent_VBoxContainer" unique_id=1962403259]
+layout_mode = 2
+text = "Checkbox"
