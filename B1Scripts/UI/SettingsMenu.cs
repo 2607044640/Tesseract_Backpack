@@ -1,8 +1,10 @@
 using Godot;
 using System;
+using R3;
 
 /// <summary>
 /// Settings menu controller that manages audio and video settings
+/// Refactored with R3 (Reactive Extensions) for automatic event disposal
 /// </summary>
 public partial class SettingsMenu : Control
 {
@@ -28,6 +30,9 @@ public partial class SettingsMenu : Control
 	private int _masterBusIdx;
 	private int _musicBusIdx;
 	private int _sfxBusIdx;
+	
+	// R3: Single disposal container for ALL subscriptions (replaces 50+ lines of manual unsubscribe)
+	private readonly CompositeDisposable _disposables = new();
 	
 	public override void _Ready()
 	{
@@ -59,61 +64,8 @@ public partial class SettingsMenu : Control
 		_musicBusIdx = AudioServer.GetBusIndex("Music");
 		_sfxBusIdx = AudioServer.GetBusIndex("SFX");
 		
-		// Subscribe to audio events
-		if (MasterVolume != null)
-		{
-			MasterVolume.ValueChanged += OnMasterVolumeChanged;
-			MasterVolume.ResetRequested += OnMasterVolumeReset;
-		}
-		
-		if (MusicVolume != null)
-		{
-			MusicVolume.ValueChanged += OnMusicVolumeChanged;
-			MusicVolume.ResetRequested += OnMusicVolumeReset;
-		}
-		
-		if (SFXVolume != null)
-		{
-			SFXVolume.ValueChanged += OnSFXVolumeChanged;
-			SFXVolume.ResetRequested += OnSFXVolumeReset;
-		}
-		
-		if (Mute != null)
-		{
-			Mute.Toggled += OnMuteToggled;
-			Mute.ResetRequested += OnMuteReset;
-		}
-		
-		// Subscribe to video events
-		if (Fullscreen != null)
-		{
-			Fullscreen.Toggled += OnFullscreenToggled;
-			Fullscreen.ResetRequested += OnFullscreenReset;
-		}
-		
-		if (Resolution != null)
-		{
-			Resolution.ItemSelected += OnResolutionSelected;
-			Resolution.ResetRequested += OnResolutionReset;
-		}
-		
-		if (AntiAliasing != null)
-		{
-			AntiAliasing.ItemSelected += OnAntiAliasingSelected;
-			AntiAliasing.ResetRequested += OnAntiAliasingReset;
-		}
-		
-		if (CameraShake != null)
-		{
-			CameraShake.ItemSelected += OnCameraShakeSelected;
-			CameraShake.ResetRequested += OnCameraShakeReset;
-		}
-		
-		// Subscribe to back button
-		if (BackButton != null)
-		{
-			BackButton.Pressed += OnBackPressed;
-		}
+		// R3: Subscribe to all events with automatic disposal
+		SubscribeToEvents();
 		
 		// Load current settings
 		LoadSettings();
@@ -121,211 +73,251 @@ public partial class SettingsMenu : Control
 	
 	public override void _ExitTree()
 	{
-		// Unsubscribe from audio events
+		// R3: ONE LINE replaces 50+ lines of manual unsubscribe - zero memory leak risk!
+		_disposables.Dispose();
+	}
+	
+	/// <summary>
+	/// Subscribe to all component events using R3 for automatic disposal
+	/// </summary>
+	private void SubscribeToEvents()
+	{
+		// === Audio Events ===
+		
 		if (MasterVolume != null)
 		{
-			MasterVolume.ValueChanged -= OnMasterVolumeChanged;
-			MasterVolume.ResetRequested -= OnMasterVolumeReset;
+			Observable.FromEvent<float>(
+				h => MasterVolume.ValueChanged += h,
+				h => MasterVolume.ValueChanged -= h
+			)
+			.Subscribe(value =>
+			{
+				float dbVolume = Mathf.LinearToDb(value / 100f);
+				AudioServer.SetBusVolumeDb(_masterBusIdx, dbVolume);
+				_settingsManager.SaveSettings();
+				GD.Print($"Master volume: {value}% ({dbVolume:F2} dB)");
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => MasterVolume.ResetRequested += h,
+				h => MasterVolume.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("Master volume reset requested"))
+			.AddTo(_disposables);
 		}
 		
 		if (MusicVolume != null)
 		{
-			MusicVolume.ValueChanged -= OnMusicVolumeChanged;
-			MusicVolume.ResetRequested -= OnMusicVolumeReset;
+			Observable.FromEvent<float>(
+				h => MusicVolume.ValueChanged += h,
+				h => MusicVolume.ValueChanged -= h
+			)
+			.Subscribe(value =>
+			{
+				float dbVolume = Mathf.LinearToDb(value / 100f);
+				AudioServer.SetBusVolumeDb(_musicBusIdx, dbVolume);
+				_settingsManager.SaveSettings();
+				GD.Print($"Music volume: {value}% ({dbVolume:F2} dB)");
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => MusicVolume.ResetRequested += h,
+				h => MusicVolume.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("Music volume reset requested"))
+			.AddTo(_disposables);
 		}
 		
 		if (SFXVolume != null)
 		{
-			SFXVolume.ValueChanged -= OnSFXVolumeChanged;
-			SFXVolume.ResetRequested -= OnSFXVolumeReset;
+			Observable.FromEvent<float>(
+				h => SFXVolume.ValueChanged += h,
+				h => SFXVolume.ValueChanged -= h
+			)
+			.Subscribe(value =>
+			{
+				float dbVolume = Mathf.LinearToDb(value / 100f);
+				AudioServer.SetBusVolumeDb(_sfxBusIdx, dbVolume);
+				_settingsManager.SaveSettings();
+				GD.Print($"SFX volume: {value}% ({dbVolume:F2} dB)");
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => SFXVolume.ResetRequested += h,
+				h => SFXVolume.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("SFX volume reset requested"))
+			.AddTo(_disposables);
 		}
 		
 		if (Mute != null)
 		{
-			Mute.Toggled -= OnMuteToggled;
-			Mute.ResetRequested -= OnMuteReset;
+			Observable.FromEvent<bool>(
+				h => Mute.Toggled += h,
+				h => Mute.Toggled -= h
+			)
+			.Subscribe(muted =>
+			{
+				AudioServer.SetBusMute(_masterBusIdx, muted);
+				_settingsManager.SaveSettings();
+				GD.Print($"Mute: {muted}");
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => Mute.ResetRequested += h,
+				h => Mute.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("Mute reset requested"))
+			.AddTo(_disposables);
 		}
 		
-		// Unsubscribe from video events
+		// === Video Events ===
+		
 		if (Fullscreen != null)
 		{
-			Fullscreen.Toggled -= OnFullscreenToggled;
-			Fullscreen.ResetRequested -= OnFullscreenReset;
+			Observable.FromEvent<bool>(
+				h => Fullscreen.Toggled += h,
+				h => Fullscreen.Toggled -= h
+			)
+			.Subscribe(fullscreen =>
+			{
+				if (fullscreen)
+				{
+					DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
+				}
+				else
+				{
+					DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
+				}
+				_settingsManager.SaveSettings();
+				GD.Print($"Fullscreen: {fullscreen}");
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => Fullscreen.ResetRequested += h,
+				h => Fullscreen.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("Fullscreen reset requested"))
+			.AddTo(_disposables);
 		}
 		
 		if (Resolution != null)
 		{
-			Resolution.ItemSelected -= OnResolutionSelected;
-			Resolution.ResetRequested -= OnResolutionReset;
+			Observable.FromEvent<Action<int, string>, (int, string)>(
+				conversion: h => (index, text) => h((index, text)),
+				addHandler: h => Resolution.ItemSelected += h,
+				removeHandler: h => Resolution.ItemSelected -= h
+			)
+			.Subscribe(x =>
+			{
+				var (index, text) = x;
+				string[] parts = text.Split('x');
+				if (parts.Length == 2)
+				{
+					int width = int.Parse(parts[0].Trim());
+					int height = int.Parse(parts[1].Trim());
+					DisplayServer.WindowSetSize(new Vector2I(width, height));
+					_settingsManager.SaveSettings();
+					GD.Print($"Resolution: {width}x{height}");
+				}
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => Resolution.ResetRequested += h,
+				h => Resolution.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("Resolution reset requested"))
+			.AddTo(_disposables);
 		}
 		
 		if (AntiAliasing != null)
 		{
-			AntiAliasing.ItemSelected -= OnAntiAliasingSelected;
-			AntiAliasing.ResetRequested -= OnAntiAliasingReset;
+			Observable.FromEvent<Action<int, string>, (int, string)>(
+				conversion: h => (index, text) => h((index, text)),
+				addHandler: h => AntiAliasing.ItemSelected += h,
+				removeHandler: h => AntiAliasing.ItemSelected -= h
+			)
+			.Subscribe(x =>
+			{
+				var (index, text) = x;
+				GD.Print($"Anti-Aliasing: {text} (index: {index})");
+				
+				switch (index)
+				{
+					case 0: // Disabled
+						GetViewport().Msaa3D = Viewport.Msaa.Disabled;
+						GetViewport().ScreenSpaceAA = Viewport.ScreenSpaceAAEnum.Disabled;
+						break;
+					case 1: // FXAA
+						GetViewport().ScreenSpaceAA = Viewport.ScreenSpaceAAEnum.Fxaa;
+						break;
+					case 2: // MSAA 2x
+						GetViewport().Msaa3D = Viewport.Msaa.Msaa2X;
+						break;
+					case 3: // MSAA 4x
+						GetViewport().Msaa3D = Viewport.Msaa.Msaa4X;
+						break;
+					case 4: // MSAA 8x
+						GetViewport().Msaa3D = Viewport.Msaa.Msaa8X;
+						break;
+				}
+				
+				_settingsManager.SaveSettings();
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => AntiAliasing.ResetRequested += h,
+				h => AntiAliasing.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("Anti-Aliasing reset requested"))
+			.AddTo(_disposables);
 		}
 		
 		if (CameraShake != null)
 		{
-			CameraShake.ItemSelected -= OnCameraShakeSelected;
-			CameraShake.ResetRequested -= OnCameraShakeReset;
+			Observable.FromEvent<Action<int, string>, (int, string)>(
+				conversion: h => (index, text) => h((index, text)),
+				addHandler: h => CameraShake.ItemSelected += h,
+				removeHandler: h => CameraShake.ItemSelected -= h
+			)
+			.Subscribe(x =>
+			{
+				var (index, text) = x;
+				_settingsManager.SaveSettings();
+				GD.Print($"Camera Shake: {text} (index: {index})");
+			})
+			.AddTo(_disposables);
+			
+			Observable.FromEvent(
+				h => CameraShake.ResetRequested += h,
+				h => CameraShake.ResetRequested -= h
+			)
+			.Subscribe(_ => GD.Print("Camera Shake reset requested"))
+			.AddTo(_disposables);
 		}
 		
-		// Unsubscribe from back button
+		// === Back Button ===
+		
 		if (BackButton != null)
 		{
-			BackButton.Pressed -= OnBackPressed;
+			Observable.FromEvent(
+				h => BackButton.Pressed += h,
+				h => BackButton.Pressed -= h
+			)
+			.Subscribe(_ =>
+			{
+				GD.Print("Back button pressed");
+				Hide();
+			})
+			.AddTo(_disposables);
 		}
-	}
-	
-	// === Audio Handlers ===
-	
-	private void OnMasterVolumeChanged(float value)
-	{
-		float dbVolume = Mathf.LinearToDb(value / 100f);
-		AudioServer.SetBusVolumeDb(_masterBusIdx, dbVolume);
-		_settingsManager.SaveSettings();
-		GD.Print($"Master volume: {value}% ({dbVolume:F2} dB)");
-	}
-	
-	private void OnMasterVolumeReset()
-	{
-		GD.Print("Master volume reset requested");
-	}
-	
-	private void OnMusicVolumeChanged(float value)
-	{
-		float dbVolume = Mathf.LinearToDb(value / 100f);
-		AudioServer.SetBusVolumeDb(_musicBusIdx, dbVolume);
-		_settingsManager.SaveSettings();
-		GD.Print($"Music volume: {value}% ({dbVolume:F2} dB)");
-	}
-	
-	private void OnMusicVolumeReset()
-	{
-		GD.Print("Music volume reset requested");
-	}
-	
-	private void OnSFXVolumeChanged(float value)
-	{
-		float dbVolume = Mathf.LinearToDb(value / 100f);
-		AudioServer.SetBusVolumeDb(_sfxBusIdx, dbVolume);
-		_settingsManager.SaveSettings();
-		GD.Print($"SFX volume: {value}% ({dbVolume:F2} dB)");
-	}
-	
-	private void OnSFXVolumeReset()
-	{
-		GD.Print("SFX volume reset requested");
-	}
-	
-	private void OnMuteToggled(bool muted)
-	{
-		AudioServer.SetBusMute(_masterBusIdx, muted);
-		_settingsManager.SaveSettings();
-		GD.Print($"Mute: {muted}");
-	}
-	
-	private void OnMuteReset()
-	{
-		GD.Print("Mute reset requested");
-	}
-	
-	// === Video Handlers ===
-	
-	private void OnFullscreenToggled(bool fullscreen)
-	{
-		if (fullscreen)
-		{
-			DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
-		}
-		else
-		{
-			DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
-		}
-		_settingsManager.SaveSettings();
-		GD.Print($"Fullscreen: {fullscreen}");
-	}
-	
-	private void OnFullscreenReset()
-	{
-		GD.Print("Fullscreen reset requested");
-	}
-	
-	private void OnResolutionSelected(int index, string text)
-	{
-		// Parse resolution string (e.g., "1920 x 1080")
-		string[] parts = text.Split('x');
-		if (parts.Length == 2)
-		{
-			int width = int.Parse(parts[0].Trim());
-			int height = int.Parse(parts[1].Trim());
-			DisplayServer.WindowSetSize(new Vector2I(width, height));
-			_settingsManager.SaveSettings();
-			GD.Print($"Resolution: {width}x{height}");
-		}
-	}
-	
-	private void OnResolutionReset()
-	{
-		GD.Print("Resolution reset requested");
-	}
-	
-	private void OnAntiAliasingSelected(int index, string text)
-	{
-		// Apply anti-aliasing settings
-		// Note: This is a simplified example. Actual implementation depends on your rendering setup
-		GD.Print($"Anti-Aliasing: {text} (index: {index})");
-		
-		// Example: Set MSAA level
-		switch (index)
-		{
-			case 0: // Disabled
-				GetViewport().Msaa3D = Viewport.Msaa.Disabled;
-				GetViewport().ScreenSpaceAA = Viewport.ScreenSpaceAAEnum.Disabled;
-				break;
-			case 1: // FXAA
-				GetViewport().ScreenSpaceAA = Viewport.ScreenSpaceAAEnum.Fxaa;
-				break;
-			case 2: // MSAA 2x
-				GetViewport().Msaa3D = Viewport.Msaa.Msaa2X;
-				break;
-			case 3: // MSAA 4x
-				GetViewport().Msaa3D = Viewport.Msaa.Msaa4X;
-				break;
-			case 4: // MSAA 8x
-				GetViewport().Msaa3D = Viewport.Msaa.Msaa8X;
-				break;
-		}
-		
-		_settingsManager.SaveSettings();
-	}
-	
-	private void OnAntiAliasingReset()
-	{
-		GD.Print("Anti-Aliasing reset requested");
-	}
-	
-	private void OnCameraShakeSelected(int index, string text)
-	{
-		// Store camera shake intensity
-		// This would typically be saved to a settings file or autoload
-		_settingsManager.SaveSettings();
-		GD.Print($"Camera Shake: {text} (index: {index})");
-	}
-	
-	private void OnCameraShakeReset()
-	{
-		GD.Print("Camera Shake reset requested");
-	}
-	
-	// === Navigation ===
-	
-	private void OnBackPressed()
-	{
-		GD.Print("Back button pressed");
-		// Hide settings menu or return to main menu
-		Hide();
 	}
 	
 	// === Settings Management ===
