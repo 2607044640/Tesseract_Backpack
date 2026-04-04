@@ -1,9 +1,11 @@
 using Godot;
 using System;
+using R3;
 
 /// <summary>
 /// 滑块组件Helper - 用于设置菜单中的滑块控件
 /// 遵循MarginContainerHelper的模式：[Tool] + 属性setter立即更新UI
+/// R3 增强版：支持 ReactiveProperty 双向绑定
 /// </summary>
 [Tool]
 [GlobalClass]
@@ -84,20 +86,43 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 		}
 	}
 	
-	// ===== 事件：C# event Action模式 =====
+	// ===== 事件：C# event Action模式（向后兼容）=====
 	public event Action<float> ValueChanged;
+	
+	// ===== R3 ReactiveProperty（新增）=====
+	public ReactiveProperty<float> Value { get; private set; }
 	
 	// ===== 内部引用 =====
 	private HSlider _slider;
 	private SpinBox _spinBox;
 	
-	private float _currentValue;
 	private bool _isUpdating = false; // 防止循环更新
+	private readonly CompositeDisposable _disposables = new();
 	
 	protected override void InitializeSpecificNodes()
 	{
 		_slider = GetNodeOrNull<HSlider>("SliderBar_HSlider");
 		_spinBox = GetNodeOrNull<SpinBox>("ValueSpinBox_SpinBox");
+		
+		// 初始化 ReactiveProperty
+		Value = new ReactiveProperty<float>(DefaultValue);
+		
+		// 订阅 ReactiveProperty 变化，同步到 UI
+		if (!Engine.IsEditorHint())
+		{
+			Value
+				.Skip(1) // 跳过初始值
+				.Subscribe(v =>
+				{
+					if (!_isUpdating)
+					{
+						_isUpdating = true;
+						SetValueInternal(v);
+						_isUpdating = false;
+					}
+				})
+				.AddTo(_disposables);
+		}
 	}
 	
 	protected override void ConnectSignals()
@@ -119,7 +144,6 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 			_slider.Value = DefaultValue;
 			_slider.TickCount = TickCount;
 			_slider.TicksOnBorders = TicksOnBorders;
-			_currentValue = DefaultValue;
 		}
 		
 		if (_spinBox != null)
@@ -129,6 +153,11 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 			_spinBox.Step = Step;
 			_spinBox.Value = DefaultValue;
 		}
+		
+		if (Value != null)
+		{
+			Value.Value = DefaultValue;
+		}
 	}
 	
 	private void OnSliderValueChanged(double value)
@@ -136,13 +165,19 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 		if (_isUpdating) return;
 		
 		_isUpdating = true;
-		_currentValue = (float)value;
+		float floatValue = (float)value;
 		
-		// 同步到SpinBox
+		// 同步到 SpinBox
 		if (_spinBox != null)
 			_spinBox.Value = value;
 		
-		ValueChanged?.Invoke(_currentValue);
+		// 更新 ReactiveProperty（会自动触发订阅者）
+		if (Value != null)
+			Value.Value = floatValue;
+		
+		// 触发传统事件（向后兼容）
+		ValueChanged?.Invoke(floatValue);
+		
 		_isUpdating = false;
 	}
 	
@@ -151,14 +186,29 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 		if (_isUpdating) return;
 		
 		_isUpdating = true;
-		_currentValue = (float)value;
+		float floatValue = (float)value;
 		
-		// 同步到Slider
+		// 同步到 Slider
 		if (_slider != null)
 			_slider.Value = value;
 		
-		ValueChanged?.Invoke(_currentValue);
+		// 更新 ReactiveProperty
+		if (Value != null)
+			Value.Value = floatValue;
+		
+		// 触发传统事件
+		ValueChanged?.Invoke(floatValue);
+		
 		_isUpdating = false;
+	}
+	
+	private void SetValueInternal(float value)
+	{
+		if (_slider != null)
+			_slider.Value = value;
+		
+		if (_spinBox != null)
+			_spinBox.Value = value;
 	}
 	
 	public override void ResetToDefault()
@@ -169,7 +219,7 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 	
 	public override Variant GetSettingValue()
 	{
-		return _currentValue;
+		return Value?.Value ?? DefaultValue;
 	}
 	
 	public override void SetSettingValue(Variant value)
@@ -179,16 +229,25 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 	
 	public void SetValue(float value)
 	{
+		if (_isUpdating) return;
+		
+		_isUpdating = true;
+		
 		if (_slider != null)
 			_slider.Value = value;
 		
 		if (_spinBox != null)
 			_spinBox.Value = value;
+		
+		if (Value != null)
+			Value.Value = value;
+		
+		_isUpdating = false;
 	}
 	
 	public float GetValue()
 	{
-		return _currentValue;
+		return Value?.Value ?? DefaultValue;
 	}
 	
 	protected override void DisconnectSignals()
@@ -198,5 +257,11 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 		
 		if (_spinBox != null)
 			_spinBox.ValueChanged -= OnSpinBoxValueChanged;
+	}
+	
+	public override void _ExitTree()
+	{
+		base._ExitTree();
+		_disposables.Dispose();
 	}
 }

@@ -1,10 +1,9 @@
 using Godot;
-using System;
-using System.Collections.Generic;
+using R3;
 
 /// <summary>
-/// 设置管理器 - 统一管理所有设置组件的保存和加载
-/// 使用ConfigFile进行持久化存储
+/// 设置管理器 - 使用 R3 ReactiveProperty 实现响应式状态管理
+/// 所有设置状态集中管理，UI 自动同步，无需手动事件订阅
 /// </summary>
 public partial class SettingsManager : Node
 {
@@ -12,40 +11,90 @@ public partial class SettingsManager : Node
 	private const string SettingsSection = "Settings";
 	
 	private ConfigFile _config;
-	private List<BaseSettingComponentHelper> _settingComponents;
+	private readonly CompositeDisposable _disposables = new();
+	
+	// ===== Audio Settings (ReactiveProperty) =====
+	public ReactiveProperty<float> MasterVolume { get; private set; }
+	public ReactiveProperty<float> MusicVolume { get; private set; }
+	public ReactiveProperty<float> SFXVolume { get; private set; }
+	public ReactiveProperty<bool> Mute { get; private set; }
+	
+	// ===== Video Settings (ReactiveProperty) =====
+	public ReactiveProperty<bool> Fullscreen { get; private set; }
+	public ReactiveProperty<int> ResolutionIndex { get; private set; }
+	public ReactiveProperty<int> AntiAliasingIndex { get; private set; }
+	public ReactiveProperty<int> CameraShakeIndex { get; private set; }
 	
 	public override void _Ready()
 	{
 		_config = new ConfigFile();
-		_settingComponents = new List<BaseSettingComponentHelper>();
 		
-		// 加载现有配置
+		// 加载配置文件
 		LoadConfig();
+		
+		// 初始化 ReactiveProperty（从配置文件加载或使用默认值）
+		MasterVolume = new ReactiveProperty<float>(LoadFloat("master_volume", 100f));
+		MusicVolume = new ReactiveProperty<float>(LoadFloat("music_volume", 80f));
+		SFXVolume = new ReactiveProperty<float>(LoadFloat("sfx_volume", 80f));
+		Mute = new ReactiveProperty<bool>(LoadBool("mute", false));
+		
+		Fullscreen = new ReactiveProperty<bool>(LoadBool("fullscreen", false));
+		ResolutionIndex = new ReactiveProperty<int>(LoadInt("resolution", 0));
+		AntiAliasingIndex = new ReactiveProperty<int>(LoadInt("anti_aliasing", 0));
+		CameraShakeIndex = new ReactiveProperty<int>(LoadInt("camera_shake", 1));
+		
+		// 订阅所有 ReactiveProperty 变化，自动保存
+		SubscribeAutoSave();
+		
+		GD.Print("SettingsManager initialized with ReactiveProperty");
 	}
 	
 	/// <summary>
-	/// 注册一个设置组件
+	/// 订阅所有设置变化，自动保存到配置文件
 	/// </summary>
-	public void RegisterComponent(BaseSettingComponentHelper component)
+	private void SubscribeAutoSave()
 	{
-		if (component != null && !_settingComponents.Contains(component))
-		{
-			_settingComponents.Add(component);
-			
-			// 订阅ResetRequested事件，当用户点击Reset时自动保存
-			component.ResetRequested += () => SaveSettings();
-		}
-	}
-	
-	/// <summary>
-	/// 批量注册多个设置组件
-	/// </summary>
-	public void RegisterComponents(params BaseSettingComponentHelper[] components)
-	{
-		foreach (var component in components)
-		{
-			RegisterComponent(component);
-		}
+		// Audio settings auto-save
+		MasterVolume
+			.Skip(1) // 跳过初始值，避免重复保存
+			.Subscribe(v => SaveFloat("master_volume", v))
+			.AddTo(_disposables);
+		
+		MusicVolume
+			.Skip(1)
+			.Subscribe(v => SaveFloat("music_volume", v))
+			.AddTo(_disposables);
+		
+		SFXVolume
+			.Skip(1)
+			.Subscribe(v => SaveFloat("sfx_volume", v))
+			.AddTo(_disposables);
+		
+		Mute
+			.Skip(1)
+			.Subscribe(v => SaveBool("mute", v))
+			.AddTo(_disposables);
+		
+		// Video settings auto-save
+		Fullscreen
+			.Skip(1)
+			.Subscribe(v => SaveBool("fullscreen", v))
+			.AddTo(_disposables);
+		
+		ResolutionIndex
+			.Skip(1)
+			.Subscribe(v => SaveInt("resolution", v))
+			.AddTo(_disposables);
+		
+		AntiAliasingIndex
+			.Skip(1)
+			.Subscribe(v => SaveInt("anti_aliasing", v))
+			.AddTo(_disposables);
+		
+		CameraShakeIndex
+			.Skip(1)
+			.Subscribe(v => SaveInt("camera_shake", v))
+			.AddTo(_disposables);
 	}
 	
 	/// <summary>
@@ -65,34 +114,78 @@ public partial class SettingsManager : Node
 	}
 	
 	/// <summary>
-	/// 加载所有已注册组件的设置
+	/// 重置所有设置到默认值
 	/// </summary>
-	public void LoadSettings()
+	public void ResetAllSettings()
 	{
-		LoadConfig();
+		MasterVolume.Value = 100f;
+		MusicVolume.Value = 80f;
+		SFXVolume.Value = 80f;
+		Mute.Value = false;
 		
-		foreach (var component in _settingComponents)
-		{
-			component.LoadSetting(_config, SettingsSection);
-		}
+		Fullscreen.Value = false;
+		ResolutionIndex.Value = 0;
+		AntiAliasingIndex.Value = 0;
+		CameraShakeIndex.Value = 1;
 		
-		GD.Print($"Loaded settings for {_settingComponents.Count} components");
+		GD.Print("All settings reset to defaults");
 	}
 	
-	/// <summary>
-	/// 保存所有已注册组件的设置
-	/// </summary>
-	public void SaveSettings()
+	// ===== Helper Methods for Loading =====
+	
+	private float LoadFloat(string key, float defaultValue)
 	{
-		foreach (var component in _settingComponents)
+		if (_config.HasSectionKey(SettingsSection, key))
 		{
-			component.SaveSetting(_config, SettingsSection);
+			return (float)_config.GetValue(SettingsSection, key);
 		}
-		
+		return defaultValue;
+	}
+	
+	private int LoadInt(string key, int defaultValue)
+	{
+		if (_config.HasSectionKey(SettingsSection, key))
+		{
+			return (int)_config.GetValue(SettingsSection, key);
+		}
+		return defaultValue;
+	}
+	
+	private bool LoadBool(string key, bool defaultValue)
+	{
+		if (_config.HasSectionKey(SettingsSection, key))
+		{
+			return (bool)_config.GetValue(SettingsSection, key);
+		}
+		return defaultValue;
+	}
+	
+	// ===== Helper Methods for Saving =====
+	
+	private void SaveFloat(string key, float value)
+	{
+		_config.SetValue(SettingsSection, key, value);
+		SaveConfigFile();
+	}
+	
+	private void SaveInt(string key, int value)
+	{
+		_config.SetValue(SettingsSection, key, value);
+		SaveConfigFile();
+	}
+	
+	private void SaveBool(string key, bool value)
+	{
+		_config.SetValue(SettingsSection, key, value);
+		SaveConfigFile();
+	}
+	
+	private void SaveConfigFile()
+	{
 		Error err = _config.Save(SettingsFilePath);
 		if (err == Error.Ok)
 		{
-			GD.Print($"Settings saved successfully to {SettingsFilePath}");
+			GD.Print($"Settings saved to {SettingsFilePath}");
 		}
 		else
 		{
@@ -100,52 +193,8 @@ public partial class SettingsManager : Node
 		}
 	}
 	
-	/// <summary>
-	/// 重置所有设置到默认值
-	/// </summary>
-	public void ResetAllSettings()
-	{
-		foreach (var component in _settingComponents)
-		{
-			component.ResetToDefault();
-		}
-		
-		SaveSettings();
-		GD.Print("All settings reset to defaults");
-	}
-	
-	/// <summary>
-	/// 获取特定设置的值
-	/// </summary>
-	public Variant GetSetting(string key, Variant defaultValue = default)
-	{
-		if (_config.HasSectionKey(SettingsSection, key))
-		{
-			return _config.GetValue(SettingsSection, key);
-		}
-		return defaultValue;
-	}
-	
-	/// <summary>
-	/// 设置特定设置的值
-	/// </summary>
-	public void SetSetting(string key, Variant value)
-	{
-		_config.SetValue(SettingsSection, key, value);
-	}
-	
 	public override void _ExitTree()
 	{
-		// 退出时自动保存
-		SaveSettings();
-		
-		// 取消订阅所有组件
-		foreach (var component in _settingComponents)
-		{
-			if (component != null)
-			{
-				component.ResetRequested -= SaveSettings;
-			}
-		}
+		_disposables.Dispose();
 	}
 }
