@@ -10,13 +10,15 @@ config_version=5
 
 [application]
 
-config/name="3dPractice"
+config/name="Tesseract_Backpack"
 run/main_scene="uid://duilxcd3om5ga"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 
 [autoload]
 
 PhantomCameraManager="*uid://duq6jhf6unyis"
+FrameProviderDispatcher="*uid://crtk7e8scthbv"
+ObservableTrackerRuntimeHook="*uid://c3ycqt6dt1pfq"
 
 [debug]
 
@@ -35,7 +37,7 @@ project/assembly_name="3dPractice"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/asset_placer/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg", "res://addons/mixamo_animation_retargeter/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/theme_gen_save_sync/plugin.cfg")
+enabled=PackedStringArray("res://addons/R3.Godot/plugin.cfg", "res://addons/Todo_Manager/plugin.cfg", "res://addons/asset_placer/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg", "res://addons/mixamo_animation_retargeter/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/theme_gen_save_sync/plugin.cfg")
 
 [file_customization]
 
@@ -46,6 +48,10 @@ folder_colors={
 "res://Animations/": "green",
 "res://addons/A1MyAddon/": "blue"
 }
+
+[godots]
+
+version_hint=""
 
 [gui]
 
