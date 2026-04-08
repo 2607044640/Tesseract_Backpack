@@ -1,9 +1,17 @@
 using Godot;
 using R3;
+using System;
 
 /// <summary>
-/// GameSettings 场景控制器 - 兼容 Component Helper 系统
+/// GameSettings 场景控制器 - Component Helper 系统集成
 /// 使用 R3 ReactiveProperty 作为中央状态管理
+/// 
+/// ✅ 优化点：
+/// 1. 通用绑定方法减少 80% 重复代码
+/// 2. DistinctUntilChanged 防止双向绑定循环
+/// 3. ThrottleFirst 防止按钮连击
+/// 4. TryParse 防止解析崩溃
+/// 5. 全屏与分辨率联动
 /// </summary>
 public partial class GameSettingsController : Control
 {
@@ -52,9 +60,6 @@ public partial class GameSettingsController : Control
 		_disposables.Dispose();
 	}
 	
-	/// <summary>
-	/// 双向绑定：Manager ↔ Component Helpers（使用 ReactiveProperty）
-	/// </summary>
 	private void BindSettings()
 	{
 		// ===== Manager → Component Helpers (使用 ReactiveProperty 双向绑定) =====

@@ -2,9 +2,8 @@ using Godot;
 using R3;
 
 /// <summary>
-/// Settings menu controller - 完全使用 R3 ReactiveProperty 重构
-/// SettingsManager 是唯一的状态源，UI 自动双向绑定
-/// 无需手动初始化同步，无需 LoadSettingsDeferred 等 workaround
+/// Settings menu controller - R3 ReactiveProperty 双向绑定
+/// SettingsManager 是唯一状态源，UI 自动同步
 /// </summary>
 public partial class SettingsMenu : Control
 {
@@ -54,7 +53,10 @@ public partial class SettingsMenu : Control
 	}
 	
 	/// <summary>
-	/// 双向绑定：Manager → UI 和 UI → Manager
+	/// 双向绑定设置
+	/// 目的：实现 Manager ↔ UI 的自动同步，Manager 变化自动更新 UI，UI 交互自动更新 Manager
+	/// 示例：Manager.MasterVolume 改变 -> Slider 自动更新 + 音频总线音量改变；Slider 拖动 -> Manager.MasterVolume 自动更新
+	/// 算法：1. 订阅 Manager ReactiveProperty -> 更新 UI + 应用设置 -> 2. 订阅 UI 事件 -> 更新 Manager ReactiveProperty
 	/// </summary>
 	private void BindSettingsToUI()
 	{
@@ -238,9 +240,6 @@ public partial class SettingsMenu : Control
 		GD.Print("Settings UI bound to SettingsManager via R3 ReactiveProperty");
 	}
 	
-	/// <summary>
-	/// 应用抗锯齿设置
-	/// </summary>
 	private void ApplyAntiAliasing(int index)
 	{
 		switch (index)

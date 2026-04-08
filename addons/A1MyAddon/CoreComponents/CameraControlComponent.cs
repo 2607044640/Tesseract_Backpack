@@ -12,35 +12,11 @@ public partial class CameraControlComponent : Node
 {
     #region Export Properties
     
-    /// <summary>
-    /// PhantomCamera3D 节点路径
-    /// </summary>
     [Export] public NodePath PCamPath { get; set; } = "PhantomCamera3D";
-    
-    /// <summary>
-    /// 鼠标灵敏度
-    /// </summary>
     [Export] public float MouseSensitivity { get; set; } = 0.05f;
-    
-    /// <summary>
-    /// 最小 Pitch 角度（上下视角限制，度数）
-    /// </summary>
     [Export] public float MinPitch { get; set; } = -89.9f;
-    
-    /// <summary>
-    /// 最大 Pitch 角度（上下视角限制，度数）
-    /// </summary>
     [Export] public float MaxPitch { get; set; } = 50f;
-    
-    /// <summary>
-    /// 是否覆盖场景中的 FollowOffset（默认 false 使用场景配置）
-    /// </summary>
     [Export] public bool OverrideFollowOffset { get; set; } = false;
-    
-    /// <summary>
-    /// 相机跟随偏移（仅在 OverrideFollowOffset=true 时生效）
-    /// 推荐 Y=0.6 避免相机贴地穿模
-    /// </summary>
     [Export] public Vector3 FollowOffset { get; set; } = new Vector3(0, 0.5f, 0);
     
     #endregion
@@ -87,13 +63,11 @@ public partial class CameraControlComponent : Node
     
     public override void _UnhandledInput(InputEvent @event)
     {
-        // 处理鼠标移动
         if (@event is InputEventMouseMotion mouseMotion && Input.MouseMode == Input.MouseModeEnum.Captured)
         {
             HandleMouseMovement(mouseMotion);
         }
         
-        // ESC 键释放鼠标，(todo user:可能会有bug，UI按esc不一定到UI上）
         if (Input.IsActionJustPressed("ui_cancel"))
         {
             Input.MouseMode = Input.MouseModeEnum.Visible;
@@ -104,9 +78,6 @@ public partial class CameraControlComponent : Node
 
     #region Camera Control
     
-    /// <summary>
-    /// 处理鼠标移动，更新相机旋转
-    /// </summary>
     private void HandleMouseMovement(InputEventMouseMotion mouseMotion)
     {
         if (_pCam == null) return;

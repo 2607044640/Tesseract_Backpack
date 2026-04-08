@@ -59,20 +59,13 @@ public partial class AnimationControllerComponent : Node
 
     #region Public Methods (For StateChart Signal Connections)
     
-    /// <summary>
-    /// 进入地面模式
-    /// 在 Godot 编辑器中连接：GroundMode.state_entered → 此方法
-    /// </summary>
+    // StateChart信号连接方法
     public void EnterGroundMode()
     {
         _currentMode = "Ground";
         GD.Print("[AnimationController] 进入地面模式");
     }
     
-    /// <summary>
-    /// 进入飞行模式
-    /// 在 Godot 编辑器中连接：FlyMode.state_entered → 此方法
-    /// </summary>
     public void EnterFlyMode()
     {
         _currentMode = "Fly";
@@ -112,10 +105,6 @@ public partial class AnimationControllerComponent : Node
 
     #region Animation Logic
     
-    /// <summary>
-    /// 更新动画（极简逻辑）
-    /// 只负责：1. 问配置要什么动画  2. 播放动画
-    /// </summary>
     private void UpdateAnimation()
     {
         if (_animPlayer == null || AnimConfig == null) return;
@@ -127,13 +116,9 @@ public partial class AnimationControllerComponent : Node
             parent.IsOnFloor()
         );
         
-        // 播放动画
         PlayAnimation(animName, speed);
     }
     
-    /// <summary>
-    /// 播放动画（带过渡）
-    /// </summary>
     private void PlayAnimation(string targetAnim, float targetSpeed)
     {
         if (string.IsNullOrEmpty(targetAnim) || _currentAnimation == targetAnim)

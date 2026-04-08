@@ -10,24 +10,10 @@ using Godot.Composition;
 public partial class CharacterRotationComponent : Node
 {
     #region Export Properties
-
-    /// <summary>
-    /// 角色模型节点路径
-    /// </summary>
-    [Export]
-    public NodePath CharacterModelPath { get; set; } = "KunoSkin";
-
-    /// <summary>
-    /// PhantomCamera3D 节点路径
-    /// </summary>
-    [Export]
-    public NodePath PhantomCameraPath { get; set; } = "PhantomCamera3D";
-
-    /// <summary>
-    /// 旋转平滑速度
-    /// </summary>
-    [Export]
-    public float RotationSpeed { get; set; } = 10.0f;
+    
+    [Export] public NodePath CharacterModelPath { get; set; } = "KunoSkin";
+    [Export] public NodePath PhantomCameraPath { get; set; } = "PhantomCamera3D";
+    [Export] public float RotationSpeed { get; set; } = 10.0f;
 
     #endregion
 
@@ -101,9 +87,6 @@ public partial class CharacterRotationComponent : Node
 
     #region Event Handlers
 
-    /// <summary>
-    /// 处理移动输入
-    /// </summary>
     private void HandleMovementInput(Vector2 inputDir)
     {
         _currentInputDir = inputDir;
@@ -114,7 +97,10 @@ public partial class CharacterRotationComponent : Node
     #region Rotation Logic
 
     /// <summary>
-    /// 更新角色朝向（面向移动方向）
+    /// 基于相机方向和输入计算角色朝向
+    /// 目的：让角色面向移动方向，支持相机相对移动
+    /// 示例：按W键时，角色面向相机前方；按D键时，角色面向相机右方
+    /// 算法：1. 获取相机前/右向量 -> 2. 根据输入合成移动方向 -> 3. 平滑旋转角色
     /// </summary>
     private void UpdateCharacterRotation(double delta)
     {
@@ -122,9 +108,7 @@ public partial class CharacterRotationComponent : Node
         if (_currentInputDir == Vector2.Zero) return;
 
         // 基于 PhantomCamera 方向计算移动方向
-        // 注意：Godot 中 -Z 是前方，X 是右方
-        // 修复：Input.GetVector 的 Y 轴是反的（forward 是负值，backward 是正值）
-        Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z;  // 使用 Z 而不是 -Z
+        Vector3 forward = _phantomCamera.GlobalTransform.Basis.Z;
         Vector3 right = _phantomCamera.GlobalTransform.Basis.X;
         forward.Y = 0;
         right.Y = 0;
@@ -135,7 +119,6 @@ public partial class CharacterRotationComponent : Node
 
         if (direction != Vector3.Zero)
         {
-            // 平滑旋转角色面向移动方向
             float targetAngle = Mathf.Atan2(direction.X, direction.Z);
             Quaternion targetRotation = new(Vector3.Up, targetAngle);
             _characterModel.Quaternion = _characterModel.Quaternion.Slerp(targetRotation, (float)delta * RotationSpeed);

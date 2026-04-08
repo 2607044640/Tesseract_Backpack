@@ -1,9 +1,17 @@
 using Godot;
 using R3;
+using System;
+using System.Collections.Generic;
+using GameSettings;
 
 /// <summary>
-/// 设置管理器 - 使用 R3 ReactiveProperty 实现响应式状态管理
-/// 所有设置状态集中管理，UI 自动同步，无需手动事件订阅
+/// 设置管理器 - R3 ReactiveProperty 响应式状态管理
+/// 所有设置状态集中管理，UI 自动同步
+/// 
+/// ✅ 优化点：
+/// 1. 使用通用绑定器减少重复代码
+/// 2. 统一的自动保存（Debounce 500ms）避免频繁 I/O
+/// 3. 简化的重置逻辑
 /// </summary>
 public partial class SettingsManager : Node
 {
@@ -12,6 +20,11 @@ public partial class SettingsManager : Node
 	
 	private ConfigFile _config;
 	private readonly CompositeDisposable _disposables = new();
+	
+	// ✅ 使用绑定器管理所有设置
+	private readonly List<SettingBinderBase<float>> _floatBinders = new();
+	private readonly List<SettingBinderBase<bool>> _boolBinders = new();
+	private readonly List<SettingBinderBase<int>> _intBinders = new();
 	
 	// ===== Audio Settings (ReactiveProperty) =====
 	public ReactiveProperty<float> MasterVolume { get; private set; }
@@ -28,78 +41,117 @@ public partial class SettingsManager : Node
 	public override void _Ready()
 	{
 		_config = new ConfigFile();
-		
-		// 加载配置文件
 		LoadConfig();
 		
-		// 初始化 ReactiveProperty（从配置文件加载或使用默认值）
-		MasterVolume = new ReactiveProperty<float>(LoadFloat("master_volume", 100f));
-		MusicVolume = new ReactiveProperty<float>(LoadFloat("music_volume", 80f));
-		SFXVolume = new ReactiveProperty<float>(LoadFloat("sfx_volume", 80f));
-		Mute = new ReactiveProperty<bool>(LoadBool("mute", false));
+		// ✅ 使用绑定器创建所有设置（自动加载初始值）
+		MasterVolume = CreateFloatSetting("master_volume", 100f);
+		MusicVolume = CreateFloatSetting("music_volume", 80f);
+		SFXVolume = CreateFloatSetting("sfx_volume", 80f);
+		Mute = CreateBoolSetting("mute", false);
 		
-		Fullscreen = new ReactiveProperty<bool>(LoadBool("fullscreen", false));
-		ResolutionIndex = new ReactiveProperty<int>(LoadInt("resolution", 0));
-		AntiAliasingIndex = new ReactiveProperty<int>(LoadInt("anti_aliasing", 0));
-		CameraShakeIndex = new ReactiveProperty<int>(LoadInt("camera_shake", 1));
+		Fullscreen = CreateBoolSetting("fullscreen", false);
+		ResolutionIndex = CreateIntSetting("resolution", 0);
+		AntiAliasingIndex = CreateIntSetting("anti_aliasing", 0);
+		CameraShakeIndex = CreateIntSetting("camera_shake", 1);
 		
-		// 订阅所有 ReactiveProperty 变化，自动保存
+		// ✅ 统一的自动保存（Debounce 500ms）
 		SubscribeAutoSave();
 		
-		GD.Print("SettingsManager initialized with ReactiveProperty");
+		GD.Print("SettingsManager initialized with optimized binders");
 	}
 	
 	/// <summary>
-	/// 订阅所有设置变化，自动保存到配置文件
+	/// ✅ 创建 Float 设置（使用绑定器）
+	/// </summary>
+	private ReactiveProperty<float> CreateFloatSetting(string key, float defaultValue)
+	{
+		var binder = new FloatSettingBinder(key, defaultValue, _config, SettingsSection);
+		_floatBinders.Add(binder);
+		return binder.GetProperty();
+	}
+	
+	/// <summary>
+	/// ✅ 创建 Bool 设置（使用绑定器）
+	/// </summary>
+	private ReactiveProperty<bool> CreateBoolSetting(string key, bool defaultValue)
+	{
+		var binder = new BoolSettingBinder(key, defaultValue, _config, SettingsSection);
+		_boolBinders.Add(binder);
+		return binder.GetProperty();
+	}
+	
+	/// <summary>
+	/// ✅ 创建 Int 设置（使用绑定器）
+	/// </summary>
+	private ReactiveProperty<int> CreateIntSetting(string key, int defaultValue)
+	{
+		var binder = new IntSettingBinder(key, defaultValue, _config, SettingsSection);
+		_intBinders.Add(binder);
+		return binder.GetProperty();
+	}
+	
+	/// <summary>
+	/// ✅ 优化后的自动保存：合并所有变化 + Debounce 500ms
+	/// 
+	/// 优化点：
+	/// 1. 削峰填谷：用户拖动滑块时，不再每帧写入磁盘，而是等待 500ms 后统一保存
+	/// 2. 减少 I/O：将成百上千次的写入压缩为一次
+	/// 3. 避免卡顿：防止频繁磁盘操作导致的 UI 卡顿
+	/// 
+	/// 示例：用户拖动音量滑块 0-100，触发 100 次变化
+	/// - 优化前：写入磁盘 100 次（卡顿）
+	/// - 优化后：等待 500ms 后写入 1 次（流畅）
 	/// </summary>
 	private void SubscribeAutoSave()
 	{
-		// Audio settings auto-save
-		MasterVolume
-			.Skip(1) // 跳过初始值，避免重复保存
-			.Subscribe(v => SaveFloat("master_volume", v))
-			.AddTo(_disposables);
+		Observable.Merge(
+			MasterVolume.Skip(1).AsUnitObservable(),
+			MusicVolume.Skip(1).AsUnitObservable(),
+			SFXVolume.Skip(1).AsUnitObservable(),
+			Mute.Skip(1).AsUnitObservable(),
+			Fullscreen.Skip(1).AsUnitObservable(),
+			ResolutionIndex.Skip(1).AsUnitObservable(),
+			AntiAliasingIndex.Skip(1).AsUnitObservable(),
+			CameraShakeIndex.Skip(1).AsUnitObservable()
+		)
+		.Debounce(TimeSpan.FromMilliseconds(500)) // ✅ 等待 500ms 后保存
+		.Subscribe(_ => SaveAllSettings())
+		.AddTo(_disposables);
 		
-		MusicVolume
-			.Skip(1)
-			.Subscribe(v => SaveFloat("music_volume", v))
-			.AddTo(_disposables);
-		
-		SFXVolume
-			.Skip(1)
-			.Subscribe(v => SaveFloat("sfx_volume", v))
-			.AddTo(_disposables);
-		
-		Mute
-			.Skip(1)
-			.Subscribe(v => SaveBool("mute", v))
-			.AddTo(_disposables);
-		
-		// Video settings auto-save
-		Fullscreen
-			.Skip(1)
-			.Subscribe(v => SaveBool("fullscreen", v))
-			.AddTo(_disposables);
-		
-		ResolutionIndex
-			.Skip(1)
-			.Subscribe(v => SaveInt("resolution", v))
-			.AddTo(_disposables);
-		
-		AntiAliasingIndex
-			.Skip(1)
-			.Subscribe(v => SaveInt("anti_aliasing", v))
-			.AddTo(_disposables);
-		
-		CameraShakeIndex
-			.Skip(1)
-			.Subscribe(v => SaveInt("camera_shake", v))
-			.AddTo(_disposables);
+		GD.Print("Auto-save enabled with 500ms debounce");
 	}
 	
 	/// <summary>
-	/// 从文件加载配置
+	/// ✅ 一次性保存所有设置（使用绑定器）
 	/// </summary>
+	private void SaveAllSettings()
+	{
+		// 使用绑定器保存所有设置
+		foreach (var binder in _floatBinders)
+		{
+			binder.SaveValue();
+		}
+		foreach (var binder in _boolBinders)
+		{
+			binder.SaveValue();
+		}
+		foreach (var binder in _intBinders)
+		{
+			binder.SaveValue();
+		}
+		
+		// 一次性写入文件
+		Error err = _config.Save(SettingsFilePath);
+		if (err == Error.Ok)
+		{
+			GD.Print($"✓ Settings saved to {SettingsFilePath}");
+		}
+		else
+		{
+			GD.PrintErr($"✗ Failed to save settings: {err}");
+		}
+	}
+	
 	private void LoadConfig()
 	{
 		Error err = _config.Load(SettingsFilePath);
@@ -114,7 +166,7 @@ public partial class SettingsManager : Node
 	}
 	
 	/// <summary>
-	/// 重置所有设置到默认值
+	/// ✅ 重置所有设置到默认值（自动触发保存）
 	/// </summary>
 	public void ResetAllSettings()
 	{
@@ -128,69 +180,7 @@ public partial class SettingsManager : Node
 		AntiAliasingIndex.Value = 0;
 		CameraShakeIndex.Value = 1;
 		
-		GD.Print("All settings reset to defaults");
-	}
-	
-	// ===== Helper Methods for Loading =====
-	
-	private float LoadFloat(string key, float defaultValue)
-	{
-		if (_config.HasSectionKey(SettingsSection, key))
-		{
-			return (float)_config.GetValue(SettingsSection, key);
-		}
-		return defaultValue;
-	}
-	
-	private int LoadInt(string key, int defaultValue)
-	{
-		if (_config.HasSectionKey(SettingsSection, key))
-		{
-			return (int)_config.GetValue(SettingsSection, key);
-		}
-		return defaultValue;
-	}
-	
-	private bool LoadBool(string key, bool defaultValue)
-	{
-		if (_config.HasSectionKey(SettingsSection, key))
-		{
-			return (bool)_config.GetValue(SettingsSection, key);
-		}
-		return defaultValue;
-	}
-	
-	// ===== Helper Methods for Saving =====
-	
-	private void SaveFloat(string key, float value)
-	{
-		_config.SetValue(SettingsSection, key, value);
-		SaveConfigFile();
-	}
-	
-	private void SaveInt(string key, int value)
-	{
-		_config.SetValue(SettingsSection, key, value);
-		SaveConfigFile();
-	}
-	
-	private void SaveBool(string key, bool value)
-	{
-		_config.SetValue(SettingsSection, key, value);
-		SaveConfigFile();
-	}
-	
-	private void SaveConfigFile()
-	{
-		Error err = _config.Save(SettingsFilePath);
-		if (err == Error.Ok)
-		{
-			GD.Print($"Settings saved to {SettingsFilePath}");
-		}
-		else
-		{
-			GD.PrintErr($"Failed to save settings: {err}");
-		}
+		GD.Print("✓ All settings reset to defaults");
 	}
 	
 	public override void _ExitTree()

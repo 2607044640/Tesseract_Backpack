@@ -66,8 +66,6 @@ public partial class GroundMovementComponent : Node
 
     public override void _PhysicsProcess(double delta)
     {
-        // 【纯粹的物理计算】无需状态判断
-        // 因为组件默认休眠，只有 StateChart 激活 GroundMode 时才会执行
         ProcessGroundPhysics(delta);
     }
 
@@ -98,24 +96,25 @@ public partial class GroundMovementComponent : Node
 
     #region Physics Logic
 
+    /// <summary>
+    /// 地面物理处理
+    /// 目的：实现重力、跳跃、地面移动的完整物理模拟
+    /// 示例：角色在地面按空格跳起，空中受重力下落，WASD控制水平移动
+    /// 算法：1. 应用重力 -> 2. 处理跳跃输入 -> 3. 计算水平移动 -> 4. 应用速度并移动
+    /// </summary>
     private void ProcessGroundPhysics(double delta)
     {
         Vector3 velocity = _entity.Velocity;
 
-        // 1. 应用重力
         if (!_entity.IsOnFloor())
         {
             velocity.Y -= Gravity * (float)delta;
         }
 
-        // 2. 处理跳跃
         if (_jumpRequested && _entity.IsOnFloor())
         {
             velocity.Y = JumpVelocity;
             _jumpRequested = false;
-            
-            // 【事件驱动】通知 StateChart 跳跃发生
-            // 可用于触发跳跃动画或其他状态变化
             _entity.SendStateEvent("jumped");
         }
         else if (_jumpRequested)
@@ -123,7 +122,6 @@ public partial class GroundMovementComponent : Node
             _jumpRequested = false;
         }
 
-        // 3. 处理水平移动
         Vector3 direction = CalculateMovementDirection();
 
         if (direction != Vector3.Zero)
@@ -137,7 +135,6 @@ public partial class GroundMovementComponent : Node
             velocity.Z = Mathf.MoveToward(velocity.Z, 0, Speed);
         }
 
-        // 4. 应用速度并移动
         _entity.Velocity = velocity;
         _entity.MoveAndSlide();
     }

@@ -2,30 +2,21 @@ using Godot;
 using GodotStateCharts;
 
 /// <summary>
-/// StateChart 自动绑定扩展 - 极致优雅的组件挂载方式
-/// 
-/// 核心思想：
-/// - 将组件直接作为 AtomicState 节点的子节点
-/// - 组件通过读取父节点自动绑定生命周期
-/// - 完全消除字符串路径依赖
-/// - 场景树结构一目了然：GroundMode 下直接挂 GroundMovementComponent
+/// StateChart 自动绑定扩展 - Power Switch 模式组件挂载
+/// 核心思想：组件作为 AtomicState 子节点，自动绑定生命周期
 /// </summary>
 public static class StateChartAutoBindExtensions
 {
     #region 自动绑定方法
 
     /// <summary>
-    /// 组件自动挂载：当组件作为 AtomicState 节点的直接子节点时，自动绑定生命周期
-    /// 
-    /// 工作原理：
-    /// 1. 获取父节点（应该是 StateChart 的状态节点）
-    /// 2. 默认休眠组件（所有 Process 方法禁用）
-    /// 3. 状态进入时 → 通电唤醒（启用所有 Process 方法）
-    /// 4. 状态退出时 → 断电休眠（禁用所有 Process 方法）
+    /// 组件自动挂载到父状态节点
+    /// 目的：实现 Power Switch 模式，状态进入时唤醒组件，退出时休眠
+    /// 示例：GroundMode 进入 -> GroundMovementComponent 启用；GroundMode 退出 -> GroundMovementComponent 禁用
+    /// 算法：1. 验证父节点是 StateChart 状态 -> 2. 默认休眠组件 -> 3. 绑定状态进入/退出信号 -> 4. 信号触发时切换组件启用状态
     /// </summary>
     public static void AutoBindToParentState(this Node component)
     {
-        // 1. 获取父节点，并验证它是否是 godot-statecharts 的状态节点
         var stateNode = component.GetParent();
         if (stateNode == null)
         {
@@ -33,7 +24,6 @@ public static class StateChartAutoBindExtensions
             return;
         }
 
-        // 使用 GodotStateCharts 的包装类尝试包装父节点
         var state = StateChartState.Of(stateNode);
         if (state == null)
         {
@@ -41,7 +31,6 @@ public static class StateChartAutoBindExtensions
             return;
         }
 
-        // 2. 【关键】默认休眠组件，等待状态机唤醒
         component.SetProcess(false);
         component.SetPhysicsProcess(false);
         component.SetProcessInput(false);
@@ -49,7 +38,6 @@ public static class StateChartAutoBindExtensions
 
         GD.Print($"[PowerSwitch] 💤 {component.Name} 已挂载到状态 '{stateNode.Name}' 下，进入默认休眠。");
 
-        // 3. 状态进入：通电唤醒
         state.Connect(StateChartState.SignalName.StateEntered, Callable.From(() =>
         {
             component.SetProcess(true);
@@ -59,7 +47,6 @@ public static class StateChartAutoBindExtensions
             GD.Print($"[PowerSwitch] ⚡ {component.Name} 已通电唤醒！");
         }));
 
-        // 4. 状态退出：断电休眠
         state.Connect(StateChartState.SignalName.StateExited, Callable.From(() =>
         {
             component.SetProcess(false);
@@ -75,26 +62,18 @@ public static class StateChartAutoBindExtensions
     #region 实体查找方法
 
     /// <summary>
-    /// 向上查找获取真实的实体控制器 (Player3D)
-    /// 
-    /// 因为现在的结构是：
-    /// Player3D -> StateChart -> Root -> Movement -> GroundMode -> GroundMovementComponent
-    /// 
-    /// 组件的 GetParent() 返回的是 GroundMode，而不是 Player3D
-    /// 所以需要这个方法来获取真正的实体
+    /// 向上查找实体控制器
+    /// 目的：从深层组件节点获取顶层实体引用（如 Player3D）
+    /// 示例：GroundMovementComponent -> GroundMode -> ... -> Player3D
+    /// 算法：1. 优先使用 Owner 属性 -> 2. 兜底方案：向上遍历父节点直到找到匹配类型
     /// </summary>
-    /// <typeparam name="T">实体类型（如 CharacterBody3D 或 Player3D）</typeparam>
-    /// <param name="component">组件节点</param>
-    /// <returns>找到的实体，未找到返回 null</returns>
     public static T GetEntity<T>(this Node component) where T : Node
     {
-        // Owner 通常是打包场景的根节点 (Player3D)，这是最高效的获取方式
         if (component.Owner is T entity)
         {
             return entity;
         }
 
-        // 兜底方案：顺着树往上爬，直到找到 T 类型的节点
         Node current = component.GetParent();
         while (current != null)
         {
@@ -113,15 +92,8 @@ public static class StateChartAutoBindExtensions
 
     #region 状态事件方法
 
-    /// <summary>
-    /// 发送状态事件（黑盒路由）
-    /// StateChart 对组件完全透明，组件只需要知道"发送事件"这个动作
-    /// </summary>
-    /// <param name="node">实体节点</param>
-    /// <param name="eventName">事件名称</param>
     public static void SendStateEvent(this Node node, string eventName)
     {
-        // 查找 StateChart 节点（假设在实体的子节点中）
         var stateChartNode = node.GetNodeOrNull("StateChart");
         if (stateChartNode == null)
         {
@@ -129,7 +101,6 @@ public static class StateChartAutoBindExtensions
             return;
         }
 
-        // 使用 GodotStateCharts 插件的包装类
         var stateChart = StateChart.Of(stateChartNode);
         stateChart.SendEvent(eventName);
     }
