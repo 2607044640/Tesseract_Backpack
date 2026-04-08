@@ -65,10 +65,16 @@ public partial class GameSettingsController : Control
 	/// </summary>
 	private void BindSettings()
 	{
-		// ✅ 音频设置（一行搞定双向绑定 + 音频总线应用）
-		BindSlider(_settingsManager.MasterVolume, MasterVolume, _masterBusIdx);
-		BindSlider(_settingsManager.MusicVolume, MusicVolume, _musicBusIdx);
-		BindSlider(_settingsManager.SFXVolume, SFXVolume, _sfxBusIdx);
+		// ✅ 音频设置（专用方法：双向绑定 + 音频总线应用）
+		BindAudioSlider(_settingsManager.MasterVolume, MasterVolume, _masterBusIdx);
+		BindAudioSlider(_settingsManager.MusicVolume, MusicVolume, _musicBusIdx);
+		BindAudioSlider(_settingsManager.SFXVolume, SFXVolume, _sfxBusIdx);
+		
+		// 也可以使用通用方法（不包含音频总线逻辑）：
+		// BindSlider(_settingsManager.MasterVolume, MasterVolume, value => {
+		//     float dbVolume = Mathf.LinearToDb(value / 100f);
+		//     AudioServer.SetBusVolumeDb(_masterBusIdx, dbVolume);
+		// });
 		
 		// ✅ 视频设置
 		BindToggle(_settingsManager.Fullscreen, Fullscreen, ApplyFullscreen);
@@ -112,14 +118,45 @@ public partial class GameSettingsController : Control
 	}
 	
 	/// <summary>
-	/// ✅ 通用滑块绑定（双向 + 音频总线）
+	/// ✅ 通用滑块绑定（双向 + 自定义应用逻辑）
 	/// 
 	/// 优化点：
 	/// 1. DistinctUntilChanged：防止双向绑定循环
 	/// 2. 统一的绑定逻辑：减少重复代码
 	/// 3. 空值检查：避免空引用异常
+	/// 4. 支持自定义应用逻辑：灵活处理不同场景
 	/// </summary>
 	private void BindSlider(
+		ReactiveProperty<float> property, 
+		SliderComponentHelper slider, 
+		Action<float> applyAction = null)
+	{
+		if (slider == null) return;
+		
+		// Manager → UI + Apply
+		property
+			.DistinctUntilChanged()
+			.Subscribe(value =>
+			{
+				slider.Value.Value = value;
+				applyAction?.Invoke(value);
+			})
+			.AddTo(_disposables);
+		
+		// UI → Manager
+		slider.Value
+			.Skip(1)
+			.DistinctUntilChanged()
+			.Subscribe(value => property.Value = value)
+			.AddTo(_disposables);
+	}
+	
+	/// <summary>
+	/// ✅ 音频滑块专用绑定（双向 + 音频总线）
+	/// 
+	/// 专用于音频设置，自动处理音频总线的 dB 转换和应用
+	/// </summary>
+	private void BindAudioSlider(
 		ReactiveProperty<float> property, 
 		SliderComponentHelper slider, 
 		int audioBusIdx)
@@ -128,7 +165,7 @@ public partial class GameSettingsController : Control
 		
 		// Manager → UI + Audio
 		property
-			.DistinctUntilChanged() // ✅ 只有真正改变时才触发
+			.DistinctUntilChanged()
 			.Subscribe(value =>
 			{
 				slider.Value.Value = value;
@@ -140,7 +177,7 @@ public partial class GameSettingsController : Control
 		// UI → Manager
 		slider.Value
 			.Skip(1)
-			.DistinctUntilChanged() // ✅ 防止重复触发
+			.DistinctUntilChanged()
 			.Subscribe(value => property.Value = value)
 			.AddTo(_disposables);
 	}

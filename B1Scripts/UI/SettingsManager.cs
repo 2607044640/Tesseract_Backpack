@@ -26,6 +26,19 @@ public partial class SettingsManager : Node
 	private readonly List<SettingBinderBase<bool>> _boolBinders = new();
 	private readonly List<SettingBinderBase<int>> _intBinders = new();
 	
+	// ===== 默认值配置（可在编辑器中修改）=====
+	[ExportGroup("Audio Defaults")]
+	[Export] public float DefaultMasterVolume { get; set; } = 100f;
+	[Export] public float DefaultMusicVolume { get; set; } = 80f;
+	[Export] public float DefaultSFXVolume { get; set; } = 80f;
+	[Export] public bool DefaultMute { get; set; } = false;
+	
+	[ExportGroup("Video Defaults")]
+	[Export] public bool DefaultFullscreen { get; set; } = false;
+	[Export] public int DefaultResolutionIndex { get; set; } = 0;
+	[Export] public int DefaultAntiAliasingIndex { get; set; } = 0;
+	[Export] public int DefaultCameraShakeIndex { get; set; } = 1;
+	
 	// ===== Audio Settings (ReactiveProperty) =====
 	public ReactiveProperty<float> MasterVolume { get; private set; }
 	public ReactiveProperty<float> MusicVolume { get; private set; }
@@ -43,16 +56,16 @@ public partial class SettingsManager : Node
 		_config = new ConfigFile();
 		LoadConfig();
 		
-		// ✅ 使用绑定器创建所有设置（自动加载初始值）
-		MasterVolume = CreateFloatSetting("master_volume", 100f);
-		MusicVolume = CreateFloatSetting("music_volume", 80f);
-		SFXVolume = CreateFloatSetting("sfx_volume", 80f);
-		Mute = CreateBoolSetting("mute", false);
+		// ✅ 使用绑定器创建所有设置（使用 [Export] 默认值）
+		MasterVolume = CreateFloatSetting("master_volume", DefaultMasterVolume);
+		MusicVolume = CreateFloatSetting("music_volume", DefaultMusicVolume);
+		SFXVolume = CreateFloatSetting("sfx_volume", DefaultSFXVolume);
+		Mute = CreateBoolSetting("mute", DefaultMute);
 		
-		Fullscreen = CreateBoolSetting("fullscreen", false);
-		ResolutionIndex = CreateIntSetting("resolution", 0);
-		AntiAliasingIndex = CreateIntSetting("anti_aliasing", 0);
-		CameraShakeIndex = CreateIntSetting("camera_shake", 1);
+		Fullscreen = CreateBoolSetting("fullscreen", DefaultFullscreen);
+		ResolutionIndex = CreateIntSetting("resolution", DefaultResolutionIndex);
+		AntiAliasingIndex = CreateIntSetting("anti_aliasing", DefaultAntiAliasingIndex);
+		CameraShakeIndex = CreateIntSetting("camera_shake", DefaultCameraShakeIndex);
 		
 		// ✅ 统一的自动保存（Debounce 500ms）
 		SubscribeAutoSave();
@@ -166,19 +179,19 @@ public partial class SettingsManager : Node
 	}
 	
 	/// <summary>
-	/// ✅ 重置所有设置到默认值（自动触发保存）
+	/// ✅ 重置所有设置到默认值（使用 [Export] 配置的默认值）
 	/// </summary>
 	public void ResetAllSettings()
 	{
-		MasterVolume.Value = 100f;
-		MusicVolume.Value = 80f;
-		SFXVolume.Value = 80f;
-		Mute.Value = false;
+		MasterVolume.Value = DefaultMasterVolume;
+		MusicVolume.Value = DefaultMusicVolume;
+		SFXVolume.Value = DefaultSFXVolume;
+		Mute.Value = DefaultMute;
 		
-		Fullscreen.Value = false;
-		ResolutionIndex.Value = 0;
-		AntiAliasingIndex.Value = 0;
-		CameraShakeIndex.Value = 1;
+		Fullscreen.Value = DefaultFullscreen;
+		ResolutionIndex.Value = DefaultResolutionIndex;
+		AntiAliasingIndex.Value = DefaultAntiAliasingIndex;
+		CameraShakeIndex.Value = DefaultCameraShakeIndex;
 		
 		GD.Print("✓ All settings reset to defaults");
 	}
