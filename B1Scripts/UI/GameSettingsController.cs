@@ -60,111 +60,24 @@ public partial class GameSettingsController : Control
 		_disposables.Dispose();
 	}
 	
+	/// <summary>
+	/// ✅ 优化后的绑定逻辑：使用通用方法，代码量减少 80%
+	/// </summary>
 	private void BindSettings()
 	{
-		// ===== Manager → Component Helpers (使用 ReactiveProperty 双向绑定) =====
+		// ✅ 音频设置（一行搞定双向绑定 + 音频总线应用）
+		BindSlider(_settingsManager.MasterVolume, MasterVolume, _masterBusIdx);
+		BindSlider(_settingsManager.MusicVolume, MusicVolume, _musicBusIdx);
+		BindSlider(_settingsManager.SFXVolume, SFXVolume, _sfxBusIdx);
 		
-		if (MasterVolume != null)
-		{
-			// Manager → Component Helper
-			_settingsManager.MasterVolume
-				.Subscribe(value =>
-				{
-					MasterVolume.Value.Value = value;
-					float dbVolume = Mathf.LinearToDb(value / 100f);
-					AudioServer.SetBusVolumeDb(_masterBusIdx, dbVolume);
-				})
-				.AddTo(_disposables);
-			
-			// Component Helper → Manager
-			MasterVolume.Value
-				.Skip(1) // 跳过初始值
-				.Subscribe(value => _settingsManager.MasterVolume.Value = value)
-				.AddTo(_disposables);
-		}
+		// ✅ 视频设置
+		BindToggle(_settingsManager.Fullscreen, Fullscreen, ApplyFullscreen);
+		BindDropdown(_settingsManager.ResolutionIndex, Resolution, ApplyResolution);
 		
-		if (MusicVolume != null)
-		{
-			_settingsManager.MusicVolume
-				.Subscribe(value =>
-				{
-					MusicVolume.Value.Value = value;
-					float dbVolume = Mathf.LinearToDb(value / 100f);
-					AudioServer.SetBusVolumeDb(_musicBusIdx, dbVolume);
-				})
-				.AddTo(_disposables);
-			
-			MusicVolume.Value
-				.Skip(1)
-				.Subscribe(value => _settingsManager.MusicVolume.Value = value)
-				.AddTo(_disposables);
-		}
+		// ✅ 全屏与分辨率联动（新增功能）
+		SetupFullscreenResolutionLink();
 		
-		if (SFXVolume != null)
-		{
-			_settingsManager.SFXVolume
-				.Subscribe(value =>
-				{
-					SFXVolume.Value.Value = value;
-					float dbVolume = Mathf.LinearToDb(value / 100f);
-					AudioServer.SetBusVolumeDb(_sfxBusIdx, dbVolume);
-				})
-				.AddTo(_disposables);
-			
-			SFXVolume.Value
-				.Skip(1)
-				.Subscribe(value => _settingsManager.SFXVolume.Value = value)
-				.AddTo(_disposables);
-		}
-		
-		if (Fullscreen != null)
-		{
-			_settingsManager.Fullscreen
-				.Subscribe(fullscreen =>
-				{
-					Fullscreen.IsToggled.Value = fullscreen;
-					DisplayServer.WindowSetMode(fullscreen 
-						? DisplayServer.WindowMode.Fullscreen 
-						: DisplayServer.WindowMode.Windowed);
-				})
-				.AddTo(_disposables);
-			
-			Fullscreen.IsToggled
-				.Skip(1)
-				.Subscribe(fullscreen => _settingsManager.Fullscreen.Value = fullscreen)
-				.AddTo(_disposables);
-		}
-		
-		if (Resolution != null)
-		{
-			_settingsManager.ResolutionIndex
-				.Subscribe(index =>
-				{
-					Resolution.SelectedIndex.Value = index;
-					
-					// 应用分辨率
-					string text = Resolution.GetSelectedText();
-					if (!string.IsNullOrEmpty(text))
-					{
-						string[] parts = text.Split('x');
-						if (parts.Length == 2)
-						{
-							int width = int.Parse(parts[0].Trim());
-							int height = int.Parse(parts[1].Trim());
-							DisplayServer.WindowSetSize(new Vector2I(width, height));
-						}
-					}
-				})
-				.AddTo(_disposables);
-			
-			Resolution.SelectedIndex
-				.Skip(1)
-				.Subscribe(index => _settingsManager.ResolutionIndex.Value = index)
-				.AddTo(_disposables);
-		}
-		
-		// ===== Buttons =====
-		
+		// ✅ 按钮
 		if (SaveButton != null)
 		{
 			SaveButton.OnPressedAsObservable()
@@ -186,10 +99,182 @@ public partial class GameSettingsController : Control
 		if (ResetAllButton != null)
 		{
 			ResetAllButton.OnPressedAsObservable()
-				.Subscribe(_ => _settingsManager.ResetAllSettings())
+				.ThrottleFirst(TimeSpan.FromSeconds(1)) // ✅ 防止连击
+				.Subscribe(_ =>
+				{
+					_settingsManager.ResetAllSettings();
+					GD.Print("✓ Settings reset (1s cooldown)");
+				})
 				.AddTo(_disposables);
 		}
 		
-		GD.Print("GameSettings bound to SettingsManager via R3 ReactiveProperty (bidirectional)");
+		GD.Print("✓ GameSettings bound with optimized binders");
+	}
+	
+	/// <summary>
+	/// ✅ 通用滑块绑定（双向 + 音频总线）
+	/// 
+	/// 优化点：
+	/// 1. DistinctUntilChanged：防止双向绑定循环
+	/// 2. 统一的绑定逻辑：减少重复代码
+	/// 3. 空值检查：避免空引用异常
+	/// </summary>
+	private void BindSlider(
+		ReactiveProperty<float> property, 
+		SliderComponentHelper slider, 
+		int audioBusIdx)
+	{
+		if (slider == null) return;
+		
+		// Manager → UI + Audio
+		property
+			.DistinctUntilChanged() // ✅ 只有真正改变时才触发
+			.Subscribe(value =>
+			{
+				slider.Value.Value = value;
+				float dbVolume = Mathf.LinearToDb(value / 100f);
+				AudioServer.SetBusVolumeDb(audioBusIdx, dbVolume);
+			})
+			.AddTo(_disposables);
+		
+		// UI → Manager
+		slider.Value
+			.Skip(1)
+			.DistinctUntilChanged() // ✅ 防止重复触发
+			.Subscribe(value => property.Value = value)
+			.AddTo(_disposables);
+	}
+	
+	/// <summary>
+	/// ✅ 通用开关绑定（双向 + 自定义应用逻辑）
+	/// </summary>
+	private void BindToggle(
+		ReactiveProperty<bool> property, 
+		ToggleComponentHelper toggle, 
+		Action<bool> applyAction = null)
+	{
+		if (toggle == null) return;
+		
+		// Manager → UI + Apply
+		property
+			.DistinctUntilChanged()
+			.Subscribe(value =>
+			{
+				toggle.IsToggled.Value = value;
+				applyAction?.Invoke(value);
+			})
+			.AddTo(_disposables);
+		
+		// UI → Manager
+		toggle.IsToggled
+			.Skip(1)
+			.DistinctUntilChanged()
+			.Subscribe(value => property.Value = value)
+			.AddTo(_disposables);
+	}
+	
+	/// <summary>
+	/// ✅ 通用下拉框绑定（双向 + 自定义应用逻辑）
+	/// </summary>
+	private void BindDropdown(
+		ReactiveProperty<int> property, 
+		DropdownComponentHelper dropdown, 
+		Action<int> applyAction = null)
+	{
+		if (dropdown == null) return;
+		
+		// Manager → UI + Apply
+		property
+			.DistinctUntilChanged()
+			.Subscribe(index =>
+			{
+				dropdown.SelectedIndex.Value = index;
+				applyAction?.Invoke(index);
+			})
+			.AddTo(_disposables);
+		
+		// UI → Manager
+		dropdown.SelectedIndex
+			.Skip(1)
+			.DistinctUntilChanged()
+			.Subscribe(index => property.Value = index)
+			.AddTo(_disposables);
+	}
+	
+	/// <summary>
+	/// ✅ 应用全屏设置
+	/// </summary>
+	private void ApplyFullscreen(bool fullscreen)
+	{
+		DisplayServer.WindowSetMode(fullscreen 
+			? DisplayServer.WindowMode.Fullscreen 
+			: DisplayServer.WindowMode.Windowed);
+		GD.Print($"✓ Fullscreen: {fullscreen}");
+	}
+	
+	/// <summary>
+	/// ✅ 应用分辨率设置（带错误处理）
+	/// 
+	/// 优化点：
+	/// 1. 使用 TryParse 替代 Parse：避免崩溃
+	/// 2. 详细的错误日志：便于调试
+	/// </summary>
+	private void ApplyResolution(int index)
+	{
+		if (Resolution == null) return;
+		
+		string text = Resolution.GetSelectedText();
+		if (!string.IsNullOrEmpty(text))
+		{
+			string[] parts = text.Split('x');
+			if (parts.Length == 2 
+				&& int.TryParse(parts[0].Trim(), out int width)
+				&& int.TryParse(parts[1].Trim(), out int height))
+			{
+				DisplayServer.WindowSetSize(new Vector2I(width, height));
+				GD.Print($"✓ Resolution set to {width}x{height}");
+			}
+			else
+			{
+				GD.PushWarning($"Invalid resolution format: {text}");
+			}
+		}
+	}
+	
+	/// <summary>
+	/// ✅ 全屏与分辨率联动（新增功能）
+	/// 
+	/// 功能：全屏时禁用分辨率选择，窗口模式时启用
+	/// 符合现代游戏交互逻辑，防止用户在不支持的模式下修改设置
+	/// </summary>
+	private void SetupFullscreenResolutionLink()
+	{
+		if (Fullscreen == null || Resolution == null) return;
+		
+		_settingsManager.Fullscreen
+			.Subscribe(isFullscreen =>
+			{
+				// 尝试获取底层的 OptionButton 控件
+				var dropdown = Resolution.GetNodeOrNull<OptionButton>("OptionButton");
+				if (dropdown != null)
+				{
+					dropdown.Disabled = isFullscreen;
+					GD.Print($"✓ Resolution selector {(isFullscreen ? "disabled" : "enabled")}");
+				}
+				else
+				{
+					// 如果找不到，尝试直接访问 Resolution 的子节点
+					foreach (var child in Resolution.GetChildren())
+					{
+						if (child is OptionButton optionButton)
+						{
+							optionButton.Disabled = isFullscreen;
+							GD.Print($"✓ Resolution selector {(isFullscreen ? "disabled" : "enabled")}");
+							break;
+						}
+					}
+				}
+			})
+			.AddTo(_disposables);
 	}
 }
