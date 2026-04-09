@@ -237,7 +237,9 @@ public partial class BackpackInteractionController : Node
 		}
 		
 		// 1. 获取当前鼠标位置
-		Vector2 mousePos = GetViewport().GetMousePosition();
+		// 使用 ViewGrid.GetGlobalMousePosition() 而非 GetViewport().GetMousePosition()
+		// 原因：自动处理 Camera2D 移动和 CanvasLayer 缩放，确保坐标准确
+		Vector2 mousePos = ViewGrid.GetGlobalMousePosition();
 		
 		// 2. 检查鼠标是否在背包 UI 范围内
 		bool isInBackpack = ViewGrid.GetGlobalRect().HasPoint(mousePos);
