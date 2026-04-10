@@ -162,6 +162,17 @@ public partial class BackpackInteractionController : Node
 			.Subscribe(_ => HandleItemRotated(itemEntity, shapeComponent))
 			.AddTo(itemEntity);
 		
+		// 3. 【内存安全】监听物品销毁事件，防止字典持有悬空引用
+		// 如果物品在拖拽过程中被销毁（如背包着火），立即从字典中移除
+		itemEntity.TreeExited += () =>
+		{
+			if (_dragStates.ContainsKey(itemEntity))
+			{
+				_dragStates.Remove(itemEntity);
+				GD.Print($"物品 {itemEntity.Name} 意外销毁，已从拖拽状态中清理");
+			}
+		};
+		
 		GD.Print($"BackpackInteractionController: 已注册物品 {itemEntity.Name}");
 	}
 	

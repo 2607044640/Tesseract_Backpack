@@ -86,6 +86,18 @@ public partial class DraggableItemComponent : Node
 	/// </summary>
 	[Export] public Node StateChart { get; set; }
 	
+	/// <summary>
+	/// 拖拽开始事件名称（发送给 StateChart）
+	/// 可在编辑器中配置，避免硬编码
+	/// </summary>
+	[Export] public string DragStartEventName { get; set; } = "drag_start";
+	
+	/// <summary>
+	/// 拖拽结束事件名称（发送给 StateChart）
+	/// 可在编辑器中配置，避免硬编码
+	/// </summary>
+	[Export] public string DragEndEventName { get; set; } = "drag_end";
+	
 	#endregion
 	
 	#region R3 Reactive Streams
@@ -233,9 +245,9 @@ public partial class DraggableItemComponent : Node
 		// 【StateChart】发送状态机事件
 		if (StateChart != null)
 		{
-			// 直接调用 StateChart 节点的 send_event 方法
-			StateChart.Call("send_event", "drag_start");
-			GD.Print("DraggableItemComponent: 发送状态事件 'drag_start'");
+			// 使用可配置的事件名称，避免硬编码
+			StateChart.Call("send_event", DragStartEventName);
+			GD.Print($"DraggableItemComponent: 发送状态事件 '{DragStartEventName}'");
 		}
 		
 		GD.Print("DraggableItemComponent: 拖拽开始");
@@ -252,9 +264,9 @@ public partial class DraggableItemComponent : Node
 		// 【StateChart】发送状态机事件
 		if (StateChart != null)
 		{
-			// 直接调用 StateChart 节点的 send_event 方法
-			StateChart.Call("send_event", "drag_end");
-			GD.Print("DraggableItemComponent: 发送状态事件 'drag_end'");
+			// 使用可配置的事件名称，避免硬编码
+			StateChart.Call("send_event", DragEndEventName);
+			GD.Print($"DraggableItemComponent: 发送状态事件 '{DragEndEventName}'");
 		}
 		
 		GD.Print("DraggableItemComponent: 拖拽结束");
