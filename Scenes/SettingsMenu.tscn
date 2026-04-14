@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://gdi0ndphqc32"]
+
+[ext_resource type="Script" uid="uid://bk83ics8idr7w" path="res://addons/A1MyAddon/Helpers/MarginContainerHelper.cs" id="1_res"]
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+script = ExtResource("1_res")
+UniformMargin = 20
+
+[node name="MainVBox" type="VBoxContainer" parent="MainMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="MainMargin/MainVBox"]
+layout_mode = 2
+text = "Settings"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="Separator1" type="HSeparator" parent="MainMargin/MainVBox"]
+layout_mode = 2
+
+[node name="AudioSection" type="HBoxContainer" parent="MainMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AudioLabel" type="Label" parent="MainMargin/MainVBox/AudioSection"]
+layout_mode = 2
+text = "Master Volume:"
+horizontal_alignment = 0
+
+[node name="VolumeBar" type="ProgressBar" parent="MainMargin/MainVBox/AudioSection"]
+layout_mode = 2
+value = 75
+size_flags_horizontal = 3
+show_percentage = true
+
+[node name="GraphicsSection" type="HBoxContainer" parent="MainMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GraphicsLabel" type="Label" parent="MainMargin/MainVBox/GraphicsSection"]
+layout_mode = 2
+text = "Fullscreen:"
+horizontal_alignment = 0
+
+[node name="FullscreenCheck" type="CheckBox" parent="MainMargin/MainVBox/GraphicsSection"]
+layout_mode = 2
+button_pressed = true
+
+[node name="ButtonSection" type="HBoxContainer" parent="MainMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ApplyButton" type="Button" parent="MainMargin/MainVBox/ButtonSection"]
+layout_mode = 2
+text = "Apply"
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Button" parent="MainMargin/MainVBox/ButtonSection"]
+layout_mode = 2
+text = "Cancel"
+size_flags_horizontal = 3

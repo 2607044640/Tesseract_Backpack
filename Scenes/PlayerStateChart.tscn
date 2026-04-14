@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://du6hrdsojinqa"]
+
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
+
+[node name="Player" type="CharacterBody3D"]
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("script_StateChart")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("script_CompoundState")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToWalking" type="Node" parent="StateChart/Root/Idle"]
+script = ExtResource("script_Transition")
+to = NodePath("../Walking")
+delay_in_seconds = "0.0"
+event = &"move_start"
+
+[node name="Walking" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToIdle" type="Node" parent="StateChart/Root/Walking"]
+script = ExtResource("script_Transition")
+to = NodePath("../Idle")
+delay_in_seconds = "0.0"
+event = &"move_stop"
+
+[node name="ToRunning" type="Node" parent="StateChart/Root/Walking"]
+script = ExtResource("script_Transition")
+to = NodePath("../Running")
+delay_in_seconds = "0.0"
+event = &"sprint_start"
+
+[node name="Running" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToWalking2" type="Node" parent="StateChart/Root/Running"]
+script = ExtResource("script_Transition")
+to = NodePath("../Walking")
+delay_in_seconds = "0.0"
+event = &"sprint_stop"

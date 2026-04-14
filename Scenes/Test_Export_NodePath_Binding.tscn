@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://6nxurb087iuk"]
+
+[ext_resource type="Script" uid="uid://test_controller" path="res://TestController.cs" id="1_res"]
+
+[node name="TestExportBinding" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Row1" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Button1" type="Button" parent="MainVBox/Row1"]
+layout_mode = 2
+text = "Button 1"
+
+[node name="Button2" type="Button" parent="MainVBox/Row1"]
+layout_mode = 2
+text = "Button 2"
+
+[node name="Row2" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label1" type="Label" parent="MainVBox/Row2"]
+layout_mode = 2
+text = "Label 1"
+horizontal_alignment = 0
+
+[node name="Progress1" type="ProgressBar" parent="MainVBox/Row2"]
+layout_mode = 2
+value = 50
+show_percentage = true
+
+[node name="NestedVBox" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Check1" type="CheckBox" parent="MainVBox/NestedVBox"]
+layout_mode = 2
+text = "Checkbox 1"
+
+[node name="Check2" type="CheckBox" parent="MainVBox/NestedVBox"]
+layout_mode = 2
+text = "Checkbox 2"
+
+[node name="Controller" type="Node" parent="."]
+script = ExtResource("1_res")
+Button1 = NodePath("../MainVBox/Row1/Button1")
+Button2 = NodePath("../MainVBox/Row1/Button2")
+Label1 = NodePath("../MainVBox/Row2/Label1")
+Progress1 = NodePath("../MainVBox/Row2/Progress1")
+Check1 = NodePath("../MainVBox/NestedVBox/Check1")
+Check2 = NodePath("../MainVBox/NestedVBox/Check2")
+
+[node name="SiblingController" type="Node" parent="."]
+script = ExtResource("1_res")
+Button1 = NodePath("../MainVBox/Row1/Button1")

@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://b1y50ph2c4cpr"]
+
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
+[ext_resource type="Script" uid="uid://hud_active_controller" path="res://B1Scripts/UI/HUDActiveController.cs" id="component_HUDActiveController"]
+[ext_resource type="Script" uid="uid://hud_paused_controller" path="res://B1Scripts/UI/HUDPausedController.cs" id="component_HUDPausedController"]
+
+[node name="PlayerHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HealthLabel" type="Label" parent="MainVBox"]
+layout_mode = 2
+text = "Health"
+horizontal_alignment = 0
+
+[node name="HealthBar" type="ProgressBar" parent="MainVBox"]
+layout_mode = 2
+value = 100
+show_percentage = true
+
+[node name="ManaLabel" type="Label" parent="MainVBox"]
+layout_mode = 2
+text = "Mana"
+horizontal_alignment = 0
+
+[node name="ManaBar" type="ProgressBar" parent="MainVBox"]
+layout_mode = 2
+value = 100
+show_percentage = true
+
+[node name="PauseButton" type="Button" parent="MainVBox"]
+layout_mode = 2
+text = "Pause"
+
+[node name="StatusLabel" type="Label" parent="MainVBox"]
+layout_mode = 2
+horizontal_alignment = 0
+
+[node name="HUDStateChart" type="Node" parent="."]
+script = ExtResource("script_StateChart")
+
+[node name="Root" type="Node" parent="HUDStateChart"]
+script = ExtResource("script_CompoundState")
+initial_state = NodePath("Active")
+
+[node name="Active" type="Node" parent="HUDStateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToPaused" type="Node" parent="HUDStateChart/Root/Active"]
+script = ExtResource("script_Transition")
+to = NodePath("../Paused")
+delay_in_seconds = "0.0"
+event = &"pause"
+
+[node name="ToHidden" type="Node" parent="HUDStateChart/Root/Active"]
+script = ExtResource("script_Transition")
+to = NodePath("../Hidden")
+delay_in_seconds = "0.0"
+event = &"hide"
+
+[node name="HUDActiveController" type="Node" parent="HUDStateChart/Root/Active"]
+script = ExtResource("component_HUDActiveController")
+HealthBar = NodePath("../../../../MainVBox/HealthBar")
+ManaBar = NodePath("../../../../MainVBox/ManaBar")
+StatusLabel = NodePath("../../../../MainVBox/StatusLabel")
+PauseButton = NodePath("../../../../MainVBox/PauseButton")
+
+[node name="Paused" type="Node" parent="HUDStateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToActive" type="Node" parent="HUDStateChart/Root/Paused"]
+script = ExtResource("script_Transition")
+to = NodePath("../Active")
+delay_in_seconds = "0.0"
+event = &"resume"
+
+[node name="HUDPausedController" type="Node" parent="HUDStateChart/Root/Paused"]
+script = ExtResource("component_HUDPausedController")
+StatusLabel = NodePath("../../../../MainVBox/StatusLabel")
+PauseButton = NodePath("../../../../MainVBox/PauseButton")
+
+[node name="Hidden" type="Node" parent="HUDStateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToActive2" type="Node" parent="HUDStateChart/Root/Hidden"]
+script = ExtResource("script_Transition")
+to = NodePath("../Active")
+delay_in_seconds = "0.0"
+event = &"show"

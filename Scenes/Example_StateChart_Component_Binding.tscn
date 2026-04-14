@@ -1,0 +1,223 @@
+[gd_scene format=3 uid="uid://nowaxwgbsj68"]
+
+[ext_resource type="Script" uid="uid://bk83ics8idr7w" path="res://addons/A1MyAddon/Helpers/MarginContainerHelper.cs" id="1_res"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
+[ext_resource type="Script" uid="uid://settings_controller_uid" path="res://B1Scripts/UI/SettingsController.cs" id="component_SettingsController"]
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="MainMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+script = ExtResource("1_res")
+UniformMargin = 40
+
+[node name="MainVBox" type="VBoxContainer" parent="MainMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="MainMargin/MainVBox"]
+layout_mode = 2
+text = "Game Settings"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="TitleSep" type="HSeparator" parent="MainMargin/MainVBox"]
+layout_mode = 2
+
+[node name="AudioTitle" type="Label" parent="MainMargin/MainVBox"]
+layout_mode = 2
+text = "Audio Settings"
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 20
+
+[node name="AudioSection" type="VBoxContainer" parent="MainMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MasterVolumeRow" type="HBoxContainer" parent="MainMargin/MainVBox/AudioSection"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MasterVolumeLabel" type="Label" parent="MainMargin/MainVBox/AudioSection/MasterVolumeRow"]
+layout_mode = 2
+text = "Master Volume:"
+horizontal_alignment = 0
+custom_minimum_size = Vector2(150, 0)
+
+[node name="MasterVolumeSlider" type="ProgressBar" parent="MainMargin/MainVBox/AudioSection/MasterVolumeRow"]
+layout_mode = 2
+value = 80
+size_flags_horizontal = 3
+show_percentage = true
+
+[node name="MusicVolumeRow" type="HBoxContainer" parent="MainMargin/MainVBox/AudioSection"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MusicVolumeLabel" type="Label" parent="MainMargin/MainVBox/AudioSection/MusicVolumeRow"]
+layout_mode = 2
+text = "Music Volume:"
+horizontal_alignment = 0
+custom_minimum_size = Vector2(150, 0)
+
+[node name="MusicVolumeSlider" type="ProgressBar" parent="MainMargin/MainVBox/AudioSection/MusicVolumeRow"]
+layout_mode = 2
+value = 70
+size_flags_horizontal = 3
+show_percentage = true
+
+[node name="AudioSep" type="HSeparator" parent="MainMargin/MainVBox"]
+layout_mode = 2
+
+[node name="GraphicsTitle" type="Label" parent="MainMargin/MainVBox"]
+layout_mode = 2
+text = "Graphics Settings"
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 20
+
+[node name="GraphicsSection" type="VBoxContainer" parent="MainMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="FullscreenRow" type="HBoxContainer" parent="MainMargin/MainVBox/GraphicsSection"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="FullscreenLabel" type="Label" parent="MainMargin/MainVBox/GraphicsSection/FullscreenRow"]
+layout_mode = 2
+text = "Fullscreen:"
+horizontal_alignment = 0
+custom_minimum_size = Vector2(150, 0)
+
+[node name="FullscreenCheckbox" type="CheckBox" parent="MainMargin/MainVBox/GraphicsSection/FullscreenRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="VSyncRow" type="HBoxContainer" parent="MainMargin/MainVBox/GraphicsSection"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="VSyncLabel" type="Label" parent="MainMargin/MainVBox/GraphicsSection/VSyncRow"]
+layout_mode = 2
+text = "VSync:"
+horizontal_alignment = 0
+custom_minimum_size = Vector2(150, 0)
+
+[node name="VSyncCheckbox" type="CheckBox" parent="MainMargin/MainVBox/GraphicsSection/VSyncRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="GraphicsSep" type="HSeparator" parent="MainMargin/MainVBox"]
+layout_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="MainMargin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="ApplyButton" type="Button" parent="MainMargin/MainVBox/ButtonRow"]
+layout_mode = 2
+text = "Apply Changes"
+size_flags_horizontal = 3
+
+[node name="ResetButton" type="Button" parent="MainMargin/MainVBox/ButtonRow"]
+layout_mode = 2
+text = "Reset to Defaults"
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Button" parent="MainMargin/MainVBox/ButtonRow"]
+layout_mode = 2
+text = "Cancel"
+size_flags_horizontal = 3
+
+[node name="StatusLabel" type="Label" parent="MainMargin/MainVBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("script_StateChart")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("script_CompoundState")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToEditing" type="Node" parent="StateChart/Root/Idle"]
+script = ExtResource("script_Transition")
+to = NodePath("../Editing")
+delay_in_seconds = "0.0"
+event = &"start_edit"
+
+[node name="Editing" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="ToIdle" type="Node" parent="StateChart/Root/Editing"]
+script = ExtResource("script_Transition")
+to = NodePath("../Idle")
+delay_in_seconds = "0.0"
+event = &"cancel"
+
+[node name="ToApplying" type="Node" parent="StateChart/Root/Editing"]
+script = ExtResource("script_Transition")
+to = NodePath("../Applying")
+delay_in_seconds = "0.0"
+event = &"apply"
+
+[node name="ToResetting" type="Node" parent="StateChart/Root/Editing"]
+script = ExtResource("script_Transition")
+to = NodePath("../Resetting")
+delay_in_seconds = "0.0"
+event = &"reset"
+
+[node name="SettingsController" type="Node" parent="StateChart/Root/Editing"]
+script = ExtResource("component_SettingsController")
+MasterVolumeSlider = NodePath("../../../../MainMargin/MainVBox/AudioSection/MasterVolumeRow/MasterVolumeSlider")
+MusicVolumeSlider = NodePath("../../../../MainMargin/MainVBox/AudioSection/MusicVolumeRow/MusicVolumeSlider")
+FullscreenCheckbox = NodePath("../../../../MainMargin/MainVBox/GraphicsSection/FullscreenRow/FullscreenCheckbox")
+VSyncCheckbox = NodePath("../../../../MainMargin/MainVBox/GraphicsSection/VSyncRow/VSyncCheckbox")
+ApplyButton = NodePath("../../../../MainMargin/MainVBox/ButtonRow/ApplyButton")
+ResetButton = NodePath("../../../../MainMargin/MainVBox/ButtonRow/ResetButton")
+CancelButton = NodePath("../../../../MainMargin/MainVBox/ButtonRow/CancelButton")
+StatusLabel = NodePath("../../../../MainMargin/MainVBox/StatusLabel")
+
+[node name="Applying" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="BackToIdle1" type="Node" parent="StateChart/Root/Applying"]
+script = ExtResource("script_Transition")
+to = NodePath("../Idle")
+delay_in_seconds = "0.0"
+event = &"complete"
+
+[node name="Resetting" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+
+[node name="BackToIdle2" type="Node" parent="StateChart/Root/Resetting"]
+script = ExtResource("script_Transition")
+to = NodePath("../Idle")
+delay_in_seconds = "0.0"
+event = &"complete"
