@@ -112,11 +112,30 @@ public partial class FollowMouseUIComponent : Node
 	
 	public override void _Ready()
 	{
-		// 验证必需属性
+		// 延迟初始化以等待 Godot 解析 NodePath
+		CallDeferred(MethodName.InitializeComponent);
+	}
+	
+	/// <summary>
+	/// 延迟初始化组件（在 NodePath 解析完成后）
+	/// </summary>
+	private void InitializeComponent()
+	{
+		// 自动查找 TargetUI（如果未手动设置）
 		if (TargetUI == null)
 		{
-			GD.PushError("FollowMouseUIComponent: TargetUI 未设置！组件将无法工作。");
-			return;
+			// 尝试向上查找 4 层（因为组件在 StateChart/Root/Dragging 下）
+			// 路径：Dragging -> Root -> StateChart -> TestItem
+			TargetUI = GetNodeOrNull<Control>("../../../..");
+			if (TargetUI != null)
+			{
+				GD.Print($"FollowMouseUIComponent: 自动找到 TargetUI '{TargetUI.Name}'");
+			}
+			else
+			{
+				GD.PushError("FollowMouseUIComponent: 无法找到 TargetUI！组件将无法工作。");
+				return;
+			}
 		}
 		
 		// 保存原始 ZIndex

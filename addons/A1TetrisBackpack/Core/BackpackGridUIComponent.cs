@@ -70,11 +70,24 @@ public partial class BackpackGridUIComponent : Control
 	
 	public override void _Ready()
 	{
-		// 验证必需引用
+		// 延迟初始化以等待 Godot 解析 NodePath
+		CallDeferred(MethodName.InitializeComponent);
+	}
+	
+	/// <summary>
+	/// 延迟初始化组件（在 NodePath 解析完成后）
+	/// </summary>
+	private void InitializeComponent()
+	{
+		// 自动查找 LogicGrid（如果未手动设置）
 		if (LogicGrid == null)
 		{
-			GD.PushError("BackpackGridUIComponent: LogicGrid 未设置！");
-			return;
+			LogicGrid = GetNodeOrNull<BackpackGridComponent>("BackpackGridComponent");
+			if (LogicGrid == null)
+			{
+				GD.PushError("BackpackGridUIComponent: 无法找到 BackpackGridComponent！");
+				return;
+			}
 		}
 		
 		// 根据逻辑网格尺寸自动调整 UI 大小

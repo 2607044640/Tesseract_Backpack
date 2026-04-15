@@ -80,15 +80,33 @@ public partial class BackpackInteractionController : Node
 	
 	public override void _Ready()
 	{
-		// 验证必需引用
+		// 延迟初始化以等待 Godot 解析 NodePath
+		CallDeferred(MethodName.InitializeComponent);
+	}
+	
+	/// <summary>
+	/// 延迟初始化组件（在 NodePath 解析完成后）
+	/// </summary>
+	private void InitializeComponent()
+	{
+		// 自动查找 LogicGrid（如果未手动设置）
 		if (LogicGrid == null)
 		{
-			GD.PushError("BackpackInteractionController: LogicGrid 未设置！");
+			LogicGrid = GetNodeOrNull<BackpackGridComponent>("../BackpackGridComponent");
+			if (LogicGrid == null)
+			{
+				GD.PushError("BackpackInteractionController: 无法找到 BackpackGridComponent！");
+			}
 		}
 		
+		// 自动查找 ViewGrid（如果未手动设置）
 		if (ViewGrid == null)
 		{
-			GD.PushError("BackpackInteractionController: ViewGrid 未设置！");
+			ViewGrid = GetNodeOrNull<BackpackGridUIComponent>("..");
+			if (ViewGrid == null)
+			{
+				GD.PushError("BackpackInteractionController: 无法找到 BackpackGridUIComponent！");
+			}
 		}
 		
 		GD.Print("BackpackInteractionController: 初始化完成");

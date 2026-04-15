@@ -157,18 +157,38 @@ public partial class DraggableItemComponent : Node
 		OnDragEndedAsObservable = new Subject<Unit>();
 		OnRotateRequestedAsObservable = new Subject<Unit>();
 		
+		// 延迟初始化以等待 Godot 解析 NodePath
+		CallDeferred(MethodName.InitializeComponent);
+	}
+	
+	/// <summary>
+	/// 延迟初始化组件（在 NodePath 解析完成后）
+	/// </summary>
+	private void InitializeComponent()
+	{
+		// 自动查找 ClickableArea（如果未手动设置）
+		if (ClickableArea == null)
+		{
+			// 尝试使用父节点作为 ClickableArea
+			ClickableArea = GetParent() as Control;
+			if (ClickableArea != null)
+			{
+				GD.Print($"DraggableItemComponent: 自动使用父节点 '{ClickableArea.Name}' 作为 ClickableArea");
+			}
+			else
+			{
+				GD.PushWarning("DraggableItemComponent: 无法找到 ClickableArea，组件将无法接收输入");
+			}
+		}
+		
 		// 订阅 GUI 输入事件
 		if (ClickableArea != null)
 		{
 			ClickableArea.GuiInput += HandleGuiInput;
 			GD.Print($"DraggableItemComponent: 已订阅 {ClickableArea.Name} 的 GuiInput 事件");
 		}
-		else
-		{
-			GD.PushWarning("DraggableItemComponent: ClickableArea 未设置，组件将无法接收输入");
-		}
 		
-		// 验证 StateChart 引用（如果未设置，尝试自动查找）
+		// 自动查找 StateChart（如果未手动设置）
 		if (StateChart == null)
 		{
 			StateChart = GetParent()?.GetNodeOrNull("StateChart");
