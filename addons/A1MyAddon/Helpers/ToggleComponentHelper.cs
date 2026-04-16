@@ -33,6 +33,7 @@ public partial class ToggleComponentHelper : BaseSettingComponentHelper
 	public ReactiveProperty<bool> IsToggled { get; private set; }
 	
 	// ===== 内部引用 =====
+	[Export] public NodePath CheckboxPath { get; set; } = "%ToggleCheckbox_CheckBox";
 	private CheckBox _checkbox;
 	
 	private bool _isUpdating = false;
@@ -40,7 +41,12 @@ public partial class ToggleComponentHelper : BaseSettingComponentHelper
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_checkbox = GetNodeOrNull<CheckBox>("ToggleCheckbox_CheckBox");
+		_checkbox = GetNodeOrNull<CheckBox>(CheckboxPath);
+		if (_checkbox == null)
+		{
+			GD.PushError($"[{Name}] Checkbox not found: {CheckboxPath}");
+			return;
+		}
 		
 		// 初始化 ReactiveProperty
 		IsToggled = new ReactiveProperty<bool>(DefaultState);

@@ -45,9 +45,14 @@ public partial class BackpackGridUIComponent : Control
 	#region Export Properties
 	
 	/// <summary>
+	/// 逻辑网格组件路径
+	/// </summary>
+	[Export] public NodePath LogicGridPath { get; set; } = "%BackpackGridComponent";
+	
+	/// <summary>
 	/// 逻辑网格组件引用
 	/// </summary>
-	[Export] public BackpackGridComponent LogicGrid { get; set; }
+	public BackpackGridComponent LogicGrid { get; private set; }
 	
 	/// <summary>
 	/// 单个网格的像素尺寸
@@ -79,15 +84,11 @@ public partial class BackpackGridUIComponent : Control
 	/// </summary>
 	private void InitializeComponent()
 	{
-		// 自动查找 LogicGrid（如果未手动设置）
+		LogicGrid = GetNodeOrNull<BackpackGridComponent>(LogicGridPath);
 		if (LogicGrid == null)
 		{
-			LogicGrid = GetNodeOrNull<BackpackGridComponent>("BackpackGridComponent");
-			if (LogicGrid == null)
-			{
-				GD.PushError("BackpackGridUIComponent: 无法找到 BackpackGridComponent！");
-				return;
-			}
+			GD.PushError($"[{Name}] BackpackGridComponent not found: {LogicGridPath}");
+			return;
 		}
 		
 		// 根据逻辑网格尺寸自动调整 UI 大小

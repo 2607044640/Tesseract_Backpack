@@ -36,23 +36,16 @@ public partial class CharacterRotationComponent : Node
         _characterModel = parent.GetNodeOrNull<Node3D>(CharacterModelPath);
         if (_characterModel == null)
         {
-            GD.PushWarning($"CharacterRotationComponent: 角色模型未找到: {CharacterModelPath}");
-        }
-        else
-        {
-            GD.Print("CharacterRotationComponent: 角色模型已连接 ✓");
+            GD.PushError($"[{Name}] Character model not found: {CharacterModelPath}");
+            return;
         }
 
         // 获取 PhantomCamera3D 引用
         _phantomCamera = parent.GetNodeOrNull<Node3D>(PhantomCameraPath);
-
         if (_phantomCamera == null)
         {
-            GD.PushWarning("CharacterRotationComponent: 未找到 PhantomCamera3D，旋转功能将不可用。");
-        }
-        else
-        {
-            GD.Print("CharacterRotationComponent: PhantomCamera3D 已连接 ✓");
+            GD.PushError($"[{Name}] PhantomCamera3D not found: {PhantomCameraPath}");
+            return;
         }
     }
 

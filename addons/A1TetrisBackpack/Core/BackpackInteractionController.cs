@@ -56,16 +56,19 @@ public partial class BackpackInteractionController : Node
 	/// <summary>
 	/// 逻辑网格组件引用（Model 层）
 	/// </summary>
-	[Export] public BackpackGridComponent LogicGrid { get; set; }
+	[Export] public NodePath LogicGridPath { get; set; } = "%BackpackGridComponent";
 	
 	/// <summary>
 	/// UI 网格视图组件引用（View 层）
 	/// </summary>
-	[Export] public BackpackGridUIComponent ViewGrid { get; set; }
+	[Export] public NodePath ViewGridPath { get; set; } = "%BackpackPanel";
 	
 	#endregion
 	
 	#region Private Fields
+	
+	private BackpackGridComponent LogicGrid;
+	private BackpackGridUIComponent ViewGrid;
 	
 	/// <summary>
 	/// 物品拖拽状态字典
@@ -80,33 +83,18 @@ public partial class BackpackInteractionController : Node
 	
 	public override void _Ready()
 	{
-		// 延迟初始化以等待 Godot 解析 NodePath
-		CallDeferred(MethodName.InitializeComponent);
-	}
-	
-	/// <summary>
-	/// 延迟初始化组件（在 NodePath 解析完成后）
-	/// </summary>
-	private void InitializeComponent()
-	{
-		// 自动查找 LogicGrid（如果未手动设置）
+		LogicGrid = GetNodeOrNull<BackpackGridComponent>(LogicGridPath);
 		if (LogicGrid == null)
 		{
-			LogicGrid = GetNodeOrNull<BackpackGridComponent>("../BackpackGridComponent");
-			if (LogicGrid == null)
-			{
-				GD.PushError("BackpackInteractionController: 无法找到 BackpackGridComponent！");
-			}
+			GD.PushError($"[{Name}] LogicGrid not found: {LogicGridPath}");
+			return;
 		}
 		
-		// 自动查找 ViewGrid（如果未手动设置）
+		ViewGrid = GetNodeOrNull<BackpackGridUIComponent>(ViewGridPath);
 		if (ViewGrid == null)
 		{
-			ViewGrid = GetNodeOrNull<BackpackGridUIComponent>("..");
-			if (ViewGrid == null)
-			{
-				GD.PushError("BackpackInteractionController: 无法找到 BackpackGridUIComponent！");
-			}
+			GD.PushError($"[{Name}] ViewGrid not found: {ViewGridPath}");
+			return;
 		}
 		
 		GD.Print("BackpackInteractionController: 初始化完成");
@@ -131,7 +119,7 @@ public partial class BackpackInteractionController : Node
 		}
 		
 		// 1. 获取必需组件
-		var draggable = itemEntity.GetNodeOrNull<DraggableItemComponent>("DraggableItemComponent");
+		var draggable = itemEntity.GetNodeOrNull<DraggableItemComponent>("%DraggableItemComponent");
 		if (draggable == null)
 		{
 			draggable = itemEntity.FindChild("*", true, false) as DraggableItemComponent;
@@ -142,7 +130,7 @@ public partial class BackpackInteractionController : Node
 			}
 		}
 		
-		var shapeComponent = itemEntity.GetNodeOrNull<GridShapeComponent>("GridShapeComponent");
+		var shapeComponent = itemEntity.GetNodeOrNull<GridShapeComponent>("%GridShapeComponent");
 		if (shapeComponent == null)
 		{
 			shapeComponent = itemEntity.FindChild("*", true, false) as GridShapeComponent;
@@ -157,12 +145,8 @@ public partial class BackpackInteractionController : Node
 		Control itemControl = itemEntity as Control;
 		if (itemControl == null)
 		{
-			itemControl = itemEntity.GetNodeOrNull<Control>(".");
-			if (itemControl == null)
-			{
-				GD.PushError($"BackpackInteractionController: 物品 {itemEntity.Name} 不是 Control 节点");
-				return;
-			}
+			GD.PushError($"BackpackInteractionController: 物品 {itemEntity.Name} 不是 Control 节点");
+			return;
 		}
 		
 		// 2. 订阅拖拽事件（使用 R3）

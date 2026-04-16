@@ -93,6 +93,8 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 	public ReactiveProperty<float> Value { get; private set; }
 	
 	// ===== 内部引用 =====
+	[Export] public NodePath SliderPath { get; set; } = "%SliderBar_HSlider";
+	[Export] public NodePath SpinBoxPath { get; set; } = "%ValueSpinBox_SpinBox";
 	private HSlider _slider;
 	private SpinBox _spinBox;
 	
@@ -101,8 +103,19 @@ public partial class SliderComponentHelper : BaseSettingComponentHelper
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_slider = GetNodeOrNull<HSlider>("SliderBar_HSlider");
-		_spinBox = GetNodeOrNull<SpinBox>("ValueSpinBox_SpinBox");
+		_slider = GetNodeOrNull<HSlider>(SliderPath);
+		if (_slider == null)
+		{
+			GD.PushError($"[{Name}] Slider not found: {SliderPath}");
+			return;
+		}
+		
+		_spinBox = GetNodeOrNull<SpinBox>(SpinBoxPath);
+		if (_spinBox == null)
+		{
+			GD.PushError($"[{Name}] SpinBox not found: {SpinBoxPath}");
+			return;
+		}
 		
 		// 初始化 ReactiveProperty
 		Value = new ReactiveProperty<float>(DefaultValue);

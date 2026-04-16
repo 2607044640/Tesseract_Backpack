@@ -40,6 +40,7 @@ public partial class OptionComponentHelper : BaseSettingComponentHelper
 	public event Action<int, string> OptionSelected;
 	
 	// ===== 内部引用 =====
+	[Export] public NodePath OptionButtonPath { get; set; } = "%OptionDropdown_Button";
 	private Button _optionButton;
 	private PopupMenu _popup;
 	
@@ -47,7 +48,12 @@ public partial class OptionComponentHelper : BaseSettingComponentHelper
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_optionButton = GetNodeOrNull<Button>("OptionDropdown_Button");
+		_optionButton = GetNodeOrNull<Button>(OptionButtonPath);
+		if (_optionButton == null)
+		{
+			GD.PushError($"[{Name}] OptionButton not found: {OptionButtonPath}");
+			return;
+		}
 		
 		// 创建PopupMenu
 		if (_optionButton != null && !_optionButton.HasNode("PopupMenu"))

@@ -93,12 +93,18 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 	public new event Action<int, string> ThemeChanged;
 	
 	// ===== 内部引用 =====
+	[Export] public NodePath ThemeDropdownPath { get; set; } = "%ThemeDropdown_OptionButton";
 	private OptionButton _themeDropdown;
 	private int _currentIndex;
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_themeDropdown = GetNodeOrNull<OptionButton>("ThemeDropdown_OptionButton");
+		_themeDropdown = GetNodeOrNull<OptionButton>(ThemeDropdownPath);
+		if (_themeDropdown == null)
+		{
+			GD.PushError($"[{Name}] ThemeDropdown not found: {ThemeDropdownPath}");
+			return;
+		}
 	}
 	
 	protected override void ConnectSignals()

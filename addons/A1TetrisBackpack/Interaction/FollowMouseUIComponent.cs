@@ -59,18 +59,14 @@ public partial class FollowMouseUIComponent : Node
 	#region Export Properties
 	
 	/// <summary>
-	/// 需要跟随鼠标的目标 UI 节点
-	/// 
-	/// 通常设置为：
-	/// - 物品的根 Control 节点（Panel、TextureRect 等）
-	/// - 拖拽预览节点（半透明的物品副本）
-	/// 
-	/// 注意：
-	/// - 该节点必须是 Control 类型
-	/// - 确保该节点不在 Container 内（Container 会覆盖位置）
-	/// - 推荐使用 GlobalPosition 以避免父节点变换的影响
+	/// 目标 UI 节点路径
 	/// </summary>
-	[Export] public Control TargetUI { get; set; }
+	[Export] public NodePath TargetUIPath { get; set; } = "%TargetUI";
+	
+	/// <summary>
+	/// 目标 UI 节点引用
+	/// </summary>
+	public Control TargetUI { get; private set; }
 	
 	/// <summary>
 	/// 抓取偏移量（鼠标相对于物品左上角的偏移）
@@ -121,21 +117,11 @@ public partial class FollowMouseUIComponent : Node
 	/// </summary>
 	private void InitializeComponent()
 	{
-		// 自动查找 TargetUI（如果未手动设置）
+		TargetUI = GetNodeOrNull<Control>(TargetUIPath);
 		if (TargetUI == null)
 		{
-			// 尝试向上查找 4 层（因为组件在 StateChart/Root/Dragging 下）
-			// 路径：Dragging -> Root -> StateChart -> TestItem
-			TargetUI = GetNodeOrNull<Control>("../../../..");
-			if (TargetUI != null)
-			{
-				GD.Print($"FollowMouseUIComponent: 自动找到 TargetUI '{TargetUI.Name}'");
-			}
-			else
-			{
-				GD.PushError("FollowMouseUIComponent: 无法找到 TargetUI！组件将无法工作。");
-				return;
-			}
+			GD.PushError($"[{Name}] TargetUI not found: {TargetUIPath}");
+			return;
 		}
 		
 		// 保存原始 ZIndex

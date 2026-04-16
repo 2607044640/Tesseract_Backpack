@@ -94,7 +94,7 @@ public static class StateChartAutoBindExtensions
 
     public static void SendStateEvent(this Node node, string eventName)
     {
-        var stateChartNode = node.GetNodeOrNull("StateChart");
+        var stateChartNode = node.GetNodeOrNull("%StateChart");
         if (stateChartNode == null)
         {
             GD.PushWarning($"[StateChart] StateChart not found in {node.Name}");

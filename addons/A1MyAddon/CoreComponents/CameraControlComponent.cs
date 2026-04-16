@@ -40,14 +40,14 @@ public partial class CameraControlComponent : Node
         Node3D pcamNode = parent.GetNodeOrNull<Node3D>(PCamPath);
         if (pcamNode == null)
         {
-            GD.PushError($"CameraControlComponent: 未找到 PhantomCamera3D 节点 (路径: {PCamPath})");
+            GD.PushError($"[{Name}] PhantomCamera3D not found: {PCamPath}");
             return;
         }
         
         _pCam = pcamNode.AsPhantomCamera3D();
         if (_pCam == null)
         {
-            GD.PushError("CameraControlComponent: 无法转换为 PhantomCamera3D 包装类");
+            GD.PushError($"[{Name}] Cannot convert to PhantomCamera3D wrapper");
             return;
         }
         
@@ -55,10 +55,7 @@ public partial class CameraControlComponent : Node
         if (OverrideFollowOffset)
         {
             _pCam.FollowOffset = FollowOffset;
-            GD.Print($"CameraControlComponent: 覆盖 FollowOffset = {FollowOffset}");
         }
-        
-        GD.Print("CameraControlComponent: 初始化完成 ✓");
     }
     
     public override void _UnhandledInput(InputEvent @event)

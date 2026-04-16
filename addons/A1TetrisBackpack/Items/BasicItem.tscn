@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://cac8ccsbkf8hf"]
+
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
+
+[node name="BasicItem" type="Control"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 3
+anchors_preset = 0
+
+[node name="ClickableBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.5, 0.8, 0.5)
+mouse_filter = 0
+unique_name_in_owner = true
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("script_StateChart")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("script_CompoundState")
+unique_name_in_owner = true
+initial_state = NodePath("%Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+unique_name_in_owner = true
+
+[node name="ToDragging" type="Node" parent="StateChart/Root/Idle"]
+script = ExtResource("script_Transition")
+to = NodePath("%Clicked")
+delay_in_seconds = 0.0
+event = &"clicked"
+
+[node name="Clicked" type="Node" parent="StateChart/Root"]
+script = ExtResource("script_AtomicState")
+unique_name_in_owner = true
+
+[node name="ToIdle" type="Node" parent="StateChart/Root/Clicked"]
+script = ExtResource("script_Transition")
+to = NodePath("%Idle")
+delay_in_seconds = 0.5
+event = &"reset"

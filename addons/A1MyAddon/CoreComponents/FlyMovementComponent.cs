@@ -44,10 +44,10 @@ public partial class FlyMovementComponent : Node
         }
 
         _phantomCamera = _entity.GetNodeOrNull<Node3D>(PhantomCameraPath);
-        
         if (_phantomCamera == null)
         {
-            GD.PushWarning("FlyMovementComponent: PhantomCamera not found");
+            GD.PushError($"[{Name}] PhantomCamera not found: {PhantomCameraPath}");
+            return;
         }
         
         // 直接获取InputComponent并订阅事件

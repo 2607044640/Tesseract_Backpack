@@ -59,32 +59,24 @@ public partial class DraggableItemComponent : Node
 	#region Export Properties
 	
 	/// <summary>
-	/// 可点击区域（接收鼠标输入的 Control 节点）
-	/// 
-	/// 设置建议：
-	/// - 通常是物品的根 Control 节点（Panel、TextureRect 等）
-	/// - 确保该 Control 的 MouseFilter 不是 Ignore
-	/// - 推荐使用 Panel 或 ColorRect 作为点击区域（可设置透明背景）
-	/// 
-	/// 在编辑器中：
-	/// 拖拽物品的 UI 根节点到此属性
+	/// 可点击区域路径
 	/// </summary>
-	[Export] public Control ClickableArea { get; set; }
+	[Export] public NodePath ClickableAreaPath { get; set; } = "%ClickableArea";
+	
+	/// <summary>
+	/// 状态机节点路径
+	/// </summary>
+	[Export] public NodePath StateChartPath { get; set; } = "%StateChart";
+	
+	/// <summary>
+	/// 可点击区域引用
+	/// </summary>
+	public Control ClickableArea { get; private set; }
 	
 	/// <summary>
 	/// 状态机节点引用
-	/// 
-	/// 指向物品实体下的 StateChart 节点。
-	/// 该组件会通过 SendStateEvent 扩展方法向状态机发送事件。
-	/// 
-	/// 注意：
-	/// - 如果不设置此属性，组件会尝试在父节点中查找名为 "StateChart" 的子节点
-	/// - 使用 Node 类型以保证最大兼容性（避免依赖特定的 StateChart C# 包装类）
-	/// 
-	/// 在编辑器中：
-	/// 拖拽物品实体下的 StateChart 节点到此属性（可选）
 	/// </summary>
-	[Export] public Node StateChart { get; set; }
+	public Node StateChart { get; private set; }
 	
 	/// <summary>
 	/// 拖拽开始事件名称（发送给 StateChart）
@@ -166,40 +158,20 @@ public partial class DraggableItemComponent : Node
 	/// </summary>
 	private void InitializeComponent()
 	{
-		// 自动查找 ClickableArea（如果未手动设置）
+		ClickableArea = GetNodeOrNull<Control>(ClickableAreaPath);
 		if (ClickableArea == null)
 		{
-			// 尝试使用父节点作为 ClickableArea
-			ClickableArea = GetParent() as Control;
-			if (ClickableArea != null)
-			{
-				GD.Print($"DraggableItemComponent: 自动使用父节点 '{ClickableArea.Name}' 作为 ClickableArea");
-			}
-			else
-			{
-				GD.PushWarning("DraggableItemComponent: 无法找到 ClickableArea，组件将无法接收输入");
-			}
+			GD.PushError($"[{Name}] ClickableArea not found: {ClickableAreaPath}");
+			return;
 		}
 		
-		// 订阅 GUI 输入事件
-		if (ClickableArea != null)
-		{
-			ClickableArea.GuiInput += HandleGuiInput;
-			GD.Print($"DraggableItemComponent: 已订阅 {ClickableArea.Name} 的 GuiInput 事件");
-		}
+		ClickableArea.GuiInput += HandleGuiInput;
 		
-		// 自动查找 StateChart（如果未手动设置）
+		StateChart = GetNodeOrNull<Node>(StateChartPath);
 		if (StateChart == null)
 		{
-			StateChart = GetParent()?.GetNodeOrNull("StateChart");
-			if (StateChart != null)
-			{
-				GD.Print("DraggableItemComponent: 自动找到 StateChart 节点");
-			}
-			else
-			{
-				GD.PushWarning("DraggableItemComponent: 未找到 StateChart 节点，状态机事件将无法发送");
-			}
+			GD.PushError($"[{Name}] StateChart not found: {StateChartPath}");
+			return;
 		}
 	}
 	

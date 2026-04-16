@@ -81,7 +81,7 @@ public partial class AnimationControllerComponent : Node
         var characterModel = parent.GetNodeOrNull<Node3D>(CharacterModelPath);
         if (characterModel == null)
         {
-            GD.PushWarning($"AnimationControllerComponent: 角色模型未找到: {CharacterModelPath}");
+            GD.PushError($"[{Name}] Character model not found: {CharacterModelPath}");
             return;
         }
 
@@ -90,7 +90,7 @@ public partial class AnimationControllerComponent : Node
         
         if (_animPlayer == null)
         {
-            GD.PushWarning($"AnimationControllerComponent: AnimationPlayer 未找到: {animPlayerFullPath}");
+            GD.PushError($"[{Name}] AnimationPlayer not found: {animPlayerFullPath}");
             return;
         }
 

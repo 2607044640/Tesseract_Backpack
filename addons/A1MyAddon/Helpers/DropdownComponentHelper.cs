@@ -45,6 +45,7 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	public ReactiveProperty<int> SelectedIndex { get; private set; }
 	
 	// ===== 内部引用 =====
+	[Export] public NodePath DropdownPath { get; set; } = "%Dropdown_OptionButton";
 	private OptionButton _dropdown;
 	
 	private bool _isUpdating = false;
@@ -52,7 +53,12 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_dropdown = GetNodeOrNull<OptionButton>("Dropdown_OptionButton");
+		_dropdown = GetNodeOrNull<OptionButton>(DropdownPath);
+		if (_dropdown == null)
+		{
+			GD.PushError($"[{Name}] Dropdown not found: {DropdownPath}");
+			return;
+		}
 		
 		// 初始化 ReactiveProperty
 		SelectedIndex = new ReactiveProperty<int>(DefaultIndex);
