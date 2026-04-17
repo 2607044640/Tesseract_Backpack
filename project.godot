@@ -39,10 +39,10 @@ enabled=PackedStringArray("res://addons/R3.Godot/plugin.cfg", "res://addons/Todo
 [file_customization]
 
 folder_colors={
+"res://A1TesseractBackpack/": "teal",
 "res://A1UIPresets/": "blue",
 "res://A1UIResources/": "blue",
 "res://A1UIScenes/": "blue",
-"res://Animations/": "green",
 "res://addons/A1MyAddon/": "blue"
 }
 

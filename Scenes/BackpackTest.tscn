@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://d2svbqvyq43tw" path="res://addons/A1TetrisBackpack/Interaction/FollowMouseUIComponent.cs" id="5_res"]
 [ext_resource type="Script" uid="uid://bdka4obxtossd" path="res://addons/A1TetrisBackpack/Interaction/DraggableItemComponent.cs" id="6_res"]
 [ext_resource type="Script" uid="uid://bbykh8wvhqtcj" path="res://addons/A1TetrisBackpack/Items/GridShapeComponent.cs" id="7_res"]
+[ext_resource type="PackedScene" uid="uid://bof44aeoq7w74" path="res://A1TesseractBackpack/TSItem.tscn" id="12_5hnf3"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
@@ -145,6 +146,11 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 0
 mouse_filter = 2
 color = Color(0.3, 0.6, 0.9, 1)
+
+[node name="TetrisDraggableItem" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer" unique_id=1959740042 instance=ExtResource("12_5hnf3")]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
 
 [node name="Instructions" type="Label" parent="ScreenMargin/MainVBox" unique_id=2075687424]
 layout_mode = 2

@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://bof44aeoq7w74"]
+
+[ext_resource type="Script" uid="uid://bdka4obxtossd" path="res://addons/A1TetrisBackpack/Interaction/DraggableItemComponent.cs" id="draggable_script"]
+[ext_resource type="Script" uid="uid://d2svbqvyq43tw" path="res://addons/A1TetrisBackpack/Interaction/FollowMouseUIComponent.cs" id="follow_mouse_script"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
+[ext_resource type="Script" uid="uid://bbykh8wvhqtcj" path="res://addons/A1TetrisBackpack/Items/GridShapeComponent.cs" id="shape_script"]
+
+[node name="TetrisDraggableItem" type="Control" unique_id=279074725]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 3
+anchors_preset = 0
+
+[node name="ClickableBackground" type="ColorRect" parent="." unique_id=1706600634]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.3, 0.7, 0.3, 0.8)
+
+[node name="VisualContainer" type="Control" parent="." unique_id=860289969]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ItemIcon" type="TextureRect" parent="VisualContainer" unique_id=1600377566]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StateChart" type="Node" parent="." unique_id=1344843508]
+unique_name_in_owner = true
+script = ExtResource("script_StateChart")
+
+[node name="Root" type="Node" parent="StateChart" unique_id=1279408276]
+unique_name_in_owner = true
+script = ExtResource("script_CompoundState")
+initial_state = NodePath("%Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root" unique_id=1734328641]
+unique_name_in_owner = true
+script = ExtResource("script_AtomicState")
+
+[node name="ToDragging" type="Node" parent="StateChart/Root/Idle" unique_id=1758277666]
+script = ExtResource("script_Transition")
+to = NodePath("%Dragging")
+event = &"drag_start"
+delay_in_seconds = "0.0"
+
+[node name="Dragging" type="Node" parent="StateChart/Root" unique_id=539024988]
+unique_name_in_owner = true
+script = ExtResource("script_AtomicState")
+
+[node name="ToIdle" type="Node" parent="StateChart/Root/Dragging" unique_id=480551148]
+script = ExtResource("script_Transition")
+to = NodePath("%Idle")
+event = &"drag_end"
+delay_in_seconds = "0.0"
+
+[node name="FollowMouseUIComponent" type="Node" parent="StateChart/Root/Dragging" unique_id=163747275]
+script = ExtResource("follow_mouse_script")
+TargetUIPath = NodePath("../../../..")
+
+[node name="DraggableItemComponent" type="Node" parent="." unique_id=1027640510]
+script = ExtResource("draggable_script")
+ClickableAreaPath = NodePath("%ClickableBackground")
+
+[node name="GridShapeComponent" type="Node" parent="." unique_id=801240277]
+script = ExtResource("shape_script")

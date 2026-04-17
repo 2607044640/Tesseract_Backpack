@@ -12,9 +12,9 @@
 BasicItem (Control)
 ├── ClickableBackground (ColorRect) - 可点击区域
 └── StateChart
-    └── Root
-        ├── Idle - 空闲状态
-        └── Clicked - 点击后状态
+	└── Root
+		├── Idle - 空闲状态
+		└── Clicked - 点击后状态
 ```
 
 **状态机**：
@@ -26,31 +26,31 @@ BasicItem (Control)
 // 1. 创建 C# 脚本监听状态变化
 public partial class BasicItemController : Node
 {
-    public override void _Ready()
-    {
-        var stateChart = GetNode("%StateChart");
-        var clickedState = GetNode("%Clicked");
-        
-        // 监听 Clicked 状态进入
-        clickedState.Connect("state_entered", Callable.From(() => {
-            GD.Print("物品被点击了！");
-            // 播放音效、改变颜色、触发效果等
-        }));
-    }
+	public override void _Ready()
+	{
+		var stateChart = GetNode("%StateChart");
+		var clickedState = GetNode("%Clicked");
+		
+		// 监听 Clicked 状态进入
+		clickedState.Connect("state_entered", Callable.From(() => {
+			GD.Print("物品被点击了！");
+			// 播放音效、改变颜色、触发效果等
+		}));
+	}
 }
 
 // 2. 添加点击触发逻辑
 public override void _Ready()
 {
-    var background = GetNode<ColorRect>("%ClickableBackground");
-    background.GuiInput += (InputEvent @event) => {
-        if (@event is InputEventMouseButton mouseEvent && 
-            mouseEvent.Pressed && 
-            mouseEvent.ButtonIndex == MouseButton.Left)
-        {
-            GetNode("%StateChart").Call("send_event", "clicked");
-        }
-    };
+	var background = GetNode<ColorRect>("%ClickableBackground");
+	background.GuiInput += (InputEvent @event) => {
+		if (@event is InputEventMouseButton mouseEvent && 
+			mouseEvent.Pressed && 
+			mouseEvent.ButtonIndex == MouseButton.Left)
+		{
+			GetNode("%StateChart").Call("send_event", "clicked");
+		}
+	};
 }
 ```
 
@@ -105,13 +105,13 @@ TetrisDraggableItem (Control)
    ```csharp
    // 创建 ItemDataResource
    var itemData = new ItemDataResource {
-       ItemID = "sword_001",
-       ItemName = "铁剑",
-       BaseShape = new Array<Vector2I> {
-           new Vector2I(0, 0),
-           new Vector2I(0, 1),
-           new Vector2I(0, 2)  // 1x3 竖条
-       }
+	   ItemID = "sword_001",
+	   ItemName = "铁剑",
+	   BaseShape = new Array<Vector2I> {
+		   new Vector2I(0, 0),
+		   new Vector2I(0, 1),
+		   new Vector2I(0, 2)  // 1x3 竖条
+	   }
    };
    
    // 设置到 GridShapeComponent
@@ -150,8 +150,8 @@ TetrisDraggableItem (Control)
 
 var equippedState = GetNode("%Equipped");
 equippedState.Connect("state_entered", Callable.From(() => {
-    GD.Print("物品已装备！");
-    // 显示装备效果
+	GD.Print("物品已装备！");
+	// 显示装备效果
 }));
 ```
 
@@ -161,14 +161,14 @@ equippedState.Connect("state_entered", Callable.From(() => {
 [GlobalClass]
 public partial class TooltipComponent : Node
 {
-    [Export] public string TooltipText { get; set; }
-    
-    public override void _Ready()
-    {
-        var background = GetParent().GetNode<Control>("%ClickableBackground");
-        background.MouseEntered += () => ShowTooltip();
-        background.MouseExited += () => HideTooltip();
-    }
+	[Export] public string TooltipText { get; set; }
+	
+	public override void _Ready()
+	{
+		var background = GetParent().GetNode<Control>("%ClickableBackground");
+		background.MouseEntered += () => ShowTooltip();
+		background.MouseExited += () => HideTooltip();
+	}
 }
 
 // 添加到物品场景
@@ -180,18 +180,18 @@ public partial class TooltipComponent : Node
 var draggable = item.GetNode<DraggableItemComponent>("%DraggableItemComponent");
 
 draggable.OnDragStartedAsObservable
-    .Subscribe(_ => {
-        GD.Print("开始拖拽");
-        // 自定义拖拽开始逻辑
-    })
-    .AddTo(disposables);
+	.Subscribe(_ => {
+		GD.Print("开始拖拽");
+		// 自定义拖拽开始逻辑
+	})
+	.AddTo(disposables);
 
 draggable.OnRotateRequestedAsObservable
-    .Subscribe(_ => {
-        GD.Print("请求旋转");
-        // 自定义旋转逻辑
-    })
-    .AddTo(disposables);
+	.Subscribe(_ => {
+		GD.Print("请求旋转");
+		// 自定义旋转逻辑
+	})
+	.AddTo(disposables);
 ```
 
 ---
@@ -225,13 +225,13 @@ AddChild(item);
 // 2. 添加点击逻辑
 var background = item.GetNode<ColorRect>("%ClickableBackground");
 background.GuiInput += (InputEvent @event) => {
-    if (@event is InputEventMouseButton mouseEvent && 
-        mouseEvent.Pressed && 
-        mouseEvent.ButtonIndex == MouseButton.Left)
-    {
-        item.GetNode("%StateChart").Call("send_event", "clicked");
-        UseItem();  // 使用物品
-    }
+	if (@event is InputEventMouseButton mouseEvent && 
+		mouseEvent.Pressed && 
+		mouseEvent.ButtonIndex == MouseButton.Left)
+	{
+		item.GetNode("%StateChart").Call("send_event", "clicked");
+		UseItem();  // 使用物品
+	}
 };
 ```
 
@@ -243,13 +243,13 @@ backpackUI.AddChild(sword);
 
 // 2. 配置数据
 var itemData = new ItemDataResource {
-    ItemID = "sword_001",
-    ItemName = "铁剑",
-    BaseShape = new Array<Vector2I> {
-        new Vector2I(0, 0),
-        new Vector2I(0, 1),
-        new Vector2I(0, 2)
-    }
+	ItemID = "sword_001",
+	ItemName = "铁剑",
+	BaseShape = new Array<Vector2I> {
+		new Vector2I(0, 0),
+		new Vector2I(0, 1),
+		new Vector2I(0, 2)
+	}
 };
 
 var shapeComponent = sword.GetNode<GridShapeComponent>("%GridShapeComponent");
