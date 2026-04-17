@@ -4,14 +4,16 @@
 [ext_resource type="Script" uid="uid://dkk5driwga8ql" path="res://addons/A1TetrisBackpack/Core/BackpackGridUIComponent.cs" id="2_res"]
 [ext_resource type="Script" uid="uid://1rgai2oppf42" path="res://addons/A1TetrisBackpack/Core/BackpackGridComponent.cs" id="3_res"]
 [ext_resource type="Script" uid="uid://drof8dtjnyqs3" path="res://addons/A1TetrisBackpack/Core/BackpackInteractionController.cs" id="4_res"]
-[ext_resource type="Script" uid="uid://d2svbqvyq43tw" path="res://addons/A1TetrisBackpack/Interaction/FollowMouseUIComponent.cs" id="5_res"]
-[ext_resource type="Script" uid="uid://bdka4obxtossd" path="res://addons/A1TetrisBackpack/Interaction/DraggableItemComponent.cs" id="6_res"]
-[ext_resource type="Script" uid="uid://bbykh8wvhqtcj" path="res://addons/A1TetrisBackpack/Items/GridShapeComponent.cs" id="7_res"]
 [ext_resource type="PackedScene" uid="uid://bof44aeoq7w74" path="res://A1TesseractBackpack/TSItem.tscn" id="12_5hnf3"]
-[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
-[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
-[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
-[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
+[ext_resource type="Script" uid="uid://lelpt5ux6h0d" path="res://addons/A1TetrisBackpack/Items/ItemDataResource.cs" id="13_b1k73"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_3kgtc"]
+
+[sub_resource type="Resource" id="Resource_suxtk"]
+script = ExtResource("13_b1k73")
+Icon = SubResource("CanvasTexture_3kgtc")
+BaseShape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1)])
+metadata/_custom_type_script = "uid://lelpt5ux6h0d"
 
 [node name="BackpackTest" type="Control" unique_id=1221362850]
 layout_mode = 3
@@ -75,82 +77,11 @@ script = ExtResource("4_res")
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="Item" type="Control" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer" unique_id=1515862609]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(64, 64)
-anchors_preset = 0
-offset_left = 128.0
-offset_top = 128.0
-offset_right = 192.0
-offset_bottom = 192.0
-
-[node name="ClickableBackground" type="ColorRect" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item" unique_id=1082732463]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.2, 0.2, 0.2, 0.5)
-
-[node name="StateChart" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item" unique_id=1581508944]
-unique_name_in_owner = true
-script = ExtResource("script_StateChart")
-
-[node name="Root" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item/StateChart" unique_id=303498079]
-unique_name_in_owner = true
-script = ExtResource("script_CompoundState")
-initial_state = NodePath("Idle")
-
-[node name="Idle" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item/StateChart/Root" unique_id=305730475]
-unique_name_in_owner = true
-script = ExtResource("script_AtomicState")
-
-[node name="ToDragging" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item/StateChart/Root/Idle" unique_id=1314999689]
-script = ExtResource("script_Transition")
-to = NodePath("../../Dragging")
-event = &"drag_start"
-delay_in_seconds = "0.0"
-
-[node name="Dragging" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item/StateChart/Root" unique_id=1378736989]
-unique_name_in_owner = true
-script = ExtResource("script_AtomicState")
-
-[node name="ToIdle" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item/StateChart/Root/Dragging" unique_id=2069424568]
-script = ExtResource("script_Transition")
-to = NodePath("../../Idle")
-event = &"drag_end"
-delay_in_seconds = "0.0"
-
-[node name="FollowMouseUIComponent" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item/StateChart/Root/Dragging" unique_id=968226425]
-script = ExtResource("5_res")
-TargetUIPath = NodePath("%Item")
-
-[node name="DraggableItemComponent" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item" unique_id=269256233]
-script = ExtResource("6_res")
-ClickableAreaPath = NodePath("%ClickableBackground")
-
-[node name="GridShapeComponent" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item" unique_id=644338023]
-unique_name_in_owner = true
-script = ExtResource("7_res")
-
-[node name="VisualContainer" type="Control" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item" unique_id=1514297909]
-anchors_preset = 0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-mouse_filter = 2
-
-[node name="ItemIcon" type="ColorRect" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer/Item/VisualContainer" unique_id=1140030504]
-custom_minimum_size = Vector2(64, 64)
-layout_mode = 0
-mouse_filter = 2
-color = Color(0.3, 0.6, 0.9, 1)
-
-[node name="TetrisDraggableItem" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer" unique_id=1959740042 instance=ExtResource("12_5hnf3")]
+[node name="TsItem" parent="ScreenMargin/MainVBox/BackpackPanel/ItemsContainer" unique_id=1959740042 instance=ExtResource("12_5hnf3")]
 layout_mode = 0
 offset_right = 64.0
 offset_bottom = 64.0
+Data = SubResource("Resource_suxtk")
 
 [node name="Instructions" type="Label" parent="ScreenMargin/MainVBox" unique_id=2075687424]
 layout_mode = 2

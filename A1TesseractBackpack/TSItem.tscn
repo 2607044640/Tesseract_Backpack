@@ -7,12 +7,14 @@
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
 [ext_resource type="Script" uid="uid://bbykh8wvhqtcj" path="res://addons/A1TetrisBackpack/Items/GridShapeComponent.cs" id="shape_script"]
+[ext_resource type="Script" path="res://A1TesseractBackpack/TSItemWrapper.cs" id="wrapper_script"]
 
 [node name="TetrisDraggableItem" type="Control" unique_id=279074725]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 3
 anchors_preset = 0
+script = ExtResource("wrapper_script")
 
 [node name="ClickableBackground" type="ColorRect" parent="." unique_id=1706600634]
 unique_name_in_owner = true

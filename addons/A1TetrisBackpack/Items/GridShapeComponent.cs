@@ -15,6 +15,21 @@ public partial class GridShapeComponent : Node
 	
 	[Export] public ItemDataResource Data { get; set; }
 	
+	/// <summary>
+	/// 单个格子的像素尺寸（用于 UI 尺寸计算）
+	/// </summary>
+	[Export] public Vector2 CellSize { get; set; } = new Vector2(64, 64);
+	
+	/// <summary>
+	/// 是否自动调整父 Control 节点的尺寸
+	/// </summary>
+	[Export] public bool AutoResizeParent { get; set; } = true;
+	
+	/// <summary>
+	/// 可选的 VisualContainer 节点路径（如果需要同时调整视觉容器尺寸）
+	/// </summary>
+	[Export] public NodePath VisualContainerPath { get; set; } = "%VisualContainer";
+	
 	#endregion
 	
 	#region Public Properties
@@ -36,6 +51,13 @@ public partial class GridShapeComponent : Node
 	{
 		OnShapeChangedAsObservable = new Subject<Unit>();
 		InitializeShape();
+		
+		// 延迟调整父节点尺寸（确保所有节点初始化完成）
+		if (AutoResizeParent)
+		{
+			CallDeferred(MethodName.UpdateParentSize);
+		}
+		
 		GD.Print($"GridShapeComponent 初始化完成：{CurrentLocalCells?.Length ?? 0} 个格子");
 	}
 	
@@ -89,6 +111,13 @@ public partial class GridShapeComponent : Node
 		}
 		
 		NormalizeShape();
+		
+		// 旋转后更新父节点尺寸
+		if (AutoResizeParent)
+		{
+			UpdateParentSize();
+		}
+		
 		OnShapeChangedAsObservable.OnNext(Unit.Default);
 		GD.Print($"物品已旋转 90°，当前形状：{string.Join(", ", CurrentLocalCells.Select(c => c.ToString()))}");
 	}
@@ -126,8 +155,72 @@ public partial class GridShapeComponent : Node
 	public void ResetShape()
 	{
 		InitializeShape();
+		
+		if (AutoResizeParent)
+		{
+			UpdateParentSize();
+		}
+		
 		OnShapeChangedAsObservable.OnNext(Unit.Default);
 		GD.Print("形状已重置为初始状态");
+	}
+	
+	#endregion
+	
+	#region UI Size Management
+	
+	/// <summary>
+	/// 根据形状自动调整父 Control 节点的尺寸
+	/// 目的：让物品 UI 自动匹配形状大小
+	/// 示例：L 形 2x2 -> Control 尺寸设置为 128x128 (假设 CellSize=64)
+	/// 算法：1. 获取边界尺寸 -> 2. 计算像素尺寸 -> 3. 更新父节点 Size 和 CustomMinimumSize
+	/// </summary>
+	private void UpdateParentSize()
+	{
+		var parent = GetParent();
+		if (parent is not Control parentControl)
+		{
+			GD.PushWarning($"GridShapeComponent: 父节点不是 Control，无法自动调整尺寸");
+			return;
+		}
+		
+		// 获取形状边界尺寸
+		Vector2I boundingSize = GetBoundingSize();
+		
+		// 计算总像素尺寸
+		Vector2 totalSize = new Vector2(
+			boundingSize.X * CellSize.X,
+			boundingSize.Y * CellSize.Y
+		);
+		
+		// 更新父 Control 尺寸
+		parentControl.CustomMinimumSize = totalSize;
+		parentControl.Size = totalSize;
+		
+		// 如果配置了 VisualContainer 路径，同时更新它
+		if (!string.IsNullOrEmpty(VisualContainerPath))
+		{
+			var visualContainer = parentControl.GetNodeOrNull<Control>(VisualContainerPath);
+			if (visualContainer != null)
+			{
+				visualContainer.CustomMinimumSize = totalSize;
+				visualContainer.Size = totalSize;
+			}
+		}
+		
+		GD.Print($"GridShapeComponent: 已更新父节点尺寸为 {totalSize} (形状: {boundingSize.X}x{boundingSize.Y})");
+		GD.Print($"GridShapeComponent: 形状格子: {string.Join(", ", CurrentLocalCells)}");
+	}
+	
+	/// <summary>
+	/// 手动触发父节点尺寸更新（供外部调用）
+	/// </summary>
+	public void RefreshParentSize()
+	{
+		if (AutoResizeParent)
+		{
+			UpdateParentSize();
+		}
 	}
 	
 	#endregion
