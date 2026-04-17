@@ -5,7 +5,7 @@ using Godot;
 /// 
 /// 用途：
 /// - 在父场景中可以直接设置 ItemDataResource
-/// - 自动传递给内部的 GridShapeComponent
+/// - 在 _EnterTree 阶段传递给 GridShapeComponent（早于 _Ready）
 /// - GridShapeComponent 会自动处理 UI 尺寸调整
 /// 
 /// 使用方式：
@@ -23,10 +23,13 @@ public partial class TSItemWrapper : Control
 	
 	private GridShapeComponent _shapeComponent;
 	
-	public override void _Ready()
+	/// <summary>
+	/// _EnterTree 在 _Ready 之前执行，用于设置子组件的 Export 属性
+	/// </summary>
+	public override void _EnterTree()
 	{
 		// 获取 GridShapeComponent
-		_shapeComponent = GetNode<GridShapeComponent>("GridShapeComponent");
+		_shapeComponent = GetNodeOrNull<GridShapeComponent>("GridShapeComponent");
 		
 		if (_shapeComponent == null)
 		{
@@ -34,15 +37,15 @@ public partial class TSItemWrapper : Control
 			return;
 		}
 		
-		// 如果外部设置了 Data，传递给 GridShapeComponent
+		// 在 _Ready 之前传递 Data，确保 GridShapeComponent._Ready() 能正确初始化
 		if (Data != null)
 		{
 			_shapeComponent.Data = Data;
-			GD.Print($"[{Name}] TSItemWrapper: 已设置 Data = {Data.ItemID}");
+			GD.Print($"[{Name}] TSItemWrapper._EnterTree: 已设置 Data = {Data.ItemID}");
 		}
 		else
 		{
-			GD.PushWarning($"[{Name}] TSItemWrapper: Data 未设置，将使用默认 1x1 形状");
+			GD.PushWarning($"[{Name}] TSItemWrapper._EnterTree: Data 未设置，将使用默认 1x1 形状");
 		}
 	}
 	

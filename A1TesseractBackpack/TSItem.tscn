@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
 [ext_resource type="Script" uid="uid://bbykh8wvhqtcj" path="res://addons/A1TetrisBackpack/Items/GridShapeComponent.cs" id="shape_script"]
-[ext_resource type="Script" path="res://A1TesseractBackpack/TSItemWrapper.cs" id="wrapper_script"]
+[ext_resource type="Script" uid="uid://c1c4n42ng8gwf" path="res://A1TesseractBackpack/TSItemWrapper.cs" id="wrapper_script"]
 
 [node name="TetrisDraggableItem" type="Control" unique_id=279074725]
 unique_name_in_owner = true
@@ -15,16 +15,6 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("wrapper_script")
-
-[node name="ClickableBackground" type="ColorRect" parent="." unique_id=1706600634]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.3, 0.7, 0.3, 0.8)
 
 [node name="VisualContainer" type="Control" parent="." unique_id=860289969]
 layout_mode = 1
@@ -34,6 +24,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="ClickableBackground" type="ColorRect" parent="VisualContainer" unique_id=1706600634]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.3, 0.7, 0.3, 0.8)
 
 [node name="ItemIcon" type="TextureRect" parent="VisualContainer" unique_id=1600377566]
 layout_mode = 1
@@ -81,7 +81,8 @@ TargetUIPath = NodePath("../../../..")
 
 [node name="DraggableItemComponent" type="Node" parent="." unique_id=1027640510]
 script = ExtResource("draggable_script")
-ClickableAreaPath = NodePath("%ClickableBackground")
+ClickableAreaPath = NodePath("../VisualContainer/ClickableBackground")
 
 [node name="GridShapeComponent" type="Node" parent="." unique_id=801240277]
 script = ExtResource("shape_script")
+VisualContainerPath = NodePath("../VisualContainer")

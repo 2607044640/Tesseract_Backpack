@@ -4,16 +4,8 @@
 [ext_resource type="Script" uid="uid://dkk5driwga8ql" path="res://addons/A1TetrisBackpack/Core/BackpackGridUIComponent.cs" id="2_res"]
 [ext_resource type="Script" uid="uid://1rgai2oppf42" path="res://addons/A1TetrisBackpack/Core/BackpackGridComponent.cs" id="3_res"]
 [ext_resource type="Script" uid="uid://drof8dtjnyqs3" path="res://addons/A1TetrisBackpack/Core/BackpackInteractionController.cs" id="4_res"]
+[ext_resource type="Resource" uid="uid://3sq18o0ahb7f" path="res://new_resource.tres" id="6_0xep6"]
 [ext_resource type="PackedScene" uid="uid://bof44aeoq7w74" path="res://A1TesseractBackpack/TSItem.tscn" id="12_5hnf3"]
-[ext_resource type="Script" uid="uid://lelpt5ux6h0d" path="res://addons/A1TetrisBackpack/Items/ItemDataResource.cs" id="13_b1k73"]
-
-[sub_resource type="CanvasTexture" id="CanvasTexture_3kgtc"]
-
-[sub_resource type="Resource" id="Resource_suxtk"]
-script = ExtResource("13_b1k73")
-Icon = SubResource("CanvasTexture_3kgtc")
-BaseShape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1)])
-metadata/_custom_type_script = "uid://lelpt5ux6h0d"
 
 [node name="BackpackTest" type="Control" unique_id=1221362850]
 layout_mode = 3
@@ -81,7 +73,7 @@ mouse_filter = 2
 layout_mode = 0
 offset_right = 64.0
 offset_bottom = 64.0
-Data = SubResource("Resource_suxtk")
+Data = ExtResource("6_0xep6")
 
 [node name="Instructions" type="Label" parent="ScreenMargin/MainVBox" unique_id=2075687424]
 layout_mode = 2
