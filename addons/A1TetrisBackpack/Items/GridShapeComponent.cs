@@ -13,8 +13,6 @@ public partial class GridShapeComponent : Node
 {
 	#region Export Properties
 	
-	[Export] public ItemDataResource Data { get; set; }
-	
 	/// <summary>
 	/// 单个格子的像素尺寸（用于 UI 尺寸计算）
 	/// </summary>
@@ -32,10 +30,21 @@ public partial class GridShapeComponent : Node
 	
 	#endregion
 	
+	#region Private Fields
+	
+	private ItemDataResource _data;
+	
+	#endregion
+	
 	#region Public Properties
 	
 	// 当前运行时占用的局部格子数组（只读）
 	public Vector2I[] CurrentLocalCells { get; private set; }
+	
+	/// <summary>
+	/// 获取当前的 ItemDataResource（只读）
+	/// </summary>
+	public ItemDataResource Data => _data;
 	
 	#endregion
 	
@@ -49,7 +58,57 @@ public partial class GridShapeComponent : Node
 	
 	public override void _Ready()
 	{
-		OnShapeChangedAsObservable = new Subject<Unit>();
+		// 订阅父节点的 DataInitialized 事件（通过接口解耦）
+		var parent = GetParent();
+		if (parent is IItemDataProvider provider)
+		{
+			provider.DataInitialized += OnDataReceived;
+			GD.Print($"[{Name}] GridShapeComponent: 已订阅父节点的 DataInitialized 事件（接口模式）");
+		}
+		else
+		{
+			GD.PushWarning($"[{Name}] GridShapeComponent: 父节点未实现 IItemDataProvider 接口，使用默认初始化");
+			InitializeShape();
+			
+			if (AutoResizeParent)
+			{
+				CallDeferred(MethodName.UpdateParentSize);
+			}
+		}
+	}
+	
+	public override void _ExitTree()
+	{
+		// 取消订阅事件，防止内存泄漏（通过接口解耦）
+		var parent = GetParent();
+		if (parent is IItemDataProvider provider)
+		{
+			provider.DataInitialized -= OnDataReceived;
+		}
+		
+		OnShapeChangedAsObservable?.Dispose();
+	}
+	
+	#endregion
+	
+	#region Event Handlers
+	
+	/// <summary>
+	/// 接收父节点传递的 ItemDataResource 并初始化形状
+	/// </summary>
+	private void OnDataReceived(ItemDataResource data)
+	{
+		SetData(data);
+	}
+	
+	/// <summary>
+	/// 设置 ItemDataResource 并初始化形状（供外部直接调用或事件触发）
+	/// </summary>
+	public void SetData(ItemDataResource data)
+	{
+		_data = data;
+		GD.Print($"[{Name}] GridShapeComponent.SetData: 收到 Data = {data?.ItemID ?? "null"}");
+		
 		InitializeShape();
 		
 		// 延迟调整父节点尺寸（确保所有节点初始化完成）
@@ -61,32 +120,27 @@ public partial class GridShapeComponent : Node
 		GD.Print($"GridShapeComponent 初始化完成：{CurrentLocalCells?.Length ?? 0} 个格子");
 	}
 	
-	public override void _ExitTree()
-	{
-		OnShapeChangedAsObservable?.Dispose();
-	}
-	
 	#endregion
 	
 	#region Shape Management
 	
 	private void InitializeShape()
 	{
-		if (Data == null)
+		if (_data == null)
 		{
 			GD.PushWarning("GridShapeComponent: Data 未设置，使用默认 1x1 形状");
 			CurrentLocalCells = new Vector2I[] { Vector2I.Zero };
 			return;
 		}
 		
-		if (Data.BaseShape == null || Data.BaseShape.Count == 0)
+		if (_data.BaseShape == null || _data.BaseShape.Count == 0)
 		{
-			GD.PushError($"GridShapeComponent: ItemDataResource [{Data.ItemID}] 的 BaseShape 为空");
+			GD.PushError($"GridShapeComponent: ItemDataResource [{_data.ItemID}] 的 BaseShape 为空");
 			CurrentLocalCells = new Vector2I[] { Vector2I.Zero };
 			return;
 		}
 		
-		CurrentLocalCells = Data.BaseShape.ToArray();
+		CurrentLocalCells = _data.BaseShape.ToArray();
 		NormalizeShape();
 	}
 	

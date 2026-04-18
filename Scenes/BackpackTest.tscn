@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://cahw8k8k84k2"]
 
-[ext_resource type="Script" uid="uid://dntmgr2svs0un" path="res://Tests/BackpackTestController.cs" id="1_res"]
 [ext_resource type="Script" uid="uid://dkk5driwga8ql" path="res://addons/A1TetrisBackpack/Core/BackpackGridUIComponent.cs" id="2_res"]
 [ext_resource type="Script" uid="uid://1rgai2oppf42" path="res://addons/A1TetrisBackpack/Core/BackpackGridComponent.cs" id="3_res"]
 [ext_resource type="Script" uid="uid://drof8dtjnyqs3" path="res://addons/A1TetrisBackpack/Core/BackpackInteractionController.cs" id="4_res"]
@@ -14,9 +13,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="BackpackTestController" type="Node" parent="." unique_id=167827569]
-script = ExtResource("1_res")
 
 [node name="Background" type="ColorRect" parent="." unique_id=762445843]
 layout_mode = 1
