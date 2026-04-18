@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Auto Sync to Gemini",
+  "description": "Automatically runs SYNC_TO_GEMINI_SILENT.bat in background when agent stops, syncing code to Google Drive without user interaction",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "powershell -WindowStyle Hidden -Command \"& 'C:\\Godot\\3d-practice\\SYNC_TO_GEMINI_SILENT.bat'\"",
+    "timeout": 120
+  }
+}
