@@ -59,19 +59,19 @@ public partial class DraggableItemComponent : Node
 	#region Export Properties
 	
 	/// <summary>
-	/// 可点击区域路径
+	/// 视觉形状组件路径（提供聚合后的输入事件流）
 	/// </summary>
-	[Export] public NodePath ClickableAreaPath { get; set; } = "%ClickableArea";
+	[Export] public NodePath GridShapeVisualComponentPath { get; set; } = "%GridShapeVisualComponent";
+	
+	/// <summary>
+	/// GridShapeVisualComponent 引用
+	/// </summary>
+	public GridShapeVisualComponent GridShapeVisualComponent { get; private set; }
 	
 	/// <summary>
 	/// 状态机节点路径
 	/// </summary>
 	[Export] public NodePath StateChartPath { get; set; } = "%StateChart";
-	
-	/// <summary>
-	/// 可点击区域引用
-	/// </summary>
-	public Control ClickableArea { get; private set; }
 	
 	/// <summary>
 	/// 状态机节点引用
@@ -158,14 +158,22 @@ public partial class DraggableItemComponent : Node
 	/// </summary>
 	private void InitializeComponent()
 	{
-		ClickableArea = GetNodeOrNull<Control>(ClickableAreaPath);
-		if (ClickableArea == null)
+		// 解析 GridShapeVisualComponent 引用
+		GridShapeVisualComponent = GetNodeOrNull<GridShapeVisualComponent>(GridShapeVisualComponentPath);
+		
+		// 验证 GridShapeVisualComponent 引用
+		if (GridShapeVisualComponent == null)
 		{
-			GD.PushError($"[{Name}] ClickableArea not found: {ClickableAreaPath}");
+			GD.PushError($"[{Name}] GridShapeVisualComponent not found at path: {GridShapeVisualComponentPath}");
 			return;
 		}
 		
-		ClickableArea.GuiInput += HandleGuiInput;
+		GD.Print($"[{Name}] GridShapeVisualComponent 引用有效: {GridShapeVisualComponent.Name}");
+		
+		// 订阅 GridShapeVisualComponent 的聚合输入事件流
+		GridShapeVisualComponent.OnBlockInputAsObservable
+			.Subscribe(HandleGuiInput)
+			.AddTo(this);
 		
 		StateChart = GetNodeOrNull<Node>(StateChartPath);
 		if (StateChart == null)
@@ -173,16 +181,12 @@ public partial class DraggableItemComponent : Node
 			GD.PushError($"[{Name}] StateChart not found: {StateChartPath}");
 			return;
 		}
+		
+		GD.Print($"[{Name}] DraggableItemComponent: 已订阅 GridShapeVisualComponent 的输入事件流");
 	}
 	
 	public override void _ExitTree()
 	{
-		// 取消订阅 GUI 输入事件（防止内存泄漏）
-		if (ClickableArea != null)
-		{
-			ClickableArea.GuiInput -= HandleGuiInput;
-		}
-		
 		// R3 规则：释放所有 Subjects
 		OnDragStartedAsObservable?.Dispose();
 		OnDragEndedAsObservable?.Dispose();
@@ -294,17 +298,6 @@ public partial class DraggableItemComponent : Node
 	public void TriggerDragEnd()
 	{
 		HandleDragEnd();
-	}
-	
-	/// <summary>
-	/// 启用/禁用输入处理
-	/// </summary>
-	public void SetInputEnabled(bool enabled)
-	{
-		if (ClickableArea != null)
-		{
-			ClickableArea.MouseFilter = enabled ? Control.MouseFilterEnum.Stop : Control.MouseFilterEnum.Ignore;
-		}
 	}
 	
 	#endregion

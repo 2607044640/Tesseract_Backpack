@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Composition;
+using R3;
 
 /// <summary>
 /// 角色旋转组件 - 负责让角色模型面向移动方向
@@ -23,6 +24,7 @@ public partial class CharacterRotationComponent : Node
     private Vector2 _currentInputDir = Vector2.Zero;
     private BaseInputComponent _inputComponent;
     private Node3D _phantomCamera;
+    private readonly CompositeDisposable _disposables = new();
 
     #endregion
 
@@ -54,12 +56,15 @@ public partial class CharacterRotationComponent : Node
     /// </summary>
     public void OnEntityReady()
     {
-        // 直接获取InputComponent并订阅事件
+        // 直接获取InputComponent并订阅R3流
         _inputComponent = parent.GetRequiredComponentInChildren<BaseInputComponent>();
         if (_inputComponent != null)
         {
-            _inputComponent.OnMovementInput += HandleMovementInput;
-            GD.Print($"✓ CharacterRotationComponent 已订阅 {_inputComponent.GetType().Name} 事件");
+            _inputComponent.MovementInput
+                .Subscribe(direction => _currentInputDir = direction)
+                .AddTo(_disposables);
+            
+            GD.Print($"✓ CharacterRotationComponent 已订阅 {_inputComponent.GetType().Name} R3流");
         }
     }
 
@@ -70,19 +75,7 @@ public partial class CharacterRotationComponent : Node
 
     public override void _ExitTree()
     {
-        if (_inputComponent != null)
-        {
-            _inputComponent.OnMovementInput -= HandleMovementInput;
-        }
-    }
-
-    #endregion
-
-    #region Event Handlers
-
-    private void HandleMovementInput(Vector2 inputDir)
-    {
-        _currentInputDir = inputDir;
+        _disposables.Dispose();
     }
 
     #endregion

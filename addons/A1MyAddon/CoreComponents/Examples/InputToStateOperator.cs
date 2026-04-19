@@ -1,9 +1,10 @@
 using Godot;
 using Godot.Composition;
+using R3;
 
 /// <summary>
 /// 输入到状态的"接线员"组件
-/// 演示如何将输入事件转换为状态机事件，实现完美解耦
+/// 演示如何将输入流转换为状态机事件，实现完美解耦
 /// 
 /// 架构模式：
 /// Input → InputComponent → InputToStateOperator → StateChart → Components
@@ -21,6 +22,7 @@ public partial class InputToStateOperator : Node
     #region Private Fields
 
     private BaseInputComponent _inputComponent;
+    private readonly CompositeDisposable _disposables = new();
 
     #endregion
 
@@ -34,27 +36,28 @@ public partial class InputToStateOperator : Node
 
     /// <summary>
     /// Entity 初始化完成后自动调用
-    /// 在这里订阅输入事件并转发到状态机
+    /// 在这里订阅输入流并转发到状态机
     /// </summary>
     public void OnEntityReady()
     {
-        // 订阅输入事件
+        // 订阅输入R3流
         if (_inputComponent != null)
         {
-            _inputComponent.OnJumpJustPressed += HandleJumpInput;
-            _inputComponent.OnMovementInput += HandleMovementInput;
-            GD.Print("✓ InputToStateOperator: 已订阅输入事件");
+            _inputComponent.JumpPressed
+                .Subscribe(_ => HandleJumpInput())
+                .AddTo(_disposables);
+            
+            _inputComponent.MovementInput
+                .Subscribe(direction => HandleMovementInput(direction))
+                .AddTo(_disposables);
+            
+            GD.Print("✓ InputToStateOperator: 已订阅输入R3流");
         }
     }
 
     public override void _ExitTree()
     {
-        // 取消订阅防止内存泄漏
-        if (_inputComponent != null)
-        {
-            _inputComponent.OnJumpJustPressed -= HandleJumpInput;
-            _inputComponent.OnMovementInput -= HandleMovementInput;
-        }
+        _disposables.Dispose();
     }
 
     #endregion

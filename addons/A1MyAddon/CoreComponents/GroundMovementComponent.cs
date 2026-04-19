@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Composition;
+using R3;
 
 /// <summary>
 /// 地面移动组件 - 处理重力、跳跃、地面移动
@@ -27,6 +28,7 @@ public partial class GroundMovementComponent : Node
     private BaseInputComponent _inputComponent;
     private Node3D _phantomCamera;
     private CharacterBody3D _entity; // 真实的实体引用
+    private readonly CompositeDisposable _disposables = new();
 
     #endregion
 
@@ -49,13 +51,19 @@ public partial class GroundMovementComponent : Node
             return;
         }
         
-        // 直接获取InputComponent并订阅事件
+        // 直接获取InputComponent并订阅R3流
         _inputComponent = _entity.GetRequiredComponentInChildren<BaseInputComponent>();
         if (_inputComponent != null)
         {
-            _inputComponent.OnMovementInput += HandleMovementInput;
-            _inputComponent.OnJumpJustPressed += HandleJumpInput;
-            GD.Print($"✓ GroundMovementComponent 已订阅 {_inputComponent.GetType().Name} 事件");
+            _inputComponent.MovementInput
+                .Subscribe(direction => _currentInputDirection = direction)
+                .AddTo(_disposables);
+            
+            _inputComponent.JumpPressed
+                .Subscribe(_ => _jumpRequested = true)
+                .AddTo(_disposables);
+            
+            GD.Print($"✓ GroundMovementComponent 已订阅 {_inputComponent.GetType().Name} R3流");
         }
         
         // 【Power Switch】自动绑定到父状态节点
@@ -71,25 +79,7 @@ public partial class GroundMovementComponent : Node
 
     public override void _ExitTree()
     {
-        if (_inputComponent != null)
-        {
-            _inputComponent.OnMovementInput -= HandleMovementInput;
-            _inputComponent.OnJumpJustPressed -= HandleJumpInput;
-        }
-    }
-
-    #endregion
-
-    #region Event Handlers
-
-    private void HandleMovementInput(Vector2 inputDir)
-    {
-        _currentInputDirection = inputDir;
-    }
-
-    private void HandleJumpInput()
-    {
-        _jumpRequested = true;
+        _disposables.Dispose();
     }
 
     #endregion

@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Composition;
+using R3;
 
 /// <summary>
 /// 飞行移动组件 - 三维全向移动，无重力
@@ -28,6 +29,7 @@ public partial class FlyMovementComponent : Node
     private BaseInputComponent _inputComponent;
     private Node3D _phantomCamera;
     private CharacterBody3D _entity; // 真实的实体引用
+    private readonly CompositeDisposable _disposables = new();
 
     #endregion
 
@@ -50,12 +52,15 @@ public partial class FlyMovementComponent : Node
             return;
         }
         
-        // 直接获取InputComponent并订阅事件
+        // 直接获取InputComponent并订阅R3流
         _inputComponent = _entity.GetRequiredComponentInChildren<BaseInputComponent>();
         if (_inputComponent != null)
         {
-            _inputComponent.OnMovementInput += HandleMovementInput;
-            GD.Print($"✓ FlyMovementComponent 已订阅 {_inputComponent.GetType().Name} 事件");
+            _inputComponent.MovementInput
+                .Subscribe(direction => _currentInputDirection = direction)
+                .AddTo(_disposables);
+            
+            GD.Print($"✓ FlyMovementComponent 已订阅 {_inputComponent.GetType().Name} R3流");
         }
         
         // 【Power Switch】自动绑定到父状态节点
@@ -77,19 +82,7 @@ public partial class FlyMovementComponent : Node
 
     public override void _ExitTree()
     {
-        if (_inputComponent != null)
-        {
-            _inputComponent.OnMovementInput -= HandleMovementInput;
-        }
-    }
-
-    #endregion
-
-    #region Event Handlers
-
-    private void HandleMovementInput(Vector2 inputDir)
-    {
-        _currentInputDirection = inputDir;
+        _disposables.Dispose();
     }
 
     #endregion

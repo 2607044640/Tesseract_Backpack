@@ -58,6 +58,12 @@ public partial class GridShapeComponent : Node
 	
 	public override void _Ready()
 	{
+		GD.Print($"[{Name}] GridShapeComponent._Ready() 开始");
+		
+		// 【BUG FIX】初始化 R3 Subject（必须在任何订阅之前完成）
+		OnShapeChangedAsObservable = new Subject<Unit>();
+		GD.Print($"[{Name}] OnShapeChangedAsObservable 已初始化");
+		
 		// 订阅父节点的 DataInitialized 事件（通过接口解耦）
 		var parent = GetParent();
 		if (parent is IItemDataProvider provider)
@@ -75,6 +81,8 @@ public partial class GridShapeComponent : Node
 				CallDeferred(MethodName.UpdateParentSize);
 			}
 		}
+		
+		GD.Print($"[{Name}] GridShapeComponent._Ready() 完成");
 	}
 	
 	public override void _ExitTree()
@@ -116,6 +124,9 @@ public partial class GridShapeComponent : Node
 		{
 			CallDeferred(MethodName.UpdateParentSize);
 		}
+		
+		// 【关键】触发形状变化事件，通知 GridShapeVisualComponent 构建视觉方块
+		OnShapeChangedAsObservable?.OnNext(Unit.Default);
 		
 		GD.Print($"GridShapeComponent 初始化完成：{CurrentLocalCells?.Length ?? 0} 个格子");
 	}

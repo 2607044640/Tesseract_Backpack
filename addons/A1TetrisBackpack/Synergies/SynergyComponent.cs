@@ -65,7 +65,7 @@ public partial class SynergyComponent : Node
 	/// <summary>
 	/// 形状组件引用（用于获取旋转状态）
 	/// </summary>
-	[Export] public GridShapeComponent Shape { get; set; }
+	[Export] public GridShapeComponent GridShapeComponent { get; set; }
 	
 	#endregion
 	
@@ -121,15 +121,15 @@ public partial class SynergyComponent : Node
 			GD.PushWarning("SynergyComponent: SynergyData 未设置");
 		}
 		
-		if (Shape == null)
+		if (GridShapeComponent == null)
 		{
-			GD.PushWarning("SynergyComponent: Shape 未设置");
+			GD.PushWarning("SynergyComponent: GridShapeComponent 未设置");
 		}
 		
 		// 订阅形状变化事件（用于追踪旋转）
-		if (Shape != null)
+		if (GridShapeComponent != null)
 		{
-			Shape.OnShapeChangedAsObservable
+			GridShapeComponent.OnShapeChangedAsObservable
 				.Subscribe(_ => OnShapeRotated())
 				.AddTo(_disposables);
 		}
