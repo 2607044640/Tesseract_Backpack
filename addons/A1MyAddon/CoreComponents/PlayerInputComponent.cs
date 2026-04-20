@@ -40,13 +40,13 @@ public partial class PlayerInputComponent : BaseInputComponent
 
         if (Input.IsActionJustPressed("toggle_fly"))
         {
-            GetParent().SendStateEvent("toggle_fly");
+            parent.SendStateEvent("toggle_fly");
             GD.Print("PlayerInputComponent: 发送状态事件 'toggle_fly'");
         }
 
         if (Input.IsActionJustPressed("interact"))
         {
-            GetParent().SendStateEvent("interact");
+            parent.SendStateEvent("interact");
             GD.Print("PlayerInputComponent: 发送状态事件 'interact'");
         }
     }

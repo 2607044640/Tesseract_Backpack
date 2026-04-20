@@ -65,6 +65,7 @@ align_position_with_view = Callable()
 align_rotation_with_view = Callable()
 
 [node name="StateChart" type="Node" parent="." unique_id=491642213]
+unique_name_in_owner = true
 script = ExtResource("11_gk2qc")
 
 [node name="Root" type="Node" parent="StateChart" unique_id=1283774687]

@@ -41,40 +41,40 @@ public partial class OptionComponentHelper : BaseSettingComponentHelper
 	
 	// ===== 内部引用 =====
 	[Export] public NodePath OptionButtonPath { get; set; } = "%OptionDropdown_Button";
-	private Button _optionButton;
-	private PopupMenu _popup;
+	private Button Button_Option;
+	private PopupMenu PopupMenu_MenuOption;
 	
 	private int _currentIndex;
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_optionButton = GetNodeOrNull<Button>(OptionButtonPath);
-		if (_optionButton == null)
+		Button_Option = GetNodeOrNull<Button>(OptionButtonPath);
+		if (Button_Option == null)
 		{
 			GD.PushError($"[{Name}] OptionButton not found: {OptionButtonPath}");
 			return;
 		}
 		
 		// 创建PopupMenu
-		if (_optionButton != null && !_optionButton.HasNode("PopupMenu"))
+		if (Button_Option != null && !Button_Option.HasNode("PopupMenu"))
 		{
-			_popup = new PopupMenu();
-			_popup.Name = "PopupMenu";
-			_optionButton.AddChild(_popup);
+			PopupMenu_MenuOption = new PopupMenu();
+			PopupMenu_MenuOption.Name = "PopupMenu";
+			Button_Option.AddChild(PopupMenu_MenuOption);
 		}
-		else if (_optionButton != null)
+		else if (Button_Option != null)
 		{
-			_popup = _optionButton.GetNode<PopupMenu>("PopupMenu");
+			PopupMenu_MenuOption = Button_Option.GetNode<PopupMenu>("PopupMenu");
 		}
 	}
 	
 	protected override void ConnectSignals()
 	{
-		if (_optionButton != null)
-			_optionButton.Pressed += OnOptionButtonPressed;
+		if (Button_Option != null)
+			Button_Option.Pressed += OnOptionButtonPressed;
 		
-		if (_popup != null)
-			_popup.IndexPressed += OnPopupIndexPressed;
+		if (PopupMenu_MenuOption != null)
+			PopupMenu_MenuOption.IndexPressed += OnPopupIndexPressed;
 	}
 	
 	protected override void UpdateControl()
@@ -85,12 +85,12 @@ public partial class OptionComponentHelper : BaseSettingComponentHelper
 	
 	private void UpdateOptions()
 	{
-		if (_popup != null)
+		if (PopupMenu_MenuOption != null)
 		{
-			_popup.Clear();
+			PopupMenu_MenuOption.Clear();
 			for (int i = 0; i < Options.Length; i++)
 			{
-				_popup.AddItem(Options[i], i);
+				PopupMenu_MenuOption.AddItem(Options[i], i);
 			}
 		}
 		UpdateSelection();
@@ -98,31 +98,31 @@ public partial class OptionComponentHelper : BaseSettingComponentHelper
 	
 	private void UpdateSelection()
 	{
-		if (_optionButton != null && Options.Length > 0)
+		if (Button_Option != null && Options.Length > 0)
 		{
 			int index = Mathf.Clamp(DefaultIndex, 0, Options.Length - 1);
 			_currentIndex = index;
-			_optionButton.Text = Options[index];
+			Button_Option.Text = Options[index];
 		}
 	}
 	
 	private void OnOptionButtonPressed()
 	{
-		if (_popup != null && _optionButton != null)
+		if (PopupMenu_MenuOption != null && Button_Option != null)
 		{
-			Vector2 buttonPos = _optionButton.GlobalPosition;
-			Vector2 buttonSize = _optionButton.Size;
-			_popup.Position = (Vector2I)(buttonPos + new Vector2(0, buttonSize.Y));
-			_popup.Popup();
+			Vector2 buttonPos = Button_Option.GlobalPosition;
+			Vector2 buttonSize = Button_Option.Size;
+			PopupMenu_MenuOption.Position = (Vector2I)(buttonPos + new Vector2(0, buttonSize.Y));
+			PopupMenu_MenuOption.Popup();
 		}
 	}
 	
 	private void OnPopupIndexPressed(long index)
 	{
 		_currentIndex = (int)index;
-		if (_optionButton != null && _currentIndex < Options.Length)
+		if (Button_Option != null && _currentIndex < Options.Length)
 		{
-			_optionButton.Text = Options[_currentIndex];
+			Button_Option.Text = Options[_currentIndex];
 			OptionSelected?.Invoke(_currentIndex, Options[_currentIndex]);
 		}
 	}
@@ -148,8 +148,8 @@ public partial class OptionComponentHelper : BaseSettingComponentHelper
 		if (index >= 0 && index < Options.Length)
 		{
 			_currentIndex = index;
-			if (_optionButton != null)
-				_optionButton.Text = Options[index];
+			if (Button_Option != null)
+				Button_Option.Text = Options[index];
 		}
 	}
 	
@@ -165,10 +165,10 @@ public partial class OptionComponentHelper : BaseSettingComponentHelper
 	
 	protected override void DisconnectSignals()
 	{
-		if (_optionButton != null)
-			_optionButton.Pressed -= OnOptionButtonPressed;
+		if (Button_Option != null)
+			Button_Option.Pressed -= OnOptionButtonPressed;
 		
-		if (_popup != null)
-			_popup.IndexPressed -= OnPopupIndexPressed;
+		if (PopupMenu_MenuOption != null)
+			PopupMenu_MenuOption.IndexPressed -= OnPopupIndexPressed;
 	}
 }

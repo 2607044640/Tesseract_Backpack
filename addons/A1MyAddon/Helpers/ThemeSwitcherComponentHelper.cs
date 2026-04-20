@@ -94,13 +94,13 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 	
 	// ===== 内部引用 =====
 	[Export] public NodePath ThemeDropdownPath { get; set; } = "%ThemeDropdown_OptionButton";
-	private OptionButton _themeDropdown;
+	private OptionButton OptionButton_Theme;
 	private int _currentIndex;
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_themeDropdown = GetNodeOrNull<OptionButton>(ThemeDropdownPath);
-		if (_themeDropdown == null)
+		OptionButton_Theme = GetNodeOrNull<OptionButton>(ThemeDropdownPath);
+		if (OptionButton_Theme == null)
 		{
 			GD.PushError($"[{Name}] ThemeDropdown not found: {ThemeDropdownPath}");
 			return;
@@ -109,8 +109,8 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 	
 	protected override void ConnectSignals()
 	{
-		if (_themeDropdown != null)
-			_themeDropdown.ItemSelected += OnThemeSelected;
+		if (OptionButton_Theme != null)
+			OptionButton_Theme.ItemSelected += OnThemeSelected;
 	}
 	
 	protected override void UpdateControl()
@@ -121,16 +121,16 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 	
 	private void UpdateThemeList()
 	{
-		if (_themeDropdown != null)
+		if (OptionButton_Theme != null)
 		{
-			_themeDropdown.Clear();
+			OptionButton_Theme.Clear();
 			
 			// 如果没有提供ThemeNames，自动从Theme资源文件名生成
 			string[] displayNames = GetDisplayNames();
 			
 			for (int i = 0; i < displayNames.Length; i++)
 			{
-				_themeDropdown.AddItem(displayNames[i], i);
+				OptionButton_Theme.AddItem(displayNames[i], i);
 			}
 		}
 		UpdateSelection();
@@ -192,11 +192,11 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 	
 	private void UpdateSelection()
 	{
-		if (_themeDropdown != null && Themes.Length > 0)
+		if (OptionButton_Theme != null && Themes.Length > 0)
 		{
 			int index = Mathf.Clamp(DefaultThemeIndex, 0, Themes.Length - 1);
 			_currentIndex = index;
-			_themeDropdown.Selected = index;
+			OptionButton_Theme.Selected = index;
 		}
 	}
 	
@@ -288,10 +288,10 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 	
 	public void SetTheme(int index)
 	{
-		if (_themeDropdown != null && index >= 0 && index < Themes.Length)
+		if (OptionButton_Theme != null && index >= 0 && index < Themes.Length)
 		{
 			_currentIndex = index;
-			_themeDropdown.Selected = index;
+			OptionButton_Theme.Selected = index;
 			ApplyTheme(index);
 		}
 	}
@@ -309,7 +309,7 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 	
 	protected override void DisconnectSignals()
 	{
-		if (_themeDropdown != null)
-			_themeDropdown.ItemSelected -= OnThemeSelected;
+		if (OptionButton_Theme != null)
+			OptionButton_Theme.ItemSelected -= OnThemeSelected;
 	}
 }

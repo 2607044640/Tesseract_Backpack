@@ -46,15 +46,15 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	
 	// ===== 内部引用 =====
 	[Export] public NodePath DropdownPath { get; set; } = "%Dropdown_OptionButton";
-	private OptionButton _dropdown;
+	private OptionButton OptionButton_Dropdown;
 	
 	private bool _isUpdating = false;
 	private readonly CompositeDisposable _disposables = new();
 	
 	protected override void InitializeSpecificNodes()
 	{
-		_dropdown = GetNodeOrNull<OptionButton>(DropdownPath);
-		if (_dropdown == null)
+		OptionButton_Dropdown = GetNodeOrNull<OptionButton>(DropdownPath);
+		if (OptionButton_Dropdown == null)
 		{
 			GD.PushError($"[{Name}] Dropdown not found: {DropdownPath}");
 			return;
@@ -83,8 +83,8 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	
 	protected override void ConnectSignals()
 	{
-		if (_dropdown != null)
-			_dropdown.ItemSelected += OnItemSelected;
+		if (OptionButton_Dropdown != null)
+			OptionButton_Dropdown.ItemSelected += OnItemSelected;
 	}
 	
 	protected override void UpdateControl()
@@ -95,12 +95,12 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	
 	private void UpdateItems()
 	{
-		if (_dropdown != null)
+		if (OptionButton_Dropdown != null)
 		{
-			_dropdown.Clear();
+			OptionButton_Dropdown.Clear();
 			for (int i = 0; i < Items.Length; i++)
 			{
-				_dropdown.AddItem(Items[i], i);
+				OptionButton_Dropdown.AddItem(Items[i], i);
 			}
 		}
 		UpdateSelection();
@@ -108,10 +108,10 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	
 	private void UpdateSelection()
 	{
-		if (_dropdown != null && Items.Length > 0)
+		if (OptionButton_Dropdown != null && Items.Length > 0)
 		{
 			int index = Mathf.Clamp(DefaultIndex, 0, Items.Length - 1);
-			_dropdown.Selected = index;
+			OptionButton_Dropdown.Selected = index;
 			
 			if (SelectedIndex != null)
 				SelectedIndex.Value = index;
@@ -140,9 +140,9 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	
 	private void SetSelectionInternal(int index)
 	{
-		if (_dropdown != null && index >= 0 && index < Items.Length)
+		if (OptionButton_Dropdown != null && index >= 0 && index < Items.Length)
 		{
-			_dropdown.Selected = index;
+			OptionButton_Dropdown.Selected = index;
 		}
 	}
 	
@@ -167,9 +167,9 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 		
 		_isUpdating = true;
 		
-		if (_dropdown != null && index >= 0 && index < Items.Length)
+		if (OptionButton_Dropdown != null && index >= 0 && index < Items.Length)
 		{
-			_dropdown.Selected = index;
+			OptionButton_Dropdown.Selected = index;
 			
 			if (SelectedIndex != null)
 				SelectedIndex.Value = index;
@@ -196,8 +196,8 @@ public partial class DropdownComponentHelper : BaseSettingComponentHelper
 	
 	protected override void DisconnectSignals()
 	{
-		if (_dropdown != null)
-			_dropdown.ItemSelected -= OnItemSelected;
+		if (OptionButton_Dropdown != null)
+			OptionButton_Dropdown.ItemSelected -= OnItemSelected;
 	}
 	
 	public override void _ExitTree()
