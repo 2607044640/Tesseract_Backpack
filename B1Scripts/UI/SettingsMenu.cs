@@ -8,18 +8,18 @@ using R3;
 public partial class SettingsMenu : Control
 {
 	// UI Components (仅用于显示，不持有状态)
-	[Export] public HSlider MasterVolumeSlider { get; set; }
-	[Export] public HSlider MusicVolumeSlider { get; set; }
-	[Export] public HSlider SFXVolumeSlider { get; set; }
-	[Export] public CheckButton MuteToggle { get; set; }
+	[Export] public HSlider HSlider_MasterVolume { get; set; }
+	[Export] public HSlider HSlider_MusicVolume { get; set; }
+	[Export] public HSlider HSlider_SFXVolume { get; set; }
+	[Export] public CheckButton CheckButton_Mute { get; set; }
 	
-	[Export] public CheckButton FullscreenToggle { get; set; }
-	[Export] public OptionButton ResolutionDropdown { get; set; }
-	[Export] public OptionButton AntiAliasingDropdown { get; set; }
-	[Export] public OptionButton CameraShakeDropdown { get; set; }
+	[Export] public CheckButton CheckButton_Fullscreen { get; set; }
+	[Export] public OptionButton OptionButton_Resolution { get; set; }
+	[Export] public OptionButton OptionButton_AntiAliasing { get; set; }
+	[Export] public OptionButton OptionButton_CameraShake { get; set; }
 	
-	[Export] public Button BackButton { get; set; }
-	[Export] public Button ResetAllButton { get; set; }
+	[Export] public Button Button_Back { get; set; }
+	[Export] public Button Button_ResetAll { get; set; }
 	
 	// Settings manager (单一状态源)
 	private SettingsManager _settingsManager;
@@ -66,8 +66,8 @@ public partial class SettingsMenu : Control
 		_settingsManager.MasterVolume
 			.Subscribe(value =>
 			{
-				if (MasterVolumeSlider != null)
-					MasterVolumeSlider.Value = value;
+				if (HSlider_MasterVolume != null)
+					HSlider_MasterVolume.Value = value;
 				
 				float dbVolume = Mathf.LinearToDb(value / 100f);
 				AudioServer.SetBusVolumeDb(_masterBusIdx, dbVolume);
@@ -78,8 +78,8 @@ public partial class SettingsMenu : Control
 		_settingsManager.MusicVolume
 			.Subscribe(value =>
 			{
-				if (MusicVolumeSlider != null)
-					MusicVolumeSlider.Value = value;
+				if (HSlider_MusicVolume != null)
+					HSlider_MusicVolume.Value = value;
 				
 				float dbVolume = Mathf.LinearToDb(value / 100f);
 				AudioServer.SetBusVolumeDb(_musicBusIdx, dbVolume);
@@ -90,8 +90,8 @@ public partial class SettingsMenu : Control
 		_settingsManager.SFXVolume
 			.Subscribe(value =>
 			{
-				if (SFXVolumeSlider != null)
-					SFXVolumeSlider.Value = value;
+				if (HSlider_SFXVolume != null)
+					HSlider_SFXVolume.Value = value;
 				
 				float dbVolume = Mathf.LinearToDb(value / 100f);
 				AudioServer.SetBusVolumeDb(_sfxBusIdx, dbVolume);
@@ -102,8 +102,8 @@ public partial class SettingsMenu : Control
 		_settingsManager.Mute
 			.Subscribe(muted =>
 			{
-				if (MuteToggle != null)
-					MuteToggle.ButtonPressed = muted;
+				if (CheckButton_Mute != null)
+					CheckButton_Mute.ButtonPressed = muted;
 				
 				AudioServer.SetBusMute(_masterBusIdx, muted);
 			})
@@ -113,8 +113,8 @@ public partial class SettingsMenu : Control
 		_settingsManager.Fullscreen
 			.Subscribe(fullscreen =>
 			{
-				if (FullscreenToggle != null)
-					FullscreenToggle.ButtonPressed = fullscreen;
+				if (CheckButton_Fullscreen != null)
+					CheckButton_Fullscreen.ButtonPressed = fullscreen;
 				
 				DisplayServer.WindowSetMode(fullscreen 
 					? DisplayServer.WindowMode.Fullscreen 
@@ -126,12 +126,12 @@ public partial class SettingsMenu : Control
 		_settingsManager.ResolutionIndex
 			.Subscribe(index =>
 			{
-				if (ResolutionDropdown != null)
+				if (OptionButton_Resolution != null)
 				{
-					ResolutionDropdown.Selected = index;
+					OptionButton_Resolution.Selected = index;
 					
 					// 应用分辨率
-					string text = ResolutionDropdown.GetItemText(index);
+					string text = OptionButton_Resolution.GetItemText(index);
 					string[] parts = text.Split('x');
 					if (parts.Length == 2)
 					{
@@ -147,8 +147,8 @@ public partial class SettingsMenu : Control
 		_settingsManager.AntiAliasingIndex
 			.Subscribe(index =>
 			{
-				if (AntiAliasingDropdown != null)
-					AntiAliasingDropdown.Selected = index;
+				if (OptionButton_AntiAliasing != null)
+					OptionButton_AntiAliasing.Selected = index;
 				
 				ApplyAntiAliasing(index);
 			})
@@ -158,81 +158,81 @@ public partial class SettingsMenu : Control
 		_settingsManager.CameraShakeIndex
 			.Subscribe(index =>
 			{
-				if (CameraShakeDropdown != null)
-					CameraShakeDropdown.Selected = index;
+				if (OptionButton_CameraShake != null)
+					OptionButton_CameraShake.Selected = index;
 			})
 			.AddTo(_disposables);
 		
 		// ===== UI → Manager (用户交互更新状态) =====
 		
-		if (MasterVolumeSlider != null)
+		if (HSlider_MasterVolume != null)
 		{
-			MasterVolumeSlider.OnValueChangedAsObservable()
+			HSlider_MasterVolume.OnValueChangedAsObservable()
 				.Subscribe(value => _settingsManager.MasterVolume.Value = (float)value)
 				.AddTo(_disposables);
 		}
 		
-		if (MusicVolumeSlider != null)
+		if (HSlider_MusicVolume != null)
 		{
-			MusicVolumeSlider.OnValueChangedAsObservable()
+			HSlider_MusicVolume.OnValueChangedAsObservable()
 				.Subscribe(value => _settingsManager.MusicVolume.Value = (float)value)
 				.AddTo(_disposables);
 		}
 		
-		if (SFXVolumeSlider != null)
+		if (HSlider_SFXVolume != null)
 		{
-			SFXVolumeSlider.OnValueChangedAsObservable()
+			HSlider_SFXVolume.OnValueChangedAsObservable()
 				.Subscribe(value => _settingsManager.SFXVolume.Value = (float)value)
 				.AddTo(_disposables);
 		}
 		
-		if (MuteToggle != null)
+		if (CheckButton_Mute != null)
 		{
-			MuteToggle.OnToggledAsObservable()
+			CheckButton_Mute.OnToggledAsObservable()
 				.Subscribe(muted => _settingsManager.Mute.Value = muted)
 				.AddTo(_disposables);
 		}
 		
-		if (FullscreenToggle != null)
+		if (CheckButton_Fullscreen != null)
 		{
-			FullscreenToggle.OnToggledAsObservable()
+			CheckButton_Fullscreen.OnToggledAsObservable()
 				.Subscribe(fullscreen => _settingsManager.Fullscreen.Value = fullscreen)
 				.AddTo(_disposables);
 		}
 		
-		if (ResolutionDropdown != null)
+		if (OptionButton_Resolution != null)
 		{
-			ResolutionDropdown.OnItemSelectedAsObservable()
+			OptionButton_Resolution.OnItemSelectedAsObservable()
 				.Subscribe(index => _settingsManager.ResolutionIndex.Value = (int)index)
 				.AddTo(_disposables);
 		}
 		
-		if (AntiAliasingDropdown != null)
+		if (OptionButton_AntiAliasing != null)
 		{
-			AntiAliasingDropdown.OnItemSelectedAsObservable()
+			OptionButton_AntiAliasing.OnItemSelectedAsObservable()
 				.Subscribe(index => _settingsManager.AntiAliasingIndex.Value = (int)index)
 				.AddTo(_disposables);
 		}
 		
-		if (CameraShakeDropdown != null)
+		if (OptionButton_CameraShake != null)
 		{
-			CameraShakeDropdown.OnItemSelectedAsObservable()
+			OptionButton_CameraShake.OnItemSelectedAsObservable()
 				.Subscribe(index => _settingsManager.CameraShakeIndex.Value = (int)index)
 				.AddTo(_disposables);
 		}
 		
 		// ===== Buttons =====
 		
-		if (BackButton != null)
+		if (Button_Back != null)
 		{
-			BackButton.OnPressedAsObservable()
+			Button_Back.OnPressedAsObservable()
 				.Subscribe(_ => Hide())
 				.AddTo(_disposables);
 		}
 		
-		if (ResetAllButton != null)
+		if (Button_ResetAll != null)
 		{
-			ResetAllButton.OnPressedAsObservable()
+			Button_ResetAll.OnPressedAsObservable()
 				.Subscribe(_ => _settingsManager.ResetAllSettings())
 				.AddTo(_disposables);
 		}

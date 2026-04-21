@@ -16,18 +16,18 @@ using System;
 public partial class GameSettingsController : Control
 {
 	// ===== Audio Component Helpers =====
-	[Export] public SliderComponentHelper MasterVolume { get; set; }
-	[Export] public SliderComponentHelper MusicVolume { get; set; }
-	[Export] public SliderComponentHelper SFXVolume { get; set; }
+	[Export] public SliderComponentHelper SliderComponentHelper_MasterVolume { get; set; }
+	[Export] public SliderComponentHelper SliderComponentHelper_MusicVolume { get; set; }
+	[Export] public SliderComponentHelper SliderComponentHelper_SFXVolume { get; set; }
 	
 	// ===== Video Component Helpers =====
-	[Export] public DropdownComponentHelper Resolution { get; set; }
-	[Export] public ToggleComponentHelper Fullscreen { get; set; }
+	[Export] public DropdownComponentHelper DropdownComponentHelper_Resolution { get; set; }
+	[Export] public ToggleComponentHelper ToggleComponentHelper_Fullscreen { get; set; }
 	
 	// ===== Buttons =====
-	[Export] public Button SaveButton { get; set; }
-	[Export] public Button CancelButton { get; set; }
-	[Export] public Button ResetAllButton { get; set; }
+	[Export] public Button Button_Save { get; set; }
+	[Export] public Button Button_Cancel { get; set; }
+	[Export] public Button Button_ResetAll { get; set; }
 	
 	// Settings manager (单一状态源)
 	private SettingsManager _settingsManager;
@@ -66,9 +66,9 @@ public partial class GameSettingsController : Control
 	private void BindSettings()
 	{
 		// ✅ 音频设置（专用方法：双向绑定 + 音频总线应用）
-		BindAudioSlider(_settingsManager.MasterVolume, MasterVolume, _masterBusIdx);
-		BindAudioSlider(_settingsManager.MusicVolume, MusicVolume, _musicBusIdx);
-		BindAudioSlider(_settingsManager.SFXVolume, SFXVolume, _sfxBusIdx);
+		BindAudioSlider(_settingsManager.MasterVolume, SliderComponentHelper_MasterVolume, _masterBusIdx);
+		BindAudioSlider(_settingsManager.MusicVolume, SliderComponentHelper_MusicVolume, _musicBusIdx);
+		BindAudioSlider(_settingsManager.SFXVolume, SliderComponentHelper_SFXVolume, _sfxBusIdx);
 		
 		// 也可以使用通用方法（不包含音频总线逻辑）：
 		// BindSlider(_settingsManager.MasterVolume, MasterVolume, value => {
@@ -77,16 +77,16 @@ public partial class GameSettingsController : Control
 		// });
 		
 		// ✅ 视频设置
-		BindToggle(_settingsManager.Fullscreen, Fullscreen, ApplyFullscreen);
-		BindDropdown(_settingsManager.ResolutionIndex, Resolution, ApplyResolution);
+		BindToggle(_settingsManager.Fullscreen, ToggleComponentHelper_Fullscreen, ApplyFullscreen);
+		BindDropdown(_settingsManager.ResolutionIndex, DropdownComponentHelper_Resolution, ApplyResolution);
 		
 		// ✅ 全屏与分辨率联动（新增功能）
 		SetupFullscreenResolutionLink();
 		
 		// ✅ 按钮
-		if (SaveButton != null)
+		if (Button_Save != null)
 		{
-			SaveButton.OnPressedAsObservable()
+			Button_Save.OnPressedAsObservable()
 				.Subscribe(_ =>
 				{
 					GD.Print("Settings saved manually");
@@ -95,16 +95,16 @@ public partial class GameSettingsController : Control
 				.AddTo(_disposables);
 		}
 		
-		if (CancelButton != null)
+		if (Button_Cancel != null)
 		{
-			CancelButton.OnPressedAsObservable()
+			Button_Cancel.OnPressedAsObservable()
 				.Subscribe(_ => Hide())
 				.AddTo(_disposables);
 		}
 		
-		if (ResetAllButton != null)
+		if (Button_ResetAll != null)
 		{
-			ResetAllButton.OnPressedAsObservable()
+			Button_ResetAll.OnPressedAsObservable()
 				.ThrottleFirst(TimeSpan.FromSeconds(1)) // ✅ 防止连击
 				.Subscribe(_ =>
 				{
@@ -258,9 +258,9 @@ public partial class GameSettingsController : Control
 	/// </summary>
 	private void ApplyResolution(int index)
 	{
-		if (Resolution == null) return;
+		if (DropdownComponentHelper_Resolution == null) return;
 		
-		string text = Resolution.GetSelectedText();
+		string text = DropdownComponentHelper_Resolution.GetSelectedText();
 		if (!string.IsNullOrEmpty(text))
 		{
 			string[] parts = text.Split('x');
@@ -286,13 +286,13 @@ public partial class GameSettingsController : Control
 	/// </summary>
 	private void SetupFullscreenResolutionLink()
 	{
-		if (Fullscreen == null || Resolution == null) return;
+		if (ToggleComponentHelper_Fullscreen == null || DropdownComponentHelper_Resolution == null) return;
 		
 		_settingsManager.Fullscreen
 			.Subscribe(isFullscreen =>
 			{
 				// 尝试获取底层的 OptionButton 控件
-				var dropdown = Resolution.GetNodeOrNull<OptionButton>("OptionButton");
+				var dropdown = DropdownComponentHelper_Resolution.GetNodeOrNull<OptionButton>("OptionButton");
 				if (dropdown != null)
 				{
 					dropdown.Disabled = isFullscreen;
@@ -301,7 +301,7 @@ public partial class GameSettingsController : Control
 				else
 				{
 					// 如果找不到，尝试直接访问 Resolution 的子节点
-					foreach (var child in Resolution.GetChildren())
+					foreach (var child in DropdownComponentHelper_Resolution.GetChildren())
 					{
 						if (child is OptionButton optionButton)
 						{

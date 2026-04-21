@@ -39,11 +39,10 @@ public partial class TSItemWrapper : Control, IItemDataProvider
 		if (Data != null)
 		{
 			DataInitialized?.Invoke(Data);
-			GD.Print($"[{Name}] TSItemWrapper._Ready: 已触发 DataInitialized 事件，Data = {Data.ItemID}");
 		}
 		else
 		{
-			GD.PushWarning($"[{Name}] TSItemWrapper._Ready: Data 未设置，将使用默认 1x1 形状");
+			GD.PushWarning($"[{Name}] Data 未设置，将使用默认 1x1 形状");
 			// 即使 Data 为 null，也触发事件让 GridShapeComponent 使用默认形状
 			DataInitialized?.Invoke(null);
 		}

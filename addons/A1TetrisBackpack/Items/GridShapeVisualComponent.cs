@@ -85,8 +85,6 @@ public partial class GridShapeVisualComponent : Node
 	
 	public override void _Ready()
 	{
-		GD.Print($"[{Name}] GridShapeVisualComponent._Ready() 开始");
-		
 		// 解析 NodePath 引用
 		GridShapeComponent = GetNodeOrNull<GridShapeComponent>(GridShapeComponentPath);
 		InteractionArea = GetNodeOrNull<Control>(InteractionAreaPath);
@@ -94,50 +92,29 @@ public partial class GridShapeVisualComponent : Node
 		// Assert required references are valid
 		if (GridShapeComponent == null)
 		{
-			GD.PushError($"[{Name}] GridShapeVisualComponent: GridShapeComponent not found at path: {GridShapeComponentPath}");
+			GD.PushError($"[{Name}] GridShapeComponent not found at path: {GridShapeComponentPath}");
 			return;
 		}
 		
 		if (InteractionArea == null)
 		{
-			GD.PushError($"[{Name}] GridShapeVisualComponent: InteractionArea not found at path: {InteractionAreaPath}");
+			GD.PushError($"[{Name}] InteractionArea not found at path: {InteractionAreaPath}");
 			return;
 		}
 		
-		GD.Print($"[{Name}] GridShapeComponent 引用有效: {GridShapeComponent.Name}");
-		GD.Print($"[{Name}] InteractionArea 引用有效: {InteractionArea.Name}");
-		
 		// 【关键架构设计】：父容器忽略鼠标，让子块独立接收事件
-		// CRITICAL: Parent container must ignore mouse to allow child blocks to receive events
 		InteractionArea.MouseFilter = Control.MouseFilterEnum.Ignore;
-		GD.Print($"[{Name}] InteractionArea.MouseFilter 已设置为 Ignore");
 		
 		// 订阅逻辑组件的形状变化事件（旋转时自动重建视觉方块）
 		GridShapeComponent.OnShapeChangedAsObservable
-			.Subscribe(_ => 
-			{
-				GD.Print($"[{Name}] 收到形状变化事件，重建视觉方块");
-				RebuildVisualBlocks();
-			})
+			.Subscribe(_ => RebuildVisualBlocks())
 			.AddTo(this);
 		
-		GD.Print($"[{Name}] 已订阅 GridShapeComponent.OnShapeChangedAsObservable");
-		
-		// 【架构修正】不在 _Ready() 中立即构建方块
-		// 原因：数据通过 IItemDataProvider 接口异步注入，此时 CurrentLocalCells 可能为 null
-		// 解决方案：仅通过 OnShapeChangedAsObservable 事件触发构建（数据注入后会自动触发）
 		// 如果数据已经存在（非接口模式），手动触发一次构建
 		if (GridShapeComponent.CurrentLocalCells != null)
 		{
-			GD.Print($"[{Name}] 数据已存在，立即构建视觉方块");
 			RebuildVisualBlocks();
 		}
-		else
-		{
-			GD.Print($"[{Name}] 数据尚未注入，等待 OnShapeChangedAsObservable 事件");
-		}
-		
-		GD.Print($"[{Name}] GridShapeVisualComponent._Ready() 完成");
 	}
 	
 	public override void _ExitTree()
@@ -167,10 +144,7 @@ public partial class GridShapeVisualComponent : Node
 	/// </summary>
 	private void RebuildVisualBlocks()
 	{
-		GD.Print($"[{Name}] RebuildVisualBlocks() 开始");
-		
 		// 1. 清理旧块（从 InteractionArea 移除并释放）
-		GD.Print($"[{Name}] 清理旧方块，当前数量: {_visualBlocks.Count}");
 		foreach (var block in _visualBlocks)
 		{
 			block.QueueFree();
@@ -180,50 +154,33 @@ public partial class GridShapeVisualComponent : Node
 		// 2. 验证数据源有效性
 		if (GridShapeComponent.CurrentLocalCells == null)
 		{
-			GD.PushWarning($"[{Name}] GridShapeVisualComponent: CurrentLocalCells is null, skipping visual block generation.");
+			GD.PushWarning($"[{Name}] CurrentLocalCells is null, skipping visual block generation.");
 			return;
 		}
-		
-		GD.Print($"[{Name}] CurrentLocalCells 有效，格子数量: {GridShapeComponent.CurrentLocalCells.Length}");
 		
 		// 3. 遍历 GridShapeComponent.CurrentLocalCells 生成视觉方块
 		int blockIndex = 0;
 		foreach (Vector2I cellPos in GridShapeComponent.CurrentLocalCells)
 		{
-			GD.Print($"[{Name}] 生成方块 {blockIndex}: cellPos=({cellPos.X}, {cellPos.Y})");
-			
 			var visualBlock = new ColorRect
 			{
-				// Position formula: cellPos * CellSize
 				Size = new Vector2(CellSize, CellSize),
 				Position = new Vector2(cellPos.X * CellSize, cellPos.Y * CellSize),
 				Color = NormalColor,
-				// 【关键】：每个方块独立接收鼠标事件
-				// CRITICAL: Each block independently receives mouse events
 				MouseFilter = Control.MouseFilterEnum.Pass,
 				Name = $"VisualBlock_{blockIndex}"
 			};
 			
-			GD.Print($"[{Name}] 方块 {blockIndex} 属性: Size={visualBlock.Size}, Position={visualBlock.Position}, Color={visualBlock.Color}, MouseFilter={visualBlock.MouseFilter}");
-			
 			// 【事件聚合】：将此方块的 GuiInput 事件推送到 R3 Subject
-			// EVENT AGGREGATION: Push this block's GuiInput to R3 Subject
 			visualBlock.GuiInput += (inputEvent) =>
 			{
-				GD.Print($"[{Name}] 方块 GuiInput 事件触发: {inputEvent}");
 				_onBlockInputSubject.OnNext(inputEvent);
 			};
 			
-			// 4. 添加到 InteractionArea 并跟踪
 			InteractionArea.AddChild(visualBlock);
 			_visualBlocks.Add(visualBlock);
-			
-			GD.Print($"[{Name}] 方块 {blockIndex} 已添加到 InteractionArea");
 			blockIndex++;
 		}
-		
-		GD.Print($"[{Name}] RebuildVisualBlocks() 完成，生成 {_visualBlocks.Count} 个视觉方块");
-		GD.Print($"[{Name}] InteractionArea 子节点数量: {InteractionArea.GetChildCount()}");
 	}
 	
 	#endregion

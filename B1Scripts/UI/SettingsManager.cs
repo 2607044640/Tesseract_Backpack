@@ -18,8 +18,8 @@ public partial class SettingsManager : Node
 	private const string SettingsFilePath = "user://settings.cfg";
 	private const string SettingsSection = "Settings";
 	
-	private ConfigFile _config;
-	private readonly CompositeDisposable _disposables = new();
+	private ConfigFile ConfigFile_Settings;
+	private readonly CompositeDisposable CompositeDisposable_Disposables = new();
 	
 	// ✅ 使用绑定器管理所有设置
 	private readonly List<SettingBinderBase<float>> _floatBinders = new();
@@ -53,7 +53,7 @@ public partial class SettingsManager : Node
 	
 	public override void _Ready()
 	{
-		_config = new ConfigFile();
+		ConfigFile_Settings = new ConfigFile();
 		LoadConfig();
 		
 		// ✅ 使用绑定器创建所有设置（使用 [Export] 默认值）
@@ -78,7 +78,7 @@ public partial class SettingsManager : Node
 	/// </summary>
 	private ReactiveProperty<float> CreateFloatSetting(string key, float defaultValue)
 	{
-		var binder = new FloatSettingBinder(key, defaultValue, _config, SettingsSection);
+		var binder = new FloatSettingBinder(key, defaultValue, ConfigFile_Settings, SettingsSection);
 		_floatBinders.Add(binder);
 		return binder.GetProperty();
 	}
@@ -88,7 +88,7 @@ public partial class SettingsManager : Node
 	/// </summary>
 	private ReactiveProperty<bool> CreateBoolSetting(string key, bool defaultValue)
 	{
-		var binder = new BoolSettingBinder(key, defaultValue, _config, SettingsSection);
+		var binder = new BoolSettingBinder(key, defaultValue, ConfigFile_Settings, SettingsSection);
 		_boolBinders.Add(binder);
 		return binder.GetProperty();
 	}
@@ -98,7 +98,7 @@ public partial class SettingsManager : Node
 	/// </summary>
 	private ReactiveProperty<int> CreateIntSetting(string key, int defaultValue)
 	{
-		var binder = new IntSettingBinder(key, defaultValue, _config, SettingsSection);
+		var binder = new IntSettingBinder(key, defaultValue, ConfigFile_Settings, SettingsSection);
 		_intBinders.Add(binder);
 		return binder.GetProperty();
 	}
@@ -129,7 +129,7 @@ public partial class SettingsManager : Node
 		)
 		.Debounce(TimeSpan.FromMilliseconds(500)) // ✅ 等待 500ms 后保存
 		.Subscribe(_ => SaveAllSettings())
-		.AddTo(_disposables);
+		.AddTo(CompositeDisposable_Disposables);
 		
 		GD.Print("Auto-save enabled with 500ms debounce");
 	}
@@ -154,7 +154,7 @@ public partial class SettingsManager : Node
 		}
 		
 		// 一次性写入文件
-		Error err = _config.Save(SettingsFilePath);
+		Error err = ConfigFile_Settings.Save(SettingsFilePath);
 		if (err == Error.Ok)
 		{
 			GD.Print($"✓ Settings saved to {SettingsFilePath}");
@@ -167,7 +167,7 @@ public partial class SettingsManager : Node
 	
 	private void LoadConfig()
 	{
-		Error err = _config.Load(SettingsFilePath);
+		Error err = ConfigFile_Settings.Load(SettingsFilePath);
 		if (err != Error.Ok)
 		{
 			GD.Print($"Settings file not found or error loading: {err}. Using defaults.");
@@ -198,6 +198,6 @@ public partial class SettingsManager : Node
 	
 	public override void _ExitTree()
 	{
-		_disposables.Dispose();
+		CompositeDisposable_Disposables.Dispose();
 	}
 }

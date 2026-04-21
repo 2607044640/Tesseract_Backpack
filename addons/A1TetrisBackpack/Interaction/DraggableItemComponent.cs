@@ -168,8 +168,6 @@ public partial class DraggableItemComponent : Node
 			return;
 		}
 		
-		GD.Print($"[{Name}] GridShapeVisualComponent 引用有效: {GridShapeVisualComponent.Name}");
-		
 		// 订阅 GridShapeVisualComponent 的聚合输入事件流
 		GridShapeVisualComponent.OnBlockInputAsObservable
 			.Subscribe(HandleGuiInput)
@@ -181,8 +179,6 @@ public partial class DraggableItemComponent : Node
 			GD.PushError($"[{Name}] StateChart not found: {StateChartPath}");
 			return;
 		}
-		
-		GD.Print($"[{Name}] DraggableItemComponent: 已订阅 GridShapeVisualComponent 的输入事件流");
 	}
 	
 	public override void _ExitTree()
