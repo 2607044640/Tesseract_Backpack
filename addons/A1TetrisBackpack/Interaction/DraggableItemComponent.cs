@@ -59,14 +59,14 @@ public partial class DraggableItemComponent : Node
 	#region Export Properties
 	
 	/// <summary>
-	/// 视觉形状组件路径（提供聚合后的输入事件流）
+	/// 单元格组控制器路径（提供聚合后的输入事件流）
 	/// </summary>
-	[Export] public NodePath GridShapeVisualComponentPath { get; set; } = "%GridShapeVisualComponent";
+	[Export] public NodePath ItemCellGroupController_Path { get; set; } = "%ItemCellGroupController";
 	
 	/// <summary>
-	/// GridShapeVisualComponent 引用
+	/// ItemCellGroupController引用
 	/// </summary>
-	public GridShapeVisualComponent GridShapeVisualComponent { get; private set; }
+	private ItemCellGroupController _itemCellGroupController;
 	
 	/// <summary>
 	/// 状态机节点路径
@@ -158,18 +158,20 @@ public partial class DraggableItemComponent : Node
 	/// </summary>
 	private void InitializeComponent()
 	{
-		// 解析 GridShapeVisualComponent 引用
-		GridShapeVisualComponent = GetNodeOrNull<GridShapeVisualComponent>(GridShapeVisualComponentPath);
+		// 解析 ItemCellGroupController 引用
+		_itemCellGroupController = GetNodeOrNull<ItemCellGroupController>(ItemCellGroupController_Path);
 		
-		// 验证 GridShapeVisualComponent 引用
-		if (GridShapeVisualComponent == null)
+		// 验证 ItemCellGroupController 引用
+		if (_itemCellGroupController == null)
 		{
-			GD.PushError($"[{Name}] GridShapeVisualComponent not found at path: {GridShapeVisualComponentPath}");
+			GD.PushError($"[{Name}] ItemCellGroupController not found at path: {ItemCellGroupController_Path}");
 			return;
 		}
 		
-		// 订阅 GridShapeVisualComponent 的聚合输入事件流
-		GridShapeVisualComponent.OnBlockInputAsObservable
+		GD.Print($"[{Name}] ItemCellGroupController 引用有效: {_itemCellGroupController.Name}");
+		
+		// 订阅 ItemCellGroupController 的聚合输入事件流
+		_itemCellGroupController.OnGroupInputAsObservable
 			.Subscribe(HandleGuiInput)
 			.AddTo(this);
 		
@@ -179,6 +181,8 @@ public partial class DraggableItemComponent : Node
 			GD.PushError($"[{Name}] StateChart not found: {StateChartPath}");
 			return;
 		}
+		
+		GD.Print($"[{Name}] DraggableItemComponent: 已订阅 ItemCellGroupController 的输入事件流");
 	}
 	
 	public override void _ExitTree()
