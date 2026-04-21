@@ -1,4 +1,301 @@
+# EditorConfig for Godot C# Project with R3 Reactive Architecture
+# Based on MainRules.md and DesignPatterns.md
 root = true
 
 [*]
 charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+
+# ============================================================================
+# C# Code Style Rules
+# ============================================================================
+
+# Organize usings
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# this. preferences
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# Language keywords vs BCL types preferences
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# Modifier preferences
+dotnet_style_require_accessibility_modifiers = always:warning
+dotnet_style_readonly_field = true:warning
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:warning
+
+# Expression-level preferences
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_explicit_tuple_names = true:warning
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_prefer_compound_assignment = true:suggestion
+
+# Null-checking preferences
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
+
+# var preferences
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Expression-bodied members
+csharp_style_expression_bodied_methods = false:silent
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_operators = false:silent
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_expression_bodied_lambdas = true:suggestion
+csharp_style_expression_bodied_local_functions = false:silent
+
+# Pattern matching preferences
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_pattern_matching = true:silent
+csharp_style_prefer_not_pattern = true:suggestion
+
+# Code block preferences
+csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:suggestion
+
+# ============================================================================
+# CUSTOM NAMING CONVENTIONS (TypeName_Purpose Pattern)
+# Based on DesignPatterns.md
+# ============================================================================
+
+# Private fields: TypeName_Purpose (both PascalCase)
+dotnet_naming_rule.private_fields_typename_purpose.severity = error
+dotnet_naming_rule.private_fields_typename_purpose.symbols = private_fields
+dotnet_naming_rule.private_fields_typename_purpose.style = typename_purpose_style
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.typename_purpose_style.capitalization = pascal_case
+dotnet_naming_style.typename_purpose_style.required_prefix = 
+dotnet_naming_style.typename_purpose_style.required_suffix = 
+dotnet_naming_style.typename_purpose_style.word_separator = _
+
+# Public/Protected fields and properties: TypeName_Purpose
+dotnet_naming_rule.public_fields_typename_purpose.severity = error
+dotnet_naming_rule.public_fields_typename_purpose.symbols = public_fields
+dotnet_naming_rule.public_fields_typename_purpose.style = typename_purpose_style
+
+dotnet_naming_symbols.public_fields.applicable_kinds = field,property
+dotnet_naming_symbols.public_fields.applicable_accessibilities = public,protected,internal
+
+# Constants: UPPER_CASE
+dotnet_naming_rule.constants_upper_case.severity = warning
+dotnet_naming_rule.constants_upper_case.symbols = constants
+dotnet_naming_rule.constants_upper_case.style = upper_case_style
+
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.required_modifiers = const
+
+dotnet_naming_style.upper_case_style.capitalization = all_upper
+dotnet_naming_style.upper_case_style.word_separator = _
+
+# Methods, Classes, Interfaces: PascalCase
+dotnet_naming_rule.methods_pascal_case.severity = error
+dotnet_naming_rule.methods_pascal_case.symbols = methods_classes
+dotnet_naming_rule.methods_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.methods_classes.applicable_kinds = method,class,struct,interface,enum,delegate,event
+dotnet_naming_symbols.methods_classes.applicable_accessibilities = *
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# Interfaces: IPascalCase
+dotnet_naming_rule.interfaces_i_prefix.severity = error
+dotnet_naming_rule.interfaces_i_prefix.symbols = interfaces
+dotnet_naming_rule.interfaces_i_prefix.style = i_prefix_style
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+
+dotnet_naming_style.i_prefix_style.capitalization = pascal_case
+dotnet_naming_style.i_prefix_style.required_prefix = I
+
+# Local variables and parameters: camelCase
+dotnet_naming_rule.locals_camel_case.severity = warning
+dotnet_naming_rule.locals_camel_case.symbols = locals_parameters
+dotnet_naming_rule.locals_camel_case.style = camel_case_style
+
+dotnet_naming_symbols.locals_parameters.applicable_kinds = parameter,local
+
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+
+# ============================================================================
+# CODE QUALITY RULES (Enforcing DesignPatterns.md)
+# ============================================================================
+
+# CA1051: Do not declare visible instance fields (Suppress for Godot [Export] fields)
+dotnet_diagnostic.CA1051.severity = none
+
+# CA1303: Do not pass literals as localized parameters (Detect hardcoded GetNode strings)
+dotnet_diagnostic.CA1303.severity = suggestion
+
+# CA1822: Mark members as static (Detect unnecessary instance methods)
+dotnet_diagnostic.CA1822.severity = suggestion
+
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = warning
+
+# CA1031: Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = warning
+
+# CA2007: Do not directly await a Task (Use ConfigureAwait)
+dotnet_diagnostic.CA2007.severity = none
+
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = warning
+
+# CA2000: Dispose objects before losing scope
+dotnet_diagnostic.CA2000.severity = warning
+
+# ============================================================================
+# ROSLYNATOR RULES
+# ============================================================================
+
+# RCS1036: Remove unnecessary blank line
+dotnet_diagnostic.RCS1036.severity = suggestion
+
+# RCS1037: Remove trailing white-space
+dotnet_diagnostic.RCS1037.severity = warning
+
+# RCS1090: Add call to 'ConfigureAwait' (or vice versa)
+dotnet_diagnostic.RCS1090.severity = none
+
+# RCS1163: Unused parameter
+dotnet_diagnostic.RCS1163.severity = warning
+
+# RCS1170: Use read-only auto-implemented property
+dotnet_diagnostic.RCS1170.severity = suggestion
+
+# RCS1181: Convert comment to documentation comment
+dotnet_diagnostic.RCS1181.severity = suggestion
+
+# RCS1194: Implement exception constructors
+dotnet_diagnostic.RCS1194.severity = warning
+
+# RCS1213: Remove unused member declaration
+dotnet_diagnostic.RCS1213.severity = warning
+
+# ============================================================================
+# STYLECOP RULES
+# ============================================================================
+
+# SA1101: Prefix local calls with this (DISABLED - conflicts with modern C#)
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1200: Using directives should be placed correctly
+dotnet_diagnostic.SA1200.severity = none
+
+# SA1309: Field names should not begin with underscore (DISABLED - allow _disposables)
+dotnet_diagnostic.SA1309.severity = none
+
+# SA1633: File should have header (DISABLED - not required)
+dotnet_diagnostic.SA1633.severity = none
+
+# SA1600: Elements should be documented (Enforce based on complexity)
+dotnet_diagnostic.SA1600.severity = suggestion
+
+# SA1601: Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = none
+
+# SA1602: Enumeration items should be documented
+dotnet_diagnostic.SA1602.severity = suggestion
+
+# SA1611: Element parameters should be documented
+dotnet_diagnostic.SA1611.severity = suggestion
+
+# SA1615: Element return value should be documented
+dotnet_diagnostic.SA1615.severity = suggestion
+
+# SA1623: Property summary documentation should begin with standard text
+dotnet_diagnostic.SA1623.severity = none
+
+# SA1629: Documentation text should end with a period
+dotnet_diagnostic.SA1629.severity = suggestion
+
+# ============================================================================
+# SONARANALYZER RULES
+# ============================================================================
+
+# S1135: Track uses of "TODO" tags
+dotnet_diagnostic.S1135.severity = suggestion
+
+# S1481: Unused local variables should be removed
+dotnet_diagnostic.S1481.severity = warning
+
+# S2094: Classes should not be empty
+dotnet_diagnostic.S2094.severity = warning
+
+# S3358: Ternary operators should not be nested
+dotnet_diagnostic.S3358.severity = warning
+
+# S3776: Cognitive Complexity of methods should not be too high
+dotnet_diagnostic.S3776.severity = warning
+
+# S4136: Method overloads should be grouped together
+dotnet_diagnostic.S4136.severity = suggestion
+
+# ============================================================================
+# FORMATTING RULES
+# ============================================================================
+
+# New line preferences
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+
+# Indentation preferences
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_labels = no_change
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_indent_case_contents_when_block = false
+
+# Space preferences
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_parentheses = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+
+# Wrapping preferences
+csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = true
+
+[*.{json,xml,yml,yaml}]
+indent_size = 2

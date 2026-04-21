@@ -60,7 +60,7 @@ public static class AnimationNames
 [GlobalClass]
 public partial class CharacterAnimationConfig : Resource
 {
-    [Export] public string CharacterName = "默认角色";
+    [Export] public string CharacterName { get; set; } = "默认角色";
     
     #region 动画配置 (在 Inspector 中暴露)
     
