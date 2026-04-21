@@ -7,5 +7,5 @@
 [resource]
 script = ExtResource("1_g5ko2")
 Icon = SubResource("CanvasTexture_3kgtc")
-BaseShape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1)])
+BaseShape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(0, 3)])
 metadata/_custom_type_script = "uid://lelpt5ux6h0d"
