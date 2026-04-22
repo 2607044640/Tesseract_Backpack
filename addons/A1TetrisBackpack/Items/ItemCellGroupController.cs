@@ -153,7 +153,6 @@ public partial class ItemCellGroupController : Node
 
 			// 实例化GridCellUI
 			var gridCellUI = new GridCellUI
-
 			{
 				Size = new Vector2(CellSize, CellSize),
 				Position = new Vector2(cellPos.X * CellSize, cellPos.Y * CellSize),
@@ -162,20 +161,21 @@ public partial class ItemCellGroupController : Node
 
 			GD.Print($"[{Name}] 单元格 {cellIndex} 属性: Size={gridCellUI.Size}, Position={gridCellUI.Position}");
 
+			// 【关键修复】先添加到场景树，再订阅事件
+			_interactionArea.AddChild(gridCellUI);
+			_cells.Add(gridCellUI);
+
 			// 【事件聚合】将此单元格的输入事件推送到聚合Subject
+			int capturedIndex = cellIndex; // 捕获当前索引，避免闭包问题
 			gridCellUI.OnCellInputAsObservable
 				.Subscribe(inputEvent =>
 				{
-					GD.Print($"[{Name}] 单元格 {cellIndex} 输入事件: {inputEvent}");
+					GD.Print($"[{Name}] 单元格 {capturedIndex} 输入事件: {inputEvent}");
 					_aggregatedInputSubject.OnNext(inputEvent);
 				})
 				.AddTo(gridCellUI); // 订阅生命周期绑定到GridCellUI
 
-			// 4. 添加到InteractionArea并跟踪
-			_interactionArea.AddChild(gridCellUI);
-			_cells.Add(gridCellUI);
-
-			GD.Print($"[{Name}] 单元格 {cellIndex} 已添加到InteractionArea");
+			GD.Print($"[{Name}] 单元格 {cellIndex} 已添加到InteractionArea并订阅事件");
 			cellIndex++;
 		}
 
