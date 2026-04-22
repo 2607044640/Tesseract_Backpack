@@ -2,7 +2,6 @@ using Godot;
 using R3;
 using System.Collections.Generic;
 
-/// <summary>
 /// 羁绊组件 - 运行时羁绊检测与激活
 /// 
 /// 职责：
@@ -44,43 +43,35 @@ using System.Collections.Generic;
 /// 使用示例：
 /// ```csharp
 /// // 物品放置后
-/// synergyComponent.CheckSynergies(logicGrid, itemGridPos);
+/// synergyComponent.CheckSynergies(backpackGridComp, itemGridPos);
 /// 
 /// // 订阅变化
 /// synergyComponent.OnSynergyChangedAsObservable
 ///     .Subscribe(activeStars => UpdateStarVisuals(activeStars))
 ///     .AddTo(disposables);
 /// ```
-/// </summary>
 [GlobalClass]
 public partial class SynergyComponent : Node
 {
 	#region Export Properties
 	
-	/// <summary>
 	/// 羁绊数据资源引用
-	/// </summary>
 	[Export] public SynergyDataResource SynergyData { get; set; }
 	
-	/// <summary>
 	/// 形状组件引用（用于获取旋转状态）
-	/// </summary>
 	[Export] public GridShapeComponent GridShapeComponent { get; set; }
 	
 	#endregion
 	
 	#region Public Properties
 	
-	/// <summary>
 	/// 当前激活的星星集合（局部坐标，已旋转）
-	/// </summary>
 	public HashSet<Vector2I> ActiveStars { get; private set; } = new HashSet<Vector2I>();
 	
 	#endregion
 	
 	#region R3 Reactive Streams
 	
-	/// <summary>
 	/// 羁绊变化事件流
 	/// 
 	/// 发送数据：当前所有激活的星星坐标（局部坐标，已旋转）
@@ -89,21 +80,16 @@ public partial class SynergyComponent : Node
 	/// - 通知 UI 层更新星星显示（灰色 → 亮色）
 	/// - 通知战斗系统应用羁绊效果
 	/// - 通知音效系统播放激活音效
-	/// </summary>
 	public Subject<HashSet<Vector2I>> OnSynergyChangedAsObservable { get; private set; }
 	
 	#endregion
 	
 	#region Private Fields
 	
-	/// <summary>
 	/// 当前旋转次数（0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°）
-	/// </summary>
 	private int _rotationCount = 0;
 	
-	/// <summary>
 	/// R3 订阅容器
-	/// </summary>
 	private CompositeDisposable _disposables = new CompositeDisposable();
 	
 	#endregion
@@ -148,13 +134,11 @@ public partial class SynergyComponent : Node
 	
 	#region Synergy Detection
 	
-	/// <summary>
 	/// 检测羁绊激活状态
 	/// 目的：遍历所有星星位置，检测相邻物品是否满足条件
 	/// 示例：香蕉在 (5, 3)，星星在 (1, 0) → 检测 (6, 3) 是否有 "Food" 物品
 	/// 算法：1. 清空激活列表 → 2. 遍历星星 → 3. 旋转偏移 → 4. 查询物品 → 5. 检查标签 → 6. 更新状态
-	/// </summary>
-	public void CheckSynergies(BackpackGridComponent logicGrid, Vector2I currentGridPos)
+	public void CheckSynergies(BackpackGridComponent backpackGridComp, Vector2I currentGridPos)
 	{
 		// 1. 清空当前激活状态
 		ActiveStars.Clear();
@@ -166,9 +150,9 @@ public partial class SynergyComponent : Node
 			return;
 		}
 		
-		if (logicGrid == null)
+		if (backpackGridComp == null)
 		{
-			GD.PushWarning("SynergyComponent: logicGrid 为空");
+			GD.PushWarning("SynergyComponent: backpackGridComp 为空");
 			OnSynergyChangedAsObservable.OnNext(ActiveStars);
 			return;
 		}
@@ -185,7 +169,7 @@ public partial class SynergyComponent : Node
 			Vector2I starWorldPos = currentGridPos + rotatedOffset;
 			
 			// 5. 查询该位置的物品
-			ItemData itemAtStar = logicGrid.GetItemAt(starWorldPos);
+			ItemData itemAtStar = backpackGridComp.GetItemAt(starWorldPos);
 			
 			if (itemAtStar == null)
 			{
@@ -226,12 +210,10 @@ public partial class SynergyComponent : Node
 		GD.Print($"SynergyComponent: 检测完成，激活 {ActiveStars.Count}/{SynergyData.StarOffsets.Count} 颗星星");
 	}
 	
-	/// <summary>
 	/// 检查物品是否有指定标签（占位实现）
 	/// 
 	/// TODO: 实现实际的标签查询逻辑
 	/// 需要从 ItemData 关联到实际的物品节点，再获取其 SynergyComponent
-	/// </summary>
 	private bool CheckItemHasTag(ItemData item, string requiredTag)
 	{
 		// 占位实现：总是返回 false
@@ -248,9 +230,7 @@ public partial class SynergyComponent : Node
 	
 	#region Rotation Logic
 	
-	/// <summary>
 	/// 形状旋转时的回调
-	/// </summary>
 	private void OnShapeRotated()
 	{
 		// 每次旋转，旋转计数 +1（模 4）
@@ -259,12 +239,10 @@ public partial class SynergyComponent : Node
 		GD.Print($"SynergyComponent: 物品已旋转，当前旋转次数 = {_rotationCount} ({_rotationCount * 90}°)");
 	}
 	
-	/// <summary>
 	/// 应用旋转变换到偏移量
 	/// 目的：将配置的星星偏移量根据物品当前旋转角度进行变换
 	/// 示例：偏移 (2, 0)，旋转 1 次（90°）→ (0, 2)
 	/// 算法：循环应用顺时针 90° 旋转矩阵 (x, y) → (-y, x)
-	/// </summary>
 	private Vector2I ApplyRotationToOffset(Vector2I offset, int rotationCount)
 	{
 		Vector2I result = offset;
@@ -281,9 +259,7 @@ public partial class SynergyComponent : Node
 		return result;
 	}
 	
-	/// <summary>
 	/// 重置旋转计数（用于物品重新放置时）
-	/// </summary>
 	public void ResetRotation()
 	{
 		_rotationCount = 0;
@@ -293,25 +269,19 @@ public partial class SynergyComponent : Node
 	
 	#region Helper Methods
 	
-	/// <summary>
 	/// 获取激活的星星数量
-	/// </summary>
 	public int GetActiveStarCount()
 	{
 		return ActiveStars.Count;
 	}
 	
-	/// <summary>
 	/// 检查指定星星是否激活
-	/// </summary>
 	public bool IsStarActive(Vector2I starOffset)
 	{
 		return ActiveStars.Contains(starOffset);
 	}
 	
-	/// <summary>
 	/// 获取羁绊效果描述
-	/// </summary>
 	public string GetSynergyEffectDescription()
 	{
 		if (SynergyData == null)

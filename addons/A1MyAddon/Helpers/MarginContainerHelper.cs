@@ -1,10 +1,8 @@
 using Godot;
 using System;
 
-/// <summary>
 /// MarginContainer辅助脚本，简化margin参数调整
 /// 提供3种模式：统一、双轴、独立调整
-/// </summary>
 [ Tool]
 [GlobalClass]
 public partial class MarginContainerHelper : MarginContainer
@@ -138,9 +136,7 @@ public partial class MarginContainerHelper : MarginContainer
         UpdateMargins(); // 初始化时应用默认值
     }
 
-    /// <summary>
     /// 验证属性，根据模式隐藏不需要的参数
-    /// </summary>
     public override void _ValidateProperty(Godot.Collections.Dictionary property)
     {
         string propertyName = property["name"].AsStringName();
@@ -178,9 +174,7 @@ public partial class MarginContainerHelper : MarginContainer
         }
     }
 
-    /// <summary>
     /// 根据当前模式更新MarginContainer的margin值
-    /// </summary>
     private void UpdateMargins()
     {
         // [Tool]特性允许在编辑器中运行

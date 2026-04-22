@@ -1,10 +1,6 @@
 using Godot;
 using R3;
 
-/// <summary>
-/// Settings menu controller - R3 ReactiveProperty 双向绑定
-/// SettingsManager 是唯一状态源，UI 自动同步
-/// </summary>
 public partial class SettingsMenu : Control
 {
 	// UI Components (仅用于显示，不持有状态)
@@ -52,12 +48,10 @@ public partial class SettingsMenu : Control
 		_disposables.Dispose();
 	}
 	
-	/// <summary>
-	/// 双向绑定设置
-	/// 目的：实现 Manager ↔ UI 的自动同步，Manager 变化自动更新 UI，UI 交互自动更新 Manager
-	/// 示例：Manager.MasterVolume 改变 -> Slider 自动更新 + 音频总线音量改变；Slider 拖动 -> Manager.MasterVolume 自动更新
-	/// 算法：1. 订阅 Manager ReactiveProperty -> 更新 UI + 应用设置 -> 2. 订阅 UI 事件 -> 更新 Manager ReactiveProperty
-	/// </summary>
+	// 双向绑定设置
+	// 目的：实现 Manager ↔ UI 的自动同步，Manager 变化自动更新 UI，UI 交互自动更新 Manager
+	// 示例：Manager.MasterVolume 改变 -> Slider 自动更新 + 音频总线音量改变；Slider 拖动 -> Manager.MasterVolume 自动更新
+	// 算法：1. 订阅 Manager ReactiveProperty -> 更新 UI + 应用设置 -> 2. 订阅 UI 事件 -> 更新 Manager ReactiveProperty
 	private void BindSettingsToUI()
 	{
 		// ===== Manager → UI (自动同步初始值 + 监听后续变化) =====

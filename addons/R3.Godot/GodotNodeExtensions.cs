@@ -5,9 +5,7 @@ namespace R3;
 
 public static class GodotNodeExtensions
 {
-    /// <summary>
     /// Dispose self on target node has bee tree exited.
-    /// </summary>
     /// <param name="disposable"></param>
     /// <param name="node"></param>
     /// <typeparam name="T"></typeparam>

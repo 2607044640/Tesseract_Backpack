@@ -2,11 +2,9 @@ using Godot;
 using System;
 using R3;
 
-/// <summary>
 /// 滑块组件Helper - 用于设置菜单中的滑块控件
 /// 遵循MarginContainerHelper的模式：[Tool] + 属性setter立即更新UI
 /// R3 增强版：支持 ReactiveProperty 双向绑定
-/// </summary>
 [Tool]
 [GlobalClass]
 public partial class SliderComponentHelper : BaseSettingComponentHelper

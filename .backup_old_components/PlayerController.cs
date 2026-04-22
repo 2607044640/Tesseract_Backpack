@@ -1,24 +1,18 @@
 using Godot;
 
-/// <summary>
 /// 玩家控制器 - 作为 Mediator 统筹 Input 和 Movement 组件
 /// 遵循 "Call Down, Signal Up" 原则：
 /// - 订阅子组件的事件（Signal Up）
 /// - 调用子组件的方法（Call Down）
-/// </summary>
 [GlobalClass]
 public partial class PlayerController : CharacterBody3D
 {
     #region Export Properties (依赖注入)
     
-    /// <summary>
     /// 输入组件引用（在编辑器中指定）
-    /// </summary>
     [Export] public PlayerInputComponent InputComponent { get; set; }
     
-    /// <summary>
     /// 移动组件引用（在编辑器中指定）
-    /// </summary>
     [Export] public MovementComponent MovementComponent { get; set; }
     
     // TODO: 添加更多组件引用
@@ -84,9 +78,7 @@ public partial class PlayerController : CharacterBody3D
 
     #region Event Handlers (事件处理 - Mediator 逻辑)
     
-    /// <summary>
     /// 处理移动输入事件
-    /// </summary>
     private void HandleMovementInput(Vector2 inputDir)
     {
         // 将输入传递给移动组件（Call Down）
@@ -96,9 +88,7 @@ public partial class PlayerController : CharacterBody3D
         // AnimationController?.UpdateMovementBlend(inputDir.Length());
     }
     
-    /// <summary>
     /// 处理跳跃输入事件
-    /// </summary>
     private void HandleJumpInput()
     {
         // 告诉移动组件执行跳跃（Call Down）

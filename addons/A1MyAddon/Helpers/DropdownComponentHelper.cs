@@ -2,11 +2,9 @@ using Godot;
 using System;
 using R3;
 
-/// <summary>
 /// 下拉菜单组件Helper - 用于设置菜单中的下拉列表控件
 /// 与OptionComponent类似，但使用OptionButton而不是普通Button
 /// R3 增强版：支持 ReactiveProperty 双向绑定
-/// </summary>
 [Tool]
 [GlobalClass]
 public partial class DropdownComponentHelper : BaseSettingComponentHelper

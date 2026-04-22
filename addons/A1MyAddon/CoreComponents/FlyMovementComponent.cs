@@ -2,13 +2,6 @@ using Godot;
 using Godot.Composition;
 using R3;
 
-/// <summary>
-/// 飞行移动组件 - 三维全向移动，无重力
-/// 绑定到 StateChart 的 "FlyMode" 状态
-/// 只有在飞行模式下才会被激活（Power Switch 模式）
-/// 
-/// 注意：此组件作为 FlyMode 状态节点的子节点，使用 AutoBindToParentState() 自动绑定
-/// </summary>
 [GlobalClass]
 public partial class FlyMovementComponent : Node
 {
@@ -89,12 +82,8 @@ public partial class FlyMovementComponent : Node
 
     #region Physics Logic
 
-    /// <summary>
-    /// 飞行物理处理
-    /// 目的：实现三维全向移动，支持上升/下降，无重力影响
-    /// 示例：WASD控制水平移动，空格上升，Ctrl下降，速度平滑过渡
-    /// 算法：1. 计算目标速度（水平+垂直） -> 2. 平滑插值到目标速度 -> 3. 应用速度并移动
-    /// </summary>
+    // 飞行物理处理 - 三维全向移动，无重力
+    // 算法：计算目标速度（水平+垂直） -> 平滑插值（Lerp加速/减速） -> 应用速度
     private void ProcessFlyPhysics(double delta)
     {
         Vector3 velocity = _entity.Velocity;

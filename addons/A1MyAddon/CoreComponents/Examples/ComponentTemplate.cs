@@ -2,7 +2,6 @@ using Godot;
 using Godot.Composition;
 using System;
 
-/// <summary>
 /// [组件名称] - [简短描述]
 /// 
 /// [详细描述组件的职责和功能]
@@ -17,7 +16,6 @@ using System;
 /// 
 /// 适用于：
 /// - [适用的实体类型]
-/// </summary>
 [GlobalClass]  // 可选：让组件在编辑器中全局可见
 [Component(typeof(Node3D))]  // 必需：指定父节点类型
 // [ComponentDependency(typeof(OtherComponent))]  // 可选：声明依赖（取消注释并替换为实际类型）
@@ -25,33 +23,23 @@ public partial class MyComponent : Node
 {
     #region Events (向外发出的事件)
     
-    /// <summary>
     /// [事件描述]
-    /// </summary>
     public event Action<int> OnSomethingHappened;
     
-    /// <summary>
     /// [事件描述]
-    /// </summary>
     public event Action OnAnotherEvent;
     
     #endregion
 
     #region Export Properties (可在编辑器中配置)
     
-    /// <summary>
     /// [属性描述]
-    /// </summary>
     [Export] public float SomeValue { get; set; } = 1.0f;
     
-    /// <summary>
     /// [属性描述]
-    /// </summary>
     [Export] public bool IsEnabled { get; set; } = true;
     
-    /// <summary>
     /// [属性描述]
-    /// </summary>
     [Export] public NodePath SomeNodePath { get; set; } = "NodeName";
     
     #endregion
@@ -65,9 +53,7 @@ public partial class MyComponent : Node
 
     #region Godot Lifecycle (生命周期)
     
-    /// <summary>
     /// 组件初始化
-    /// </summary>
     public override void _Ready()
     {
         // 必需：初始化组件系统
@@ -79,10 +65,8 @@ public partial class MyComponent : Node
         GD.Print($"{GetType().Name}: 已初始化 ✓");
     }
     
-    /// <summary>
     /// Entity 初始化完成后自动调用
     /// 在这里订阅其他组件的事件
-    /// </summary>
     public void OnEntityReady()
     {
         // 订阅依赖组件的事件
@@ -92,9 +76,7 @@ public partial class MyComponent : Node
         GD.Print($"{GetType().Name}: 已订阅事件 ✓");
     }
     
-    /// <summary>
     /// 每帧更新（可选）
-    /// </summary>
     public override void _Process(double delta)
     {
         if (!IsEnabled) return;
@@ -103,9 +85,7 @@ public partial class MyComponent : Node
         UpdateLogic(delta);
     }
     
-    /// <summary>
     /// 物理帧更新（可选）
-    /// </summary>
     public override void _PhysicsProcess(double delta)
     {
         if (!IsEnabled) return;
@@ -114,9 +94,7 @@ public partial class MyComponent : Node
         UpdatePhysics(delta);
     }
     
-    /// <summary>
     /// 输入处理（可选）
-    /// </summary>
     public override void _UnhandledInput(InputEvent @event)
     {
         if (!IsEnabled) return;
@@ -125,9 +103,7 @@ public partial class MyComponent : Node
         HandleInput(@event);
     }
     
-    /// <summary>
     /// 组件销毁时清理
-    /// </summary>
     public override void _ExitTree()
     {
         // 取消订阅事件（防止内存泄漏）
@@ -141,9 +117,7 @@ public partial class MyComponent : Node
 
     #region Initialization (初始化逻辑)
     
-    /// <summary>
     /// 初始化内部状态
-    /// </summary>
     private void InitializeInternalState()
     {
         // 获取场景节点引用
@@ -159,9 +133,7 @@ public partial class MyComponent : Node
 
     #region Event Handlers (事件处理)
     
-    /// <summary>
     /// 处理其他组件的事件
-    /// </summary>
     private void HandleSomeEvent(int value)
     {
         GD.Print($"{GetType().Name}: 收到事件，值={value}");
@@ -177,17 +149,13 @@ public partial class MyComponent : Node
 
     #region Update Logic (更新逻辑)
     
-    /// <summary>
     /// 每帧更新逻辑
-    /// </summary>
     private void UpdateLogic(double delta)
     {
         // 实现每帧逻辑
     }
     
-    /// <summary>
     /// 物理帧更新逻辑
-    /// </summary>
     private void UpdatePhysics(double delta)
     {
         // 实现物理逻辑
@@ -195,9 +163,7 @@ public partial class MyComponent : Node
         // parent.Position += ...;
     }
     
-    /// <summary>
     /// 输入处理逻辑
-    /// </summary>
     private void HandleInput(InputEvent @event)
     {
         // 实现输入逻辑
@@ -207,9 +173,7 @@ public partial class MyComponent : Node
 
     #region Public API (公共接口)
     
-    /// <summary>
     /// 公共方法：供其他组件调用
-    /// </summary>
     public void DoSomething(float value)
     {
         if (!IsEnabled) return;
@@ -221,9 +185,7 @@ public partial class MyComponent : Node
         OnSomethingHappened?.Invoke((int)value);
     }
     
-    /// <summary>
     /// 公共方法：获取状态
-    /// </summary>
     public float GetState()
     {
         return _internalState;
@@ -233,9 +195,7 @@ public partial class MyComponent : Node
 
     #region Helper Methods (辅助方法)
     
-    /// <summary>
     /// 私有辅助方法
-    /// </summary>
     private void HelperMethod()
     {
         // 辅助逻辑

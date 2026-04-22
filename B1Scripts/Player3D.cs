@@ -1,10 +1,6 @@
 using Godot;
 using Godot.Composition;
 
-/// <summary>
-/// Player3D - 纯粹的 Entity 容器
-/// 职责：仅作为组件的挂载点，不包含任何业务逻辑
-/// </summary>
 [Entity]
 public partial class Player3D : CharacterBody3D
 {

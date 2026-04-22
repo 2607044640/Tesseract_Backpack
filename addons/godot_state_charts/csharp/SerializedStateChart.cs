@@ -4,9 +4,7 @@ namespace GodotStateCharts
     using System;
     using Godot;
 
-    /// <summary>
     /// C# wrapper for the SerializedStateChart Godot resource.
-    /// </summary>
     public class SerializedStateChart : ResourceWrapper
     {
         private SerializedStateChart(Resource wrapped) : base(wrapped) { }

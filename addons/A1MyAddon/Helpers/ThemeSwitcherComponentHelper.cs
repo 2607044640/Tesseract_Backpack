@@ -2,11 +2,9 @@ using Godot;
 using System;
 using System.IO;
 
-/// <summary>
 /// 主题切换组件Helper - 用于切换UI主题
 /// 自动查找根Control节点并应用主题
 /// 支持拖拽Theme资源到Inspector
-/// </summary>
 [Tool]
 [GlobalClass]
 public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
@@ -26,9 +24,7 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 		}
 	}
 	
-	/// <summary>
 	/// 加载默认主题资源
-	/// </summary>
 	private static Theme[] LoadDefaultThemes()
 	{
 		string[] defaultPaths = new string[]
@@ -136,9 +132,7 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 		UpdateSelection();
 	}
 	
-	/// <summary>
 	/// 获取显示名称：优先使用ThemeNames，否则从Theme资源路径提取文件名
-	/// </summary>
 	private string[] GetDisplayNames()
 	{
 		// 如果ThemeNames数组长度匹配Themes数组，直接使用
@@ -173,9 +167,7 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 		return names;
 	}
 	
-	/// <summary>
 	/// 格式化主题名称：将下划线替换为空格，首字母大写
-	/// </summary>
 	private string FormatThemeName(string fileName)
 	{
 		// 替换下划线为空格
@@ -212,9 +204,7 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 		}
 	}
 	
-	/// <summary>
 	/// 应用主题到根Control节点
-	/// </summary>
 	private void ApplyTheme(int index)
 	{
 		if (index < 0 || index >= Themes.Length)
@@ -247,10 +237,8 @@ public partial class ThemeSwitcherComponentHelper : BaseSettingComponentHelper
 		GD.Print($"Applied theme '{displayNames[index]}' to {rootControl.Name}");
 	}
 	
-	/// <summary>
 	/// 向上遍历查找根Control节点
 	/// 根Control定义为：没有Control类型父节点的Control节点
-	/// </summary>
 	private Control FindRootControl()
 	{
 		Node current = this;

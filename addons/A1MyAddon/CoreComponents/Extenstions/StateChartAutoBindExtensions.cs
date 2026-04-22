@@ -1,20 +1,16 @@
 using Godot;
 using GodotStateCharts;
 
-/// <summary>
 /// StateChart 自动绑定扩展 - Power Switch 模式组件挂载
 /// 核心思想：组件作为 AtomicState 子节点，自动绑定生命周期
-/// </summary>
 public static class StateChartAutoBindExtensions
 {
     #region 自动绑定方法
 
-    /// <summary>
     /// 组件自动挂载到父状态节点
     /// 目的：实现 Power Switch 模式，状态进入时唤醒组件，退出时休眠
     /// 示例：GroundMode 进入 -> GroundMovementComponent 启用；GroundMode 退出 -> GroundMovementComponent 禁用
     /// 算法：1. 验证父节点是 StateChart 状态 -> 2. 默认休眠组件 -> 3. 绑定状态进入/退出信号 -> 4. 信号触发时切换组件启用状态
-    /// </summary>
     public static void AutoBindToParentState(this Node component)
     {
         var stateNode = component.GetParent();
@@ -61,12 +57,10 @@ public static class StateChartAutoBindExtensions
 
     #region 实体查找方法
 
-    /// <summary>
     /// 向上查找实体控制器
     /// 目的：从深层组件节点获取顶层实体引用（如 Player3D）
     /// 示例：GroundMovementComponent -> GroundMode -> ... -> Player3D
     /// 算法：1. 优先使用 Owner 属性 -> 2. 兜底方案：向上遍历父节点直到找到匹配类型
-    /// </summary>
     public static T GetEntity<T>(this Node component) where T : Node
     {
         if (component.Owner is T entity)

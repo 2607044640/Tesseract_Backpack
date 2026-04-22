@@ -2,7 +2,6 @@ using Godot;
 using Godot.Composition;
 using System;
 
-/// <summary>
 /// Box 实体示例
 /// 
 /// 展示如何创建可交互的物理对象（箱子、桶、石头等）。
@@ -16,7 +15,6 @@ using System;
 /// - PushableComponent - 响应推力
 /// - HealthComponent - 可破坏（复用 Enemy 的组件）
 /// - BreakableComponent - 破碎效果
-/// </summary>
 [Entity]
 public partial class Box : RigidBody3D
 {
@@ -46,31 +44,23 @@ public partial class Box : RigidBody3D
 // PushableComponent 示例实现
 // ============================================
 
-/// <summary>
 /// 可推动组件
 /// 
 /// 让物体可以被玩家或其他力量推动。
 /// 适用于箱子、桶、石头等物理对象。
-/// </summary>
 [GlobalClass]
 [Component(typeof(RigidBody3D))]
 public partial class PushableComponent : Node
 {
     #region Export Properties
     
-    /// <summary>
     /// 推力倍数
-    /// </summary>
     [Export] public float PushForceMultiplier { get; set; } = 1.0f;
     
-    /// <summary>
     /// 最大推力
-    /// </summary>
     [Export] public float MaxPushForce { get; set; } = 100.0f;
     
-    /// <summary>
     /// 是否可以被推动
-    /// </summary>
     [Export] public bool CanBePushed { get; set; } = true;
     
     #endregion
@@ -120,9 +110,7 @@ public partial class PushableComponent : Node
 
     #region Public API
     
-    /// <summary>
     /// 应用推力
-    /// </summary>
     public void ApplyPush(Vector3 direction, float force)
     {
         if (!CanBePushed) return;
@@ -140,12 +128,10 @@ public partial class PushableComponent : Node
 // BreakableComponent 示例实现
 // ============================================
 
-/// <summary>
 /// 可破坏组件
 /// 
 /// 让物体在生命值为 0 时破碎。
 /// 依赖 HealthComponent。
-/// </summary>
 [GlobalClass]
 [Component(typeof(RigidBody3D))]
 [ComponentDependency(typeof(HealthComponent))]
@@ -153,19 +139,13 @@ public partial class BreakableComponent : Node
 {
     #region Export Properties
     
-    /// <summary>
     /// 破碎粒子场景
-    /// </summary>
     [Export] public PackedScene BreakParticles { get; set; }
     
-    /// <summary>
     /// 破碎音效
-    /// </summary>
     [Export] public AudioStream BreakSound { get; set; }
     
-    /// <summary>
     /// 碎片场景（可选）
-    /// </summary>
     [Export] public PackedScene[] DebrisScenes { get; set; }
     
     #endregion

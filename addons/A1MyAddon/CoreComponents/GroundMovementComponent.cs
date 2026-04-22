@@ -2,13 +2,6 @@ using Godot;
 using Godot.Composition;
 using R3;
 
-/// <summary>
-/// 地面移动组件 - 处理重力、跳跃、地面移动
-/// 绑定到 StateChart 的 "GroundMode" 状态
-/// 只有在地面模式下才会被激活（Power Switch 模式）
-/// 
-/// 注意：此组件作为 GroundMode 状态节点的子节点，使用 AutoBindToParentState() 自动绑定
-/// </summary>
 [GlobalClass]
 public partial class GroundMovementComponent : Node
 {
@@ -86,12 +79,8 @@ public partial class GroundMovementComponent : Node
 
     #region Physics Logic
 
-    /// <summary>
-    /// 地面物理处理
-    /// 目的：实现重力、跳跃、地面移动的完整物理模拟
-    /// 示例：角色在地面按空格跳起，空中受重力下落，WASD控制水平移动
-    /// 算法：1. 应用重力 -> 2. 处理跳跃输入 -> 3. 计算水平移动 -> 4. 应用速度并移动
-    /// </summary>
+    // 地面物理处理 - 重力、跳跃、地面移动
+    // 算法：应用重力 -> 处理跳跃输入 -> 计算水平移动（相机方向） -> 应用速度
     private void ProcessGroundPhysics(double delta)
     {
         Vector3 velocity = _entity.Velocity;

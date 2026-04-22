@@ -2,30 +2,22 @@ using Godot;
 using R3;
 using System.Linq;
 
-/// <summary>
 /// 网格形状组件 - 管理物品运行时形状
 /// 目的：从 ItemDataResource 加载形状，支持运行时旋转，通过 R3 发布形状变化事件
 /// 示例：L 形物品 [(0,0), (0,1), (1,1)] 旋转 90° -> [(0,0), (1,0), (1,1)]
 /// 算法：1. 加载初始形状 -> 2. 应用旋转矩阵 (x,y) -> (-y,x) -> 3. 归一化坐标 -> 4. 发布 R3 事件
-/// </summary>
 [GlobalClass]
 public partial class GridShapeComponent : Node
 {
 	#region Export Properties
 	
-	/// <summary>
 	/// 单个格子的像素尺寸（用于 UI 尺寸计算）
-	/// </summary>
 	[Export] public Vector2 CellSize { get; set; } = new Vector2(64, 64);
 	
-	/// <summary>
 	/// 是否自动调整父 Control 节点的尺寸
-	/// </summary>
 	[Export] public bool AutoResizeParent { get; set; } = true;
 	
-	/// <summary>
 	/// 可选的 VisualContainer 节点路径（如果需要同时调整视觉容器尺寸）
-	/// </summary>
 	[Export] public NodePath VisualContainerPath { get; set; } = "%VisualContainer";
 	
 	#endregion
@@ -41,9 +33,7 @@ public partial class GridShapeComponent : Node
 	// 当前运行时占用的局部格子数组（只读）
 	public Vector2I[] CurrentLocalCells { get; private set; }
 	
-	/// <summary>
 	/// 获取当前的 ItemDataResource（只读）
-	/// </summary>
 	public ItemDataResource Data => _data;
 	
 	#endregion
@@ -95,17 +85,13 @@ public partial class GridShapeComponent : Node
 	
 	#region Event Handlers
 	
-	/// <summary>
 	/// 接收父节点传递的 ItemDataResource 并初始化形状
-	/// </summary>
 	private void OnDataReceived(ItemDataResource data)
 	{
 		SetData(data);
 	}
 	
-	/// <summary>
 	/// 设置 ItemDataResource 并初始化形状（供外部直接调用或事件触发）
-	/// </summary>
 	public void SetData(ItemDataResource data)
 	{
 		_data = data;
@@ -146,12 +132,10 @@ public partial class GridShapeComponent : Node
 		NormalizeShape();
 	}
 	
-	/// <summary>
 	/// 顺时针旋转 90 度
 	/// 目的：应用旋转矩阵实现形状旋转，保持坐标归一化
 	/// 示例：2x1 横条 [(0,0), (1,0)] 旋转 -> 1x2 竖条 [(0,0), (0,1)]
 	/// 算法：1. 应用旋转矩阵 (x,y) -> (-y,x) -> 2. 归一化坐标（确保左上角为原点）-> 3. 发布 R3 事件
-	/// </summary>
 	public void Rotate90()
 	{
 		if (CurrentLocalCells == null || CurrentLocalCells.Length == 0)
@@ -177,12 +161,10 @@ public partial class GridShapeComponent : Node
 		OnShapeChangedAsObservable.OnNext(Unit.Default);
 	}
 	
-	/// <summary>
 	/// 归一化形状坐标
 	/// 目的：确保形状左上角始终为 (0,0)，避免负坐标
 	/// 示例：旋转后坐标 [(-1,0), (-1,1), (0,1)] -> 归一化后 [(0,0), (0,1), (1,1)]
 	/// 算法：1. 找到最小 X 和最小 Y -> 2. 所有坐标减去 (minX, minY)
-	/// </summary>
 	private void NormalizeShape()
 	{
 		if (CurrentLocalCells == null || CurrentLocalCells.Length == 0)
@@ -223,12 +205,10 @@ public partial class GridShapeComponent : Node
 	
 	#region UI Size Management
 	
-	/// <summary>
 	/// 根据形状自动调整父 Control 节点的尺寸
 	/// 目的：让物品 UI 自动匹配形状大小
 	/// 示例：L 形 2x2 -> Control 尺寸设置为 128x128 (假设 CellSize=64)
 	/// 算法：1. 获取边界尺寸 -> 2. 计算像素尺寸 -> 3. 更新父节点 Size 和 CustomMinimumSize
-	/// </summary>
 	private void UpdateParentSize()
 	{
 		var parent = GetParent();
@@ -263,9 +243,7 @@ public partial class GridShapeComponent : Node
 		}
 	}
 	
-	/// <summary>
 	/// 手动触发父节点尺寸更新（供外部调用）
-	/// </summary>
 	public void RefreshParentSize()
 	{
 		if (AutoResizeParent)

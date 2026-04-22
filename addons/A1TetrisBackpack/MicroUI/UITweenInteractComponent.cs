@@ -1,6 +1,5 @@
 using Godot;
 
-/// <summary>
 /// UI Tween 交互组件 - 响应式微交互动效
 /// 
 /// 职责：
@@ -46,13 +45,11 @@ using Godot;
 /// 
 /// // 无需任何代码！组件会自动工作。
 /// ```
-/// </summary>
 [GlobalClass]
 public partial class UITweenInteractComponent : Node
 {
 	#region Export Properties
 	
-	/// <summary>
 	/// 交互区域（接收鼠标事件的逻辑节点）
 	/// 
 	/// 特性：
@@ -62,10 +59,8 @@ public partial class UITweenInteractComponent : Node
 	/// 
 	/// 默认值：
 	/// 如果未设置，自动使用父节点
-	/// </summary>
 	[Export] public Control InteractionArea { get; set; }
 	
-	/// <summary>
 	/// 视觉目标（执行缩放动画的视觉节点）
 	/// 
 	/// 特性：
@@ -75,37 +70,26 @@ public partial class UITweenInteractComponent : Node
 	/// 
 	/// 必需：
 	/// 必须手动设置，否则组件无法工作
-	/// </summary>
 	[Export] public Control VisualTarget { get; set; }
 	
-	/// <summary>
 	/// 悬停时的目标缩放
-	/// </summary>
 	[Export] public Vector2 HoverScale { get; set; } = new Vector2(1.05f, 1.05f);
 	
-	/// <summary>
 	/// 按下时的目标缩放
-	/// </summary>
 	[Export] public Vector2 PressScale { get; set; } = new Vector2(0.95f, 0.95f);
 	
-	/// <summary>
 	/// 动画过渡时间（秒）
-	/// </summary>
 	[Export] public float TweenDuration { get; set; } = 0.15f;
 	
 	#endregion
 	
 	#region Private Fields
 	
-	/// <summary>
 	/// 当前正在执行的 Tween 动画
 	/// 用于支持平滑打断
-	/// </summary>
 	private Tween _currentTween;
 	
-	/// <summary>
 	/// 是否正在按下
-	/// </summary>
 	private bool _isPressed = false;
 	
 	#endregion
@@ -207,12 +191,10 @@ public partial class UITweenInteractComponent : Node
 	
 	#region Animation Logic
 	
-	/// <summary>
 	/// 执行缩放动画
 	/// 目的：平滑过渡到目标缩放值
 	/// 示例：AnimateToScale((1.05, 1.05)) → VisualTarget 在 0.15 秒内缩放到 105%
 	/// 算法：1. 杀死当前动画 → 2. 创建新 Tween → 3. 配置缓动 → 4. 执行缩放
-	/// </summary>
 	private void AnimateToScale(Vector2 targetScale)
 	{
 		if (VisualTarget == null)
@@ -235,10 +217,8 @@ public partial class UITweenInteractComponent : Node
 		_currentTween.TweenProperty(VisualTarget, "scale", targetScale, TweenDuration);
 	}
 	
-	/// <summary>
 	/// 更新 PivotOffset 为中心点
 	/// 确保缩放从中心进行，而不是左上角
-	/// </summary>
 	private void UpdatePivotOffset()
 	{
 		if (VisualTarget == null)
@@ -252,34 +232,26 @@ public partial class UITweenInteractComponent : Node
 	
 	#region Public Methods
 	
-	/// <summary>
 	/// 手动触发悬停动画
-	/// </summary>
 	public void TriggerHover()
 	{
 		AnimateToScale(HoverScale);
 	}
 	
-	/// <summary>
 	/// 手动触发按下动画
-	/// </summary>
 	public void TriggerPress()
 	{
 		AnimateToScale(PressScale);
 	}
 	
-	/// <summary>
 	/// 手动重置到正常状态
-	/// </summary>
 	public void ResetToNormal()
 	{
 		_isPressed = false;
 		AnimateToScale(Vector2.One);
 	}
 	
-	/// <summary>
 	/// 立即设置缩放（无动画）
-	/// </summary>
 	public void SetScaleImmediate(Vector2 scale)
 	{
 		if (VisualTarget == null)
@@ -289,9 +261,7 @@ public partial class UITweenInteractComponent : Node
 		VisualTarget.Scale = scale;
 	}
 	
-	/// <summary>
 	/// 刷新 PivotOffset（当 VisualTarget 尺寸改变时调用）
-	/// </summary>
 	public void RefreshPivotOffset()
 	{
 		UpdatePivotOffset();

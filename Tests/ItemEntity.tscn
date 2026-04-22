@@ -1,11 +1,11 @@
-[gd_scene format=3 uid="uid://cjdgxa8da52sy"]
+[gd_scene format=3 uid="uid://dpif2qhsc6yxt"]
 
-[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
-[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="script_AtomicState"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="script_CompoundState"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="script_StateChart"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="script_Transition"]
 
-[node name="ItemEntity" type="Control"]
+[node name="ItemEntity" type="Control" unique_id=630292855]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,52 +13,50 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ItemIcon" type="TextureRect" parent="."]
-layout_mode = 2
-expand_mode = 0
-stretch_mode = 0
+[node name="ItemIcon" type="TextureRect" parent="." unique_id=1971325038]
+layout_mode = 0
 
-[node name="ItemName" type="Label" parent="."]
-layout_mode = 2
+[node name="ItemName" type="Label" parent="." unique_id=1966375206]
+layout_mode = 0
 text = "Sword of Truth"
 horizontal_alignment = 1
 
-[node name="StateChart" type="Node" parent="."]
+[node name="StateChart" type="Node" parent="." unique_id=672925015]
 script = ExtResource("script_StateChart")
 
-[node name="Root" type="Node" parent="StateChart"]
+[node name="Root" type="Node" parent="StateChart" unique_id=1193429285]
 script = ExtResource("script_CompoundState")
 initial_state = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="StateChart/Root"]
+[node name="Idle" type="Node" parent="StateChart/Root" unique_id=778585122]
 script = ExtResource("script_AtomicState")
 
-[node name="ToDragging" type="Node" parent="StateChart/Root/Idle"]
+[node name="ToDragging" type="Node" parent="StateChart/Root/Idle" unique_id=98583177]
 script = ExtResource("script_Transition")
 to = NodePath("../Dragging")
-delay_in_seconds = "0.0"
 event = &"drag_start"
+delay_in_seconds = "0.0"
 
-[node name="ToEquipped" type="Node" parent="StateChart/Root/Idle"]
+[node name="ToEquipped" type="Node" parent="StateChart/Root/Idle" unique_id=2007601402]
 script = ExtResource("script_Transition")
 to = NodePath("../Equipped")
-delay_in_seconds = "0.0"
 event = &"equip"
+delay_in_seconds = "0.0"
 
-[node name="Dragging" type="Node" parent="StateChart/Root"]
+[node name="Dragging" type="Node" parent="StateChart/Root" unique_id=1193568703]
 script = ExtResource("script_AtomicState")
 
-[node name="ToIdle" type="Node" parent="StateChart/Root/Dragging"]
+[node name="ToIdle" type="Node" parent="StateChart/Root/Dragging" unique_id=2061083339]
 script = ExtResource("script_Transition")
 to = NodePath("../Idle")
-delay_in_seconds = "0.0"
 event = &"drag_end"
+delay_in_seconds = "0.0"
 
-[node name="Equipped" type="Node" parent="StateChart/Root"]
+[node name="Equipped" type="Node" parent="StateChart/Root" unique_id=1912975531]
 script = ExtResource("script_AtomicState")
 
-[node name="ToIdle2" type="Node" parent="StateChart/Root/Equipped"]
+[node name="ToIdle2" type="Node" parent="StateChart/Root/Equipped" unique_id=477826528]
 script = ExtResource("script_Transition")
 to = NodePath("../Idle")
-delay_in_seconds = "0.0"
 event = &"unequip"
+delay_in_seconds = "0.0"

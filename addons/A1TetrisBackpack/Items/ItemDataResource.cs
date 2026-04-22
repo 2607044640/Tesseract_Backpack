@@ -1,12 +1,10 @@
 using Godot;
 using Godot.Collections;
 
-/// <summary>
 /// 物品静态数据资源 - Godot Resource 配置
 /// 目的：在编辑器中创建可复用的物品配置（ID、名称、图标、形状），支持多实例共享
 /// 示例：创建 sword_item.tres 配置剑的属性 -> 多个剑实例引用同一配置
 /// 算法：1. 编辑器创建 .tres 资源 -> 2. 配置属性 -> 3. 场景引用资源 -> 4. Godot 自动序列化/反序列化
-/// </summary>
 [GlobalClass]
 public partial class ItemDataResource : Resource
 {
@@ -41,12 +39,10 @@ public partial class ItemDataResource : Resource
 		return BaseShape?.Count ?? 1;
 	}
 	
-	/// <summary>
 	/// 获取物品边界框尺寸
 	/// 目的：计算物品占用的最小矩形区域，用于 UI 预览和碰撞检测
 	/// 示例：L形物品 [(0,0), (0,1), (1,1)] -> 返回 (2, 2)
 	/// 算法：1. 遍历所有坐标找最小/最大 X/Y -> 2. 计算宽高 (maxX-minX+1, maxY-minY+1)
-	/// </summary>
 	public Vector2I GetBoundingSize()
 	{
 		if (BaseShape == null || BaseShape.Count == 0)
@@ -66,12 +62,10 @@ public partial class ItemDataResource : Resource
 		return new Vector2I(maxX - minX + 1, maxY - minY + 1);
 	}
 	
-	/// <summary>
 	/// 验证形状数据有效性
 	/// 目的：调试时检查形状配置是否合法（非空、无重复坐标）
 	/// 示例：形状 [(0,0), (0,0)] -> 返回 false 并输出警告
 	/// 算法：1. 检查是否为空 -> 2. 使用 HashSet 检测重复坐标 -> 3. 返回验证结果
-	/// </summary>
 	public bool IsShapeValid()
 	{
 		if (BaseShape == null || BaseShape.Count == 0)

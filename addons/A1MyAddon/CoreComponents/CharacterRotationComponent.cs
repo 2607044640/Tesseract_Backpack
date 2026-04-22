@@ -2,10 +2,8 @@ using Godot;
 using Godot.Composition;
 using R3;
 
-/// <summary>
 /// 角色旋转组件 - 负责让角色模型面向移动方向
 /// 依赖抽象的 BaseInputComponent，可复用于玩家和 AI
-/// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
 public partial class CharacterRotationComponent : Node
@@ -51,9 +49,7 @@ public partial class CharacterRotationComponent : Node
         }
     }
 
-    /// <summary>
     /// Entity 初始化完成后自动调用
-    /// </summary>
     public void OnEntityReady()
     {
         // 直接获取InputComponent并订阅R3流
@@ -82,12 +78,10 @@ public partial class CharacterRotationComponent : Node
 
     #region Rotation Logic
 
-    /// <summary>
     /// 基于相机方向和输入计算角色朝向
     /// 目的：让角色面向移动方向，支持相机相对移动
     /// 示例：按W键时，角色面向相机前方；按D键时，角色面向相机右方
     /// 算法：1. 获取相机前/右向量 -> 2. 根据输入合成移动方向 -> 3. 平滑旋转角色
-    /// </summary>
     private void UpdateCharacterRotation(double delta)
     {
         if (_characterModel == null || _phantomCamera == null) return;

@@ -1,24 +1,18 @@
 using Godot;
 
-/// <summary>
 /// Player3D - 使用组件化架构的玩家控制器
 /// 职责：
 /// 1. 作为 Mediator 协调各个组件
 /// 2. 处理相机控制
 /// 3. 处理角色朝向
-/// </summary>
 public partial class Player3D : CharacterBody3D
 {
     #region Export Properties - 组件引用
     
-    /// <summary>
     /// 输入组件（会自动查找子节点）
-    /// </summary>
     [Export] public PlayerInputComponent InputComponent { get; set; }
     
-    /// <summary>
     /// 移动组件（会自动查找子节点）
-    /// </summary>
     [Export] public MovementComponent MovementComponent { get; set; }
     
     #endregion
@@ -31,9 +25,7 @@ public partial class Player3D : CharacterBody3D
     
     #region Export Properties - 角色模型
     
-    /// <summary>
     /// 角色模型节点路径（用于旋转朝向）
-    /// </summary>
     [Export] public NodePath CharacterModelPath { get; set; } = "KunoSkin";
     
     #endregion
@@ -104,9 +96,7 @@ public partial class Player3D : CharacterBody3D
 
     #region Initialization
     
-    /// <summary>
     /// 初始化组件引用（自动查找子节点）
-    /// </summary>
     private void InitializeComponents()
     {
         // 如果未在编辑器中设置，尝试自动获取子节点
@@ -140,9 +130,7 @@ public partial class Player3D : CharacterBody3D
         }
     }
     
-    /// <summary>
     /// 初始化相机引用
-    /// </summary>
     private void InitializeCamera()
     {
         _cameraPivot = GetNodeOrNull<Node3D>("CameraPivot");
@@ -159,9 +147,7 @@ public partial class Player3D : CharacterBody3D
         }
     }
     
-    /// <summary>
     /// 初始化角色模型引用
-    /// </summary>
     private void InitializeCharacterModel()
     {
         _characterModel = GetNodeOrNull<Node3D>(CharacterModelPath);
@@ -179,9 +165,7 @@ public partial class Player3D : CharacterBody3D
 
     #region Component Event Handling
     
-    /// <summary>
     /// 订阅组件事件
-    /// </summary>
     private void SubscribeToComponentEvents()
     {
         if (InputComponent != null)
@@ -192,9 +176,7 @@ public partial class Player3D : CharacterBody3D
         }
     }
     
-    /// <summary>
     /// 取消订阅组件事件
-    /// </summary>
     private void UnsubscribeFromComponentEvents()
     {
         if (InputComponent != null)
@@ -204,9 +186,7 @@ public partial class Player3D : CharacterBody3D
         }
     }
     
-    /// <summary>
     /// 处理移动输入（从 InputComponent 接收）
-    /// </summary>
     private void HandleMovementInput(Vector2 inputDir)
     {
         _currentInputDir = inputDir;
@@ -215,9 +195,7 @@ public partial class Player3D : CharacterBody3D
         MovementComponent?.UpdateMovementDirection(inputDir);
     }
     
-    /// <summary>
     /// 处理跳跃输入（从 InputComponent 接收）
-    /// </summary>
     private void HandleJumpInput()
     {
         MovementComponent?.PerformJump();
@@ -227,9 +205,7 @@ public partial class Player3D : CharacterBody3D
 
     #region Character Rotation
     
-    /// <summary>
     /// 更新角色朝向（面向移动方向）
-    /// </summary>
     private void UpdateCharacterRotation(double delta)
     {
         if (_characterModel == null || _camera == null) return;
@@ -258,9 +234,7 @@ public partial class Player3D : CharacterBody3D
 
     #region Camera Control
     
-    /// <summary>
     /// 处理相机输入
-    /// </summary>
     private void HandleCameraInput(InputEvent @event)
     {
         if (_cameraPivot == null || _springArm == null) return;

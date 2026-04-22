@@ -1,24 +1,18 @@
 using Godot;
 using System;
 
-/// <summary>
 /// 玩家输入组件 - 仅负责读取输入并通过事件向外广播
 /// 遵循单一职责原则：只处理输入，不处理移动逻辑
-/// </summary>
 [GlobalClass]
 public partial class PlayerInputComponent : Node
 {
     #region Events (向上传递信息)
     
-    /// <summary>
     /// 移动输入事件 (WASD/方向键)
     /// Vector2: X = 左右 (-1 到 1), Y = 前后 (-1 到 1)
-    /// </summary>
     public event Action<Vector2> OnMovementInput;
     
-    /// <summary>
     /// 跳跃按键刚按下事件
-    /// </summary>
     public event Action OnJumpJustPressed;
     
     // TODO: 添加更多输入事件
@@ -31,9 +25,7 @@ public partial class PlayerInputComponent : Node
 
     #region Export Properties (可在编辑器中配置)
     
-    /// <summary>
     /// 是否启用输入处理
-    /// </summary>
     [Export] public bool InputEnabled { get; set; } = true;
     
     #endregion

@@ -2,11 +2,9 @@ using Godot;
 using System;
 using R3;
 
-/// <summary>
 /// 开关组件Helper - 用于设置菜单中的复选框控件
 /// 支持配置标签文本、默认状态等
 /// R3 增强版：支持 ReactiveProperty 双向绑定
-/// </summary>
 [Tool]
 [GlobalClass]
 public partial class ToggleComponentHelper : BaseSettingComponentHelper

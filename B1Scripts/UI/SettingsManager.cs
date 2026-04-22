@@ -4,15 +4,6 @@ using System;
 using System.Collections.Generic;
 using GameSettings;
 
-/// <summary>
-/// 设置管理器 - R3 ReactiveProperty 响应式状态管理
-/// 所有设置状态集中管理，UI 自动同步
-/// 
-/// ✅ 优化点：
-/// 1. 使用通用绑定器减少重复代码
-/// 2. 统一的自动保存（Debounce 500ms）避免频繁 I/O
-/// 3. 简化的重置逻辑
-/// </summary>
 public partial class SettingsManager : Node
 {
 	private const string SettingsFilePath = "user://settings.cfg";
@@ -73,9 +64,6 @@ public partial class SettingsManager : Node
 		GD.Print("SettingsManager initialized with optimized binders");
 	}
 	
-	/// <summary>
-	/// ✅ 创建 Float 设置（使用绑定器）
-	/// </summary>
 	private ReactiveProperty<float> CreateFloatSetting(string key, float defaultValue)
 	{
 		var binder = new FloatSettingBinder(key, defaultValue, ConfigFile_Settings, SettingsSection);
@@ -83,9 +71,6 @@ public partial class SettingsManager : Node
 		return binder.GetProperty();
 	}
 	
-	/// <summary>
-	/// ✅ 创建 Bool 设置（使用绑定器）
-	/// </summary>
 	private ReactiveProperty<bool> CreateBoolSetting(string key, bool defaultValue)
 	{
 		var binder = new BoolSettingBinder(key, defaultValue, ConfigFile_Settings, SettingsSection);
@@ -93,9 +78,6 @@ public partial class SettingsManager : Node
 		return binder.GetProperty();
 	}
 	
-	/// <summary>
-	/// ✅ 创建 Int 设置（使用绑定器）
-	/// </summary>
 	private ReactiveProperty<int> CreateIntSetting(string key, int defaultValue)
 	{
 		var binder = new IntSettingBinder(key, defaultValue, ConfigFile_Settings, SettingsSection);
@@ -103,18 +85,14 @@ public partial class SettingsManager : Node
 		return binder.GetProperty();
 	}
 	
-	/// <summary>
-	/// ✅ 优化后的自动保存：合并所有变化 + Debounce 500ms
-	/// 
-	/// 优化点：
-	/// 1. 削峰填谷：用户拖动滑块时，不再每帧写入磁盘，而是等待 500ms 后统一保存
-	/// 2. 减少 I/O：将成百上千次的写入压缩为一次
-	/// 3. 避免卡顿：防止频繁磁盘操作导致的 UI 卡顿
-	/// 
-	/// 示例：用户拖动音量滑块 0-100，触发 100 次变化
-	/// - 优化前：写入磁盘 100 次（卡顿）
-	/// - 优化后：等待 500ms 后写入 1 次（流畅）
-	/// </summary>
+	// 优化后的自动保存：合并所有变化 + Debounce 500ms
+	// 优化点：
+	// 1. 削峰填谷：用户拖动滑块时，不再每帧写入磁盘，而是等待 500ms 后统一保存
+	// 2. 减少 I/O：将成百上千次的写入压缩为一次
+	// 3. 避免卡顿：防止频繁磁盘操作导致的 UI 卡顿
+	// 示例：用户拖动音量滑块 0-100，触发 100 次变化
+	// - 优化前：写入磁盘 100 次（卡顿）
+	// - 优化后：等待 500ms 后写入 1 次（流畅）
 	private void SubscribeAutoSave()
 	{
 		Observable.Merge(
@@ -134,9 +112,6 @@ public partial class SettingsManager : Node
 		GD.Print("Auto-save enabled with 500ms debounce");
 	}
 	
-	/// <summary>
-	/// ✅ 一次性保存所有设置（使用绑定器）
-	/// </summary>
 	private void SaveAllSettings()
 	{
 		// 使用绑定器保存所有设置
@@ -178,9 +153,6 @@ public partial class SettingsManager : Node
 		}
 	}
 	
-	/// <summary>
-	/// ✅ 重置所有设置到默认值（使用 [Export] 配置的默认值）
-	/// </summary>
 	public void ResetAllSettings()
 	{
 		MasterVolume.Value = DefaultMasterVolume;

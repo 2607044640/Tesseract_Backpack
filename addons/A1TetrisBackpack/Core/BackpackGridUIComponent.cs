@@ -1,6 +1,5 @@
 using Godot;
 
-/// <summary>
 /// 背包网格 UI 组件 - 视图层坐标转换器
 /// 
 /// 职责：
@@ -38,35 +37,24 @@ using Godot;
 /// // 获取格子中心（用于居中显示）
 /// item.Position = backpackUI.GetCellCenterPosition(new Vector2I(2, 3));
 /// ```
-/// </summary>
 [GlobalClass]
 public partial class BackpackGridUIComponent : Control
 {
 	#region Export Properties
 	
-	/// <summary>
 	/// 逻辑网格组件路径
-	/// </summary>
-	[Export] public NodePath LogicGridPath { get; set; } = "%BackpackGridComponent";
+	[Export] public NodePath BackpackGridComponentPath { get; set; } = "%BackpackGridComponent";
 	
-	/// <summary>
 	/// 逻辑网格组件引用
-	/// </summary>
-	public BackpackGridComponent LogicGrid { get; private set; }
+	public BackpackGridComponent BackpackGridComp { get; private set; }
 	
-	/// <summary>
 	/// 单个网格的像素尺寸
-	/// </summary>
 	[Export] public Vector2 CellSize { get; set; } = new Vector2(64, 64);
 	
-	/// <summary>
 	/// 是否绘制调试网格线
-	/// </summary>
 	[Export] public bool DrawDebugLines { get; set; } = true;
 	
-	/// <summary>
 	/// 网格线颜色
-	/// </summary>
 	[Export] public Color GridColor { get; set; } = new Color(1, 1, 1, 0.3f);
 	
 	#endregion
@@ -79,15 +67,13 @@ public partial class BackpackGridUIComponent : Control
 		CallDeferred(MethodName.InitializeComponent);
 	}
 	
-	/// <summary>
 	/// 延迟初始化组件（在 NodePath 解析完成后）
-	/// </summary>
 	private void InitializeComponent()
 	{
-		LogicGrid = GetNodeOrNull<BackpackGridComponent>(LogicGridPath);
-		if (LogicGrid == null)
+		BackpackGridComp = GetNodeOrNull<BackpackGridComponent>(BackpackGridComponentPath);
+		if (BackpackGridComp == null)
 		{
-			GD.PushError($"[{Name}] BackpackGridComponent not found: {LogicGridPath}");
+			GD.PushError($"[{Name}] BackpackGridComponent not found: {BackpackGridComponentPath}");
 			return;
 		}
 		
@@ -97,12 +83,12 @@ public partial class BackpackGridUIComponent : Control
 		// 触发初始绘制
 		QueueRedraw();
 		
-		GD.Print($"BackpackGridUIComponent: 初始化完成 ({LogicGrid.Width}x{LogicGrid.Height} 网格，{CellSize} 像素/格)");
+		GD.Print($"BackpackGridUIComponent: 初始化完成 ({BackpackGridComp.Width}x{BackpackGridComp.Height} 网格，{CellSize} 像素/格)");
 	}
 	
 	public override void _Draw()
 	{
-		if (!DrawDebugLines || LogicGrid == null)
+		if (!DrawDebugLines || BackpackGridComp == null)
 			return;
 		
 		DrawGridLines();
@@ -112,12 +98,10 @@ public partial class BackpackGridUIComponent : Control
 	
 	#region Coordinate Conversion
 	
-	/// <summary>
 	/// 全局像素坐标 → 网格坐标
 	/// 目的：将鼠标点击位置转换为逻辑网格坐标
 	/// 示例：鼠标点击 (320, 192) → 网格坐标 (5, 3)（假设 CellSize=64）
 	/// 算法：1. 转为局部坐标 → 2. 除以格子尺寸 → 3. 向下取整 → 4. 边界检查
-	/// </summary>
 	public Vector2I GlobalToGridPosition(Vector2 globalPos)
 	{
 		// 1. 转换为相对于此 Control 的局部坐标
@@ -128,51 +112,43 @@ public partial class BackpackGridUIComponent : Control
 		int gridY = Mathf.FloorToInt(localPos.Y / CellSize.Y);
 		
 		// 3. 边界限制（确保在有效范围内）
-		gridX = Mathf.Clamp(gridX, 0, LogicGrid.Width - 1);
-		gridY = Mathf.Clamp(gridY, 0, LogicGrid.Height - 1);
+		gridX = Mathf.Clamp(gridX, 0, BackpackGridComp.Width - 1);
+		gridY = Mathf.Clamp(gridY, 0, BackpackGridComp.Height - 1);
 		
 		return new Vector2I(gridX, gridY);
 	}
 	
-	/// <summary>
 	/// 网格坐标 → 局部像素坐标（左上角）
 	/// 目的：将物品吸附到网格位置
 	/// 示例：网格坐标 (2, 3) → 局部像素 (128, 192)（假设 CellSize=64）
 	/// 算法：直接乘以格子尺寸
-	/// </summary>
 	public Vector2 GridToLocalPosition(Vector2I gridPos)
 	{
 		return new Vector2(gridPos.X * CellSize.X, gridPos.Y * CellSize.Y);
 	}
 	
-	/// <summary>
 	/// 网格坐标 → 局部像素坐标（中心点）
-	/// </summary>
 	public Vector2 GetCellCenterPosition(Vector2I gridPos)
 	{
 		Vector2 topLeft = GridToLocalPosition(gridPos);
 		return topLeft + CellSize / 2;
 	}
 	
-	/// <summary>
 	/// 检查网格坐标是否在有效范围内
-	/// </summary>
 	public bool IsValidGridPosition(Vector2I gridPos)
 	{
-		return gridPos.X >= 0 && gridPos.X < LogicGrid.Width &&
-		       gridPos.Y >= 0 && gridPos.Y < LogicGrid.Height;
+		return gridPos.X >= 0 && gridPos.X < BackpackGridComp.Width &&
+		       gridPos.Y >= 0 && gridPos.Y < BackpackGridComp.Height;
 	}
 	
-	/// <summary>
 	/// 局部像素坐标 → 网格坐标
-	/// </summary>
 	public Vector2I LocalToGridPosition(Vector2 localPos)
 	{
 		int gridX = Mathf.FloorToInt(localPos.X / CellSize.X);
 		int gridY = Mathf.FloorToInt(localPos.Y / CellSize.Y);
 		
-		gridX = Mathf.Clamp(gridX, 0, LogicGrid.Width - 1);
-		gridY = Mathf.Clamp(gridY, 0, LogicGrid.Height - 1);
+		gridX = Mathf.Clamp(gridX, 0, BackpackGridComp.Width - 1);
+		gridY = Mathf.Clamp(gridY, 0, BackpackGridComp.Height - 1);
 		
 		return new Vector2I(gridX, gridY);
 	}
@@ -181,17 +157,15 @@ public partial class BackpackGridUIComponent : Control
 	
 	#region UI Management
 	
-	/// <summary>
 	/// 根据逻辑网格尺寸更新 UI 大小
-	/// </summary>
 	private void UpdateUISize()
 	{
-		if (LogicGrid == null)
+		if (BackpackGridComp == null)
 			return;
 		
 		Vector2 totalSize = new Vector2(
-			LogicGrid.Width * CellSize.X,
-			LogicGrid.Height * CellSize.Y
+			BackpackGridComp.Width * CellSize.X,
+			BackpackGridComp.Height * CellSize.Y
 		);
 		
 		CustomMinimumSize = totalSize;
@@ -200,19 +174,17 @@ public partial class BackpackGridUIComponent : Control
 		GD.Print($"BackpackGridUIComponent: UI 尺寸设置为 {totalSize}");
 	}
 	
-	/// <summary>
 	/// 绘制调试网格线
-	/// </summary>
 	private void DrawGridLines()
 	{
-		if (LogicGrid == null)
+		if (BackpackGridComp == null)
 			return;
 		
-		float totalWidth = LogicGrid.Width * CellSize.X;
-		float totalHeight = LogicGrid.Height * CellSize.Y;
+		float totalWidth = BackpackGridComp.Width * CellSize.X;
+		float totalHeight = BackpackGridComp.Height * CellSize.Y;
 		
 		// 绘制横线
-		for (int y = 0; y <= LogicGrid.Height; y++)
+		for (int y = 0; y <= BackpackGridComp.Height; y++)
 		{
 			float yPos = y * CellSize.Y;
 			DrawLine(
@@ -224,7 +196,7 @@ public partial class BackpackGridUIComponent : Control
 		}
 		
 		// 绘制竖线
-		for (int x = 0; x <= LogicGrid.Width; x++)
+		for (int x = 0; x <= BackpackGridComp.Width; x++)
 		{
 			float xPos = x * CellSize.X;
 			DrawLine(
@@ -236,9 +208,7 @@ public partial class BackpackGridUIComponent : Control
 		}
 	}
 	
-	/// <summary>
 	/// 刷新网格显示（属性变化后调用）
-	/// </summary>
 	public void RefreshGrid()
 	{
 		UpdateUISize();
@@ -249,18 +219,14 @@ public partial class BackpackGridUIComponent : Control
 	
 	#region Helper Methods
 	
-	/// <summary>
 	/// 获取指定网格位置的矩形区域（用于高亮显示）
-	/// </summary>
 	public Rect2 GetCellRect(Vector2I gridPos)
 	{
 		Vector2 topLeft = GridToLocalPosition(gridPos);
 		return new Rect2(topLeft, CellSize);
 	}
 	
-	/// <summary>
 	/// 获取多个格子组成的矩形区域（用于物品形状高亮）
-	/// </summary>
 	public Rect2 GetShapeRect(Vector2I startPos, Vector2I[] shape)
 	{
 		if (shape == null || shape.Length == 0)
@@ -288,18 +254,14 @@ public partial class BackpackGridUIComponent : Control
 		return new Rect2(topLeft, size);
 	}
 	
-	/// <summary>
 	/// 设置格子尺寸并刷新显示
-	/// </summary>
 	public void SetCellSize(Vector2 newSize)
 	{
 		CellSize = newSize;
 		RefreshGrid();
 	}
 	
-	/// <summary>
 	/// 切换调试网格线显示
-	/// </summary>
 	public void ToggleDebugLines(bool enabled)
 	{
 		DrawDebugLines = enabled;

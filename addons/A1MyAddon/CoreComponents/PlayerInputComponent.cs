@@ -1,9 +1,5 @@
 using Godot;
 
-/// <summary>
-/// 玩家输入组件 - 读取键盘/手柄输入并通过事件广播
-/// 继承 BaseInputComponent，实现玩家特定的输入逻辑
-/// </summary>
 [GlobalClass]
 public partial class PlayerInputComponent : BaseInputComponent
 {

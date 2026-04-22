@@ -2,10 +2,6 @@ using Godot;
 
 namespace Game;
 
-/// <summary>
-/// 敌人测试场景控制器
-/// 按空格键触发敌人被击中
-/// </summary>
 public partial class EnemyTestScene : Node3D
 {
     private Enemy _enemy;

@@ -2,105 +2,86 @@ using Godot;
 using R3;
 using System.Collections.Generic;
 
-/// <summary>
 /// 物品单元格组控制器 - GridCellUI集合管理器 + 事件聚合器
 /// 目的：管理物品形状对应的GridCellUI实例集合，并将所有单元格的输入事件聚合到单一R3流
 /// 示例：L形 [(0,0), (0,1), (1,1)] -> 生成3个GridCellUI，聚合它们的GuiInput事件
 /// 算法：1. 监听GridShapeComponent形状变化 -> 2. 重建GridCellUI集合 -> 3. 聚合事件流
-/// 
+///
 /// 架构模式：Event Aggregator + Controller
 /// 关键突破：完全绕过AABB问题，每个GridCellUI独立响应，无需_HasPoint重写
-/// </summary>
+/// 测试：验证 addons/A1 文件夹的变更追踪
 [GlobalClass]
 public partial class ItemCellGroupController : Node
 {
 	#region Export Properties
-	
-	/// <summary>
+
 	/// 逻辑数据源组件路径（提供局部坐标数组和形状变化事件）
-	/// </summary>
 	[Export] public NodePath GridShapeComp_Path { get; set; } = "%GridShapeComponent";
-	
-	/// <summary>
+
 	/// 交互区域容器路径（用于放置生成的单元格）
-	/// </summary>
 	[Export] public NodePath InteractionArea_Path { get; set; } = "%InteractionArea";
-	
-	/// <summary>
+
 	/// 单个格子的像素尺寸（默认64x64）
-	/// </summary>
 	[Export] public float CellSize { get; set; } = 64f;
-	
+
 	#endregion
-	
+
 	#region Private Fields
-	
-	/// <summary>
+
 	/// GridShapeComponent引用
-	/// </summary>
 	private GridShapeComponent _gridShapeComp;
-	
-	/// <summary>
+
 	/// InteractionArea引用
-	/// </summary>
 	private Control _interactionArea;
-	
-	/// <summary>
+
 	/// 跟踪所有生成的GridCellUI实例
-	/// </summary>
 	private readonly List<GridCellUI> _cells = new();
-	
-	/// <summary>
+
 	/// R3 Subject - 聚合所有单元格的输入事件
-	/// </summary>
 	private readonly Subject<InputEvent> _aggregatedInputSubject = new();
-	
-	/// <summary>
+
 	/// CompositeDisposable - 管理所有订阅
-	/// </summary>
 	private readonly CompositeDisposable _disposables = new();
-	
+
 	#endregion
-	
+
 	#region Public Interface
-	
-	/// <summary>
+
 	/// 暴露聚合后的输入事件流（供DraggableItemComponent订阅）
-	/// </summary>
 	public Observable<InputEvent> OnGroupInputAsObservable => _aggregatedInputSubject;
-	
+
 	#endregion
-	
+
 	#region Godot Lifecycle
-	
+
 	public override void _Ready()
 	{
 		GD.Print($"[{Name}] ItemCellGroupController._Ready() 开始");
-		
+
 		// 解析NodePath引用
 		_gridShapeComp = GetNodeOrNull<GridShapeComponent>(GridShapeComp_Path);
 		_interactionArea = GetNodeOrNull<Control>(InteractionArea_Path);
-		
+
 		// 验证引用有效性
 		if (_gridShapeComp == null)
 		{
 			GD.PushError($"[{Name}] GridShapeComponent not found at path: {GridShapeComp_Path}");
 			return;
 		}
-		
+
 		if (_interactionArea == null)
 		{
 			GD.PushError($"[{Name}] InteractionArea not found at path: {InteractionArea_Path}");
 			return;
 		}
-		
+
 		GD.Print($"[{Name}] GridShapeComponent引用有效: {_gridShapeComp.Name}");
 		GD.Print($"[{Name}] InteractionArea引用有效: {_interactionArea.Name}");
-		
+
 		// 【关键架构设计】父容器忽略鼠标，让子GridCellUI独立接收事件
 		_interactionArea.MouseFilter = Control.MouseFilterEnum.Ignore;
 		GD.Print($"[{Name}] InteractionArea.MouseFilter已设置为Ignore");
-		
+
 		// 订阅GridShapeComponent的形状变化事件
 		_gridShapeComp.OnShapeChangedAsObservable
 			.Subscribe(_ =>
@@ -109,9 +90,9 @@ public partial class ItemCellGroupController : Node
 				RebuildCells();
 			})
 			.AddTo(_disposables);
-		
+
 		GD.Print($"[{Name}] 已订阅GridShapeComponent.OnShapeChangedAsObservable");
-		
+
 		// 【架构修正】仅在数据已存在时立即构建
 		if (_gridShapeComp.CurrentLocalCells != null)
 		{
@@ -122,33 +103,31 @@ public partial class ItemCellGroupController : Node
 		{
 			GD.Print($"[{Name}] 数据尚未注入，等待OnShapeChangedAsObservable事件");
 		}
-		
+
 		GD.Print($"[{Name}] ItemCellGroupController._Ready() 完成");
 	}
-	
+
 	public override void _ExitTree()
 	{
 		// 清理所有订阅
 		_disposables?.Dispose();
-		
+
 		// 清理聚合Subject
 		_aggregatedInputSubject?.Dispose();
 	}
-	
+
 	#endregion
-	
+
 	#region Cell Management
-	
-	/// <summary>
+
 	/// 重建单元格集合
 	/// 目的：根据GridShapeComponent的当前形状生成对应的GridCellUI实例
 	/// 示例：L形 [(0,0), (0,1), (1,1)] -> 生成3个GridCellUI，位置分别为(0,0), (0,64), (64,64)
 	/// 算法：1. 清理旧单元格 -> 2. 遍历局部坐标 -> 3. 实例化GridCellUI并绑定事件 -> 4. 添加到容器
-	/// </summary>
 	private void RebuildCells()
 	{
 		GD.Print($"[{Name}] RebuildCells() 开始");
-		
+
 		// 1. 清理旧单元格
 		GD.Print($"[{Name}] 清理旧单元格，当前数量: {_cells.Count}");
 		foreach (var cell in _cells)
@@ -156,32 +135,33 @@ public partial class ItemCellGroupController : Node
 			cell.QueueFree();
 		}
 		_cells.Clear();
-		
+
 		// 2. 验证数据源有效性
 		if (_gridShapeComp.CurrentLocalCells == null)
 		{
 			GD.PushWarning($"[{Name}] CurrentLocalCells is null, skipping cell generation.");
 			return;
 		}
-		
+
 		GD.Print($"[{Name}] CurrentLocalCells有效，格子数量: {_gridShapeComp.CurrentLocalCells.Length}");
-		
+
 		// 3. 遍历局部坐标生成GridCellUI
 		int cellIndex = 0;
 		foreach (Vector2I cellPos in _gridShapeComp.CurrentLocalCells)
 		{
 			GD.Print($"[{Name}] 生成单元格 {cellIndex}: cellPos=({cellPos.X}, {cellPos.Y})");
-			
+
 			// 实例化GridCellUI
 			var gridCellUI = new GridCellUI
+
 			{
 				Size = new Vector2(CellSize, CellSize),
 				Position = new Vector2(cellPos.X * CellSize, cellPos.Y * CellSize),
 				Name = $"GridCell_{cellIndex}"
 			};
-			
+
 			GD.Print($"[{Name}] 单元格 {cellIndex} 属性: Size={gridCellUI.Size}, Position={gridCellUI.Position}");
-			
+
 			// 【事件聚合】将此单元格的输入事件推送到聚合Subject
 			gridCellUI.OnCellInputAsObservable
 				.Subscribe(inputEvent =>
@@ -190,46 +170,42 @@ public partial class ItemCellGroupController : Node
 					_aggregatedInputSubject.OnNext(inputEvent);
 				})
 				.AddTo(gridCellUI); // 订阅生命周期绑定到GridCellUI
-			
+
 			// 4. 添加到InteractionArea并跟踪
 			_interactionArea.AddChild(gridCellUI);
 			_cells.Add(gridCellUI);
-			
+
 			GD.Print($"[{Name}] 单元格 {cellIndex} 已添加到InteractionArea");
 			cellIndex++;
 		}
-		
+
 		GD.Print($"[{Name}] RebuildCells() 完成，生成 {_cells.Count} 个单元格");
 		GD.Print($"[{Name}] InteractionArea子节点数量: {_interactionArea.GetChildCount()}");
 	}
-	
+
 	#endregion
-	
+
 	#region Public API
-	
-	/// <summary>
+
 	/// 设置整组单元格的状态
 	/// 目的：统一控制所有单元格的视觉状态（用于拖拽反馈）
 	/// 示例：SetGroupState(GridCellUI.CellState.Valid) -> 所有单元格显示绿色发光边框
 	/// 算法：遍历_cells列表，调用每个GridCellUI的SetState方法
-	/// </summary>
 	public void SetGroupState(GridCellUI.CellState state)
 	{
 		foreach (var cell in _cells)
 		{
 			cell.SetState(state);
 		}
-		
+
 		GD.Print($"[{Name}] 已将整组单元格状态设置为: {state}");
 	}
-	
-	/// <summary>
+
 	/// 重置整组单元格状态为Normal
-	/// </summary>
 	public void ResetGroupState()
 	{
 		SetGroupState(GridCellUI.CellState.Normal);
 	}
-	
+
 	#endregion
 }

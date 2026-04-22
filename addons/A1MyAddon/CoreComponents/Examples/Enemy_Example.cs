@@ -2,7 +2,6 @@ using Godot;
 using Godot.Composition;
 using System;
 
-/// <summary>
 /// Enemy 实体示例
 /// 
 /// 展示如何复用 Player 的组件来创建 AI 控制的敌人。
@@ -21,7 +20,6 @@ using System;
 /// 新增的组件：
 /// - AIInputComponent - 替代 PlayerInputComponent，发出相同的事件
 /// - HealthComponent - 处理生命值
-/// </summary>
 [Entity]
 public partial class EnemyExample : CharacterBody3D
 {
@@ -54,36 +52,26 @@ public partial class EnemyExample : CharacterBody3D
 // AIInputComponent 示例实现
 // ============================================
 
-/// <summary>
 /// AI 输入组件
 /// 
 /// 模拟 PlayerInputComponent 的接口，但输入来自 AI 决策。
 /// 继承 BaseInputComponent，实现与 PlayerInputComponent 相同的接口。
 /// 这样就可以复用所有依赖 BaseInputComponent 的组件。
-/// </summary>
 [GlobalClass]
 public partial class AIInputComponent : BaseInputComponent
 {
     #region Export Properties
     
-    /// <summary>
     /// AI 类型
-    /// </summary>
     [Export] public AIType Type { get; set; } = AIType.Patrol;
     
-    /// <summary>
     /// 巡逻点
-    /// </summary>
     [Export] public Node3D[] PatrolPoints { get; set; }
     
-    /// <summary>
     /// 追击目标（通常是玩家）
-    /// </summary>
     [Export] public Node3D Target { get; set; }
     
-    /// <summary>
     /// 检测范围
-    /// </summary>
     [Export] public float DetectionRange { get; set; } = 10.0f;
     
     #endregion
@@ -211,64 +199,46 @@ public enum AIState
 // HealthComponent 示例实现
 // ============================================
 
-/// <summary>
 /// 生命值组件
 /// 
 /// 处理生命值、伤害、死亡等逻辑。
 /// 可用于 Enemy、Player、可破坏物体等。
-/// </summary>
 [GlobalClass]
 [Component(typeof(Node3D))]
 public partial class HealthComponent : Node
 {
     #region Events
     
-    /// <summary>
     /// 受到伤害事件
-    /// </summary>
     public event Action<float> OnDamaged;
     
-    /// <summary>
     /// 治疗事件
-    /// </summary>
     public event Action<float> OnHealed;
     
-    /// <summary>
     /// 死亡事件
-    /// </summary>
     public event Action OnDied;
     
     #endregion
 
     #region Export Properties
     
-    /// <summary>
     /// 最大生命值
-    /// </summary>
     [Export] public float MaxHealth { get; set; } = 100.0f;
     
-    /// <summary>
     /// 当前生命值
-    /// </summary>
     [Export] public float CurrentHealth { get; set; } = 100.0f;
     
-    /// <summary>
     /// 是否无敌
-    /// </summary>
     [Export] public bool IsInvincible { get; set; } = false;
     
     #endregion
 
     #region Properties
     
-    /// <summary>
     /// 是否存活
-    /// </summary>
     public bool IsAlive => CurrentHealth > 0;
     
-    /// <summary>
     /// 生命值百分比
-    /// </summary>
     public float HealthPercent => CurrentHealth / MaxHealth;
     
     #endregion
@@ -285,9 +255,7 @@ public partial class HealthComponent : Node
 
     #region Public API
     
-    /// <summary>
     /// 受到伤害
-    /// </summary>
     public void TakeDamage(float amount)
     {
         if (!IsAlive || IsInvincible) return;
@@ -303,9 +271,7 @@ public partial class HealthComponent : Node
         }
     }
     
-    /// <summary>
     /// 治疗
-    /// </summary>
     public void Heal(float amount)
     {
         if (!IsAlive) return;
@@ -316,9 +282,7 @@ public partial class HealthComponent : Node
         GD.Print($"HealthComponent: 治疗 {amount}，当前 {CurrentHealth}/{MaxHealth}");
     }
     
-    /// <summary>
     /// 死亡
-    /// </summary>
     private void Die()
     {
         GD.Print("HealthComponent: 死亡！");

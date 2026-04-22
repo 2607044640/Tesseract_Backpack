@@ -1,7 +1,6 @@
 using Godot;
 using Godot.Composition;
 
-/// <summary>
 /// 动画控制器组件 - 极简数值驱动架构
 /// 
 /// 架构原则：
@@ -15,7 +14,6 @@ using Godot.Composition;
 ///    - GroundMode.state_entered → AnimationControllerComponent.EnterGroundMode()
 ///    - FlyMode.state_entered → AnimationControllerComponent.EnterFlyMode()
 /// 2. 组件会根据 parent.Velocity 自动选择合适的动画
-/// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
 public partial class AnimationControllerComponent : Node

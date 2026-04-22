@@ -1,7 +1,6 @@
 using Godot;
 using GodotStateCharts;
 
-/// <summary>
 /// UI 跟随鼠标组件 - 拖拽状态下的物理跟随
 /// 
 /// 职责：
@@ -52,23 +51,17 @@ using GodotStateCharts;
 /// 
 /// // 无需任何代码！组件会自动工作。
 /// ```
-/// </summary>
 [GlobalClass]
 public partial class FollowMouseUIComponent : Node
 {
 	#region Export Properties
 	
-	/// <summary>
 	/// 目标 UI 节点路径
-	/// </summary>
 	[Export] public NodePath TargetUIPath { get; set; } = "%TargetUI";
 	
-	/// <summary>
 	/// 目标 UI 节点引用
-	/// </summary>
 	public Control TargetUI { get; private set; }
 	
-	/// <summary>
 	/// 抓取偏移量（鼠标相对于物品左上角的偏移）
 	/// 
 	/// 用途：
@@ -85,21 +78,16 @@ public partial class FollowMouseUIComponent : Node
 	/// 示例：
 	/// - 鼠标点击物品中心 → GrabOffset = (-width/2, -height/2)
 	/// - 鼠标点击左上角 → GrabOffset = (0, 0)
-	/// </summary>
 	[Export] public Vector2 GrabOffset { get; set; } = Vector2.Zero;
 	
 	#endregion
 	
 	#region Private Fields
 	
-	/// <summary>
 	/// 原始 ZIndex（用于退出拖拽时恢复）
-	/// </summary>
 	private int _originalZIndex;
 	
-	/// <summary>
 	/// 拖拽时的 ZIndex 提升值
-	/// </summary>
 	private const int DragZIndexBoost = 100;
 	
 	#endregion
@@ -112,9 +100,7 @@ public partial class FollowMouseUIComponent : Node
 		CallDeferred(MethodName.InitializeComponent);
 	}
 	
-	/// <summary>
 	/// 延迟初始化组件（在 NodePath 解析完成后）
-	/// </summary>
 	private void InitializeComponent()
 	{
 		TargetUI = GetNodeOrNull<Control>(TargetUIPath);
@@ -171,9 +157,7 @@ public partial class FollowMouseUIComponent : Node
 	
 	#region State Event Handlers
 	
-	/// <summary>
 	/// 拖拽状态进入时的处理
-	/// </summary>
 	private void OnDragStateEntered()
 	{
 		if (TargetUI == null)
@@ -185,9 +169,7 @@ public partial class FollowMouseUIComponent : Node
 		GD.Print($"FollowMouseUIComponent: 拖拽开始，ZIndex {_originalZIndex} → {TargetUI.ZIndex}");
 	}
 	
-	/// <summary>
 	/// 拖拽状态退出时的处理
-	/// </summary>
 	private void OnDragStateExited()
 	{
 		if (TargetUI == null)
@@ -203,17 +185,13 @@ public partial class FollowMouseUIComponent : Node
 	
 	#region Helper Methods
 	
-	/// <summary>
 	/// 设置抓取偏移量（通常在拖拽开始时调用）
-	/// </summary>
 	public void SetGrabOffset(Vector2 offset)
 	{
 		GrabOffset = offset;
 	}
 	
-	/// <summary>
 	/// 根据当前鼠标位置自动计算抓取偏移
-	/// </summary>
 	public void CalculateGrabOffsetFromMouse()
 	{
 		if (TargetUI == null)
@@ -228,9 +206,7 @@ public partial class FollowMouseUIComponent : Node
 		GD.Print($"FollowMouseUIComponent: 自动计算偏移量 = {GrabOffset}");
 	}
 	
-	/// <summary>
 	/// 设置拖拽时的 ZIndex 提升值（可选，用于自定义层级）
-	/// </summary>
 	public void SetDragZIndexBoost(int boost)
 	{
 		// 注意：这是一个实例方法，但 DragZIndexBoost 是常量

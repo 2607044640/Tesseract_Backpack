@@ -5,12 +5,9 @@ namespace GodotStateCharts
     using Godot;
     using System;
 
-    /// <summary>
     /// Wrapper around the GDScript state chart node. Allows interacting with the state chart.
-    /// </summary>
     public class StateChart : NodeWrapper
     {
-        /// <summary>
         /// Emitted when the state chart receives an event. This will be 
         /// emitted no matter which state is currently active and can be 
         /// useful to trigger additional logic elsewhere in the game 
@@ -21,7 +18,6 @@ namespace GodotStateCharts
         /// because the state chart will always finish processing one event
         /// fully before processing the next. If an event is received
         /// while another is still processing, it will be enqueued.
-        /// </summary>
         public event Action<StringName> EventReceived
         {
             add => Wrapped.Connect(SignalName.EventReceived, Callable.From(value));
@@ -32,11 +28,9 @@ namespace GodotStateCharts
         {
         }
 
-        /// <summary>
         /// Creates a wrapper object around the given node and verifies that the node
         /// is actually a state chart. The wrapper object can then be used to interact
         /// with the state chart from C#.
-        /// </summary>
         /// <param name="stateChart">the node that is the state chart</param>
         /// <returns>a StateChart wrapper.</returns>
         /// <throws>ArgumentException if the node is not a state chart.</throws>
@@ -51,18 +45,14 @@ namespace GodotStateCharts
             return new StateChart(stateChart);
         }
 
-        /// <summary>
         /// Sends an event to the state chart node.
-        /// </summary>
         /// <param name="eventName">the name of the event to send</param>
         public void SendEvent(string eventName)
         {
             Call(MethodName.SendEvent, eventName);
         }
 
-        /// <summary>
         /// Sets an expression property on the state chart node for later use with expression guards.
-        /// </summary>
         /// <param name="name">the name of the property to set. This is case sensitive.</param>
         /// <param name="value">the value to set the property to.</param>
         public void SetExpressionProperty(string name, Variant value)
@@ -71,9 +61,7 @@ namespace GodotStateCharts
         }
         
         
-        /// <summary>
         /// Returns the value of an expression property on the state chart node.
-        /// </summary>
         /// <param name="name">the name of the proeprty to read. This is case sensitive. </param>
         /// <param name="defaultValue">the default value to be returned if no such property exists</param>
         /// <returns>the value of the property</returns>
@@ -82,11 +70,9 @@ namespace GodotStateCharts
             return Call(MethodName.GetExpressionProperty, name, Variant.From(defaultValue)).As<T>();
         }
 
-        /// <summary>
         /// Steps the state chart node. This will invoke all <code>state_stepped</code> signals on the
         /// currently active states in the state charts. See the "Stepping Mode" section of the manual
         /// for more details.
-        /// </summary>
         public void Step()
         {
             Call(MethodName.Step);
@@ -96,32 +82,23 @@ namespace GodotStateCharts
         {
            /// <see cref="StateChart.EventReceived"/>
            /// 
-           /// </summary>
             public static readonly StringName EventReceived = "event_received";
         }
         
         public class MethodName : Node.MethodName
         {
-            /// <summary>
             /// Sends an event to the state chart node.
-            /// </summary>
             public static readonly StringName SendEvent = "send_event";
             
-            /// <summary>
             /// Sets an expression property on the state chart node for later use with expression guards.
-            /// </summary>
             public static readonly StringName SetExpressionProperty = "set_expression_property";
             
-            /// <summary>
             /// Returns the value of an expression property on the state chart node.
-            /// </summary>
             public static readonly StringName GetExpressionProperty = "get_expression_property";
             
-            /// <summary>
             /// Steps the state chart node. This will invoke all <code>state_stepped</code> signals on the
             /// currently active states in the state charts. See the "Stepping Mode" section of the manual
             /// for more details.
-            /// </summary>
             public static readonly StringName Step = "step";
         }
         

@@ -1,9 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-/// <summary>
 /// 动画名称常量（合并在同一个文件顶部，方便查看）
-/// </summary>
 public static class AnimationNames
 {
     #region 基础移动动画
@@ -49,14 +47,12 @@ public static class AnimationNames
     #endregion
 }
 
-/// <summary>
 /// 角色动画配置中心 - 极简架构
 /// 合并了原来的 AnimationNames, AnimationSet, CharacterAnimationConfig 三个文件
 /// 
 /// 添加新动画只需2步：
 /// 1. 声明 [Export] 变量
 /// 2. 在 ApplyAndInitialize 中调用 RegisterAnim
-/// </summary>
 [GlobalClass]
 public partial class CharacterAnimationConfig : Resource
 {
@@ -141,10 +137,8 @@ public partial class CharacterAnimationConfig : Resource
     
     #region 公共API
     
-    /// <summary>
     /// 将配置应用到 AnimationPlayer 并完成初始化（一键搞定）
     /// 替代原来的 ApplyToAnimationPlayer + AnimationSet.Initialize
-    /// </summary>
     public void ApplyAndInitialize(AnimationPlayer player)
     {
         if (player == null) return;
@@ -199,25 +193,19 @@ public partial class CharacterAnimationConfig : Resource
         GD.Print($"[AnimationConfig] 飞行动画: Idle={hasFlyIdle}, Move={hasFlyMove}, Fast={hasFlyFast}");
     }
     
-    /// <summary>
     /// 检查动画是否存在
-    /// </summary>
     public bool HasAnimation(string animName)
     {
         return _player != null && _player.HasAnimation(animName);
     }
     
-    /// <summary>
     /// 获取动画播放速度（替代原来几百行的 switch 语句）
-    /// </summary>
     public float GetAnimationSpeed(string animName)
     {
         return _animSpeeds.TryGetValue(animName, out float speed) ? speed : 1.0f;
     }
     
-    /// <summary>
     /// 根据状态和速度获取应该播放的动画
-    /// </summary>
     public (string animName, float speed) GetAnimationForState(string mode, Vector3 velocity, bool isOnFloor)
     {
         if (_player == null) return ("", 1.0f);
@@ -234,10 +222,8 @@ public partial class CharacterAnimationConfig : Resource
     
     #region 私有方法
     
-    /// <summary>
     /// 核心改进：内部辅助注册方法
     /// 一行代码完成：设置循环模式 + 添加到库 + 缓存速度
-    /// </summary>
     private void RegisterAnim(AnimationLibrary lib, string name, Animation anim, float speed, bool isLoop)
     {
         if (anim == null) return;
@@ -252,9 +238,7 @@ public partial class CharacterAnimationConfig : Resource
         _animSpeeds[name] = speed;
     }
     
-    /// <summary>
     /// 选择地面模式动画
-    /// </summary>
     private (string, float) GetGroundAnimation(Vector3 velocity, bool isOnFloor)
     {
         float horizontalSpeed = new Vector2(velocity.X, velocity.Z).Length();
@@ -283,9 +267,7 @@ public partial class CharacterAnimationConfig : Resource
         return ("", 1.0f);
     }
     
-    /// <summary>
     /// 选择飞行模式动画
-    /// </summary>
     private (string, float) GetFlyAnimation(Vector3 velocity)
     {
         float speed = velocity.Length();

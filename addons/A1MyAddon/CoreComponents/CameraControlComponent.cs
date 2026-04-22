@@ -2,10 +2,8 @@ using Godot;
 using Godot.Composition;
 using PhantomCamera;
 
-/// <summary>
 /// 相机控制组件 - 使用 PhantomCamera3D 处理第三人称相机旋转和鼠标输入
 /// 纯净版：只负责相机旋转，不处理其他逻辑
-/// </summary>
 [GlobalClass]
 [Component(typeof(CharacterBody3D))]
 public partial class CameraControlComponent : Node

@@ -1,37 +1,25 @@
 using Godot;
 
-/// <summary>
 /// 移动组件 - 仅负责物理计算与位移
 /// 遵循单一职责原则：只处理移动，不处理输入或动画
-/// </summary>
 [GlobalClass]
 public partial class MovementComponent : Node
 {
     #region Export Properties (依赖注入)
     
-    /// <summary>
     /// 需要控制的物理身体（会自动获取父节点）
-    /// </summary>
     [Export] public CharacterBody3D Body { get; set; }
     
-    /// <summary>
     /// 相机引用（用于计算相对于相机的移动方向）
-    /// </summary>
     [Export] public Camera3D Camera { get; set; }
     
-    /// <summary>
     /// 移动速度 (米/秒)
-    /// </summary>
     [Export] public float Speed { get; set; } = 5.0f;
     
-    /// <summary>
     /// 跳跃初速度 (米/秒)
-    /// </summary>
     [Export] public float JumpVelocity { get; set; } = 4.5f;
     
-    /// <summary>
     /// 重力加速度 (使用项目设置中的默认值)
-    /// </summary>
     [Export] public float Gravity { get; set; } = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
     
     #endregion
@@ -86,26 +74,20 @@ public partial class MovementComponent : Node
 
     #region Public API (供外部调用)
     
-    /// <summary>
     /// 更新移动方向（由 InputComponent 或 Controller 调用）
-    /// </summary>
     /// <param name="inputDir">输入方向 (X: 左右, Y: 前后)</param>
     public void UpdateMovementDirection(Vector2 inputDir)
     {
         _currentInputDirection = inputDir;
     }
     
-    /// <summary>
     /// 执行跳跃（由 InputComponent 或 Controller 调用）
-    /// </summary>
     public void PerformJump()
     {
         _jumpRequested = true;
     }
     
-    /// <summary>
     /// 物理帧处理（必须在 _PhysicsProcess 中调用）
-    /// </summary>
     /// <param name="delta">物理帧时间间隔</param>
     public void ProcessPhysics(double delta)
     {

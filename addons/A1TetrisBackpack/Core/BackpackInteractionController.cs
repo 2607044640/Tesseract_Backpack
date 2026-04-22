@@ -2,7 +2,6 @@ using Godot;
 using R3;
 using System.Collections.Generic;
 
-/// <summary>
 /// 背包交互控制器 - MVC 架构中的 Controller 层
 /// 
 /// 职责：
@@ -13,7 +12,7 @@ using System.Collections.Generic;
 /// - 防止"自我占用"问题（拾取时先从网格移除）
 /// 
 /// 架构定位：
-/// - Controller 层：连接 Model（LogicGrid）和 View（ViewGrid）
+/// - Controller 层：连接 Model（BackpackGridComp）和 View（ViewGrid）
 /// - 事件驱动：订阅物品的拖拽事件并响应
 /// - 状态管理：维护每个物品的拖拽状态
 /// 
@@ -26,7 +25,7 @@ using System.Collections.Generic;
 /// 关键机制：
 /// 
 /// **防自我占用：**
-/// 拾取时立即从 LogicGrid 移除，避免放置时检测到自己占用的格子。
+/// 拾取时立即从 BackpackGridComp 移除，避免放置时检测到自己占用的格子。
 /// 
 /// **回弹机制：**
 /// 放置失败时（越界或碰撞），强制将物品放回原位置。
@@ -38,7 +37,7 @@ using System.Collections.Generic;
 /// ```csharp
 /// // 在背包 UI 初始化时
 /// var controller = GetNode<BackpackInteractionController>("Controller");
-/// controller.LogicGrid = logicGrid;
+/// controller.BackpackGridComp = backpackGridComp;
 /// controller.ViewGrid = viewGrid;
 /// 
 /// // 注册物品
@@ -47,34 +46,27 @@ using System.Collections.Generic;
 ///     controller.RegisterItem(item);
 /// }
 /// ```
-/// </summary>
 [GlobalClass]
 public partial class BackpackInteractionController : Node
 {
 	#region Export Properties
 	
-	/// <summary>
 	/// 逻辑网格组件引用（Model 层）
-	/// </summary>
-	[Export] public NodePath LogicGridPath { get; set; } = "%BackpackGridComponent";
+	[Export] public NodePath BackpackGridComponentPath { get; set; } = "%BackpackGridComponent";
 	
-	/// <summary>
 	/// UI 网格视图组件引用（View 层）
-	/// </summary>
 	[Export] public NodePath ViewGridPath { get; set; } = "%BackpackPanel";
 	
 	#endregion
 	
 	#region Private Fields
 	
-	private BackpackGridComponent LogicGrid;
+	private BackpackGridComponent BackpackGridComp;
 	private BackpackGridUIComponent ViewGrid;
 	
-	/// <summary>
 	/// 物品拖拽状态字典
 	/// Key: 物品实体节点
 	/// Value: 拖拽状态信息
-	/// </summary>
 	private Dictionary<Node, ItemDragState> _dragStates = new Dictionary<Node, ItemDragState>();
 	
 	#endregion
@@ -83,10 +75,10 @@ public partial class BackpackInteractionController : Node
 	
 	public override void _Ready()
 	{
-		LogicGrid = GetNodeOrNull<BackpackGridComponent>(LogicGridPath);
-		if (LogicGrid == null)
+		BackpackGridComp = GetNodeOrNull<BackpackGridComponent>(BackpackGridComponentPath);
+		if (BackpackGridComp == null)
 		{
-			GD.PushError($"[{Name}] LogicGrid not found: {LogicGridPath}");
+			GD.PushError($"[{Name}] BackpackGridComp not found: {BackpackGridComponentPath}");
 			return;
 		}
 		
@@ -104,12 +96,10 @@ public partial class BackpackInteractionController : Node
 	
 	#region Item Registration
 	
-	/// <summary>
 	/// 注册物品到控制器
 	/// 目的：订阅物品的拖拽事件，使其能够与背包交互
 	/// 示例：controller.RegisterItem(swordItem) → 剑可以被拖拽到背包
 	/// 算法：1. 获取必需组件 → 2. 订阅拖拽事件 → 3. 绑定到物品生命周期
-	/// </summary>
 	public void RegisterItem(Node itemEntity)
 	{
 		if (itemEntity == null)
@@ -178,9 +168,7 @@ public partial class BackpackInteractionController : Node
 		GD.Print($"BackpackInteractionController: 已注册物品 {itemEntity.Name}");
 	}
 	
-	/// <summary>
 	/// 批量注册多个物品
-	/// </summary>
 	public void RegisterItems(IEnumerable<Node> items)
 	{
 		foreach (var item in items)
@@ -193,12 +181,10 @@ public partial class BackpackInteractionController : Node
 	
 	#region Drag Event Handlers
 	
-	/// <summary>
 	/// 处理物品拾取（拖拽开始）
 	/// 目的：记录原始状态并从网格移除，防止"自我占用"
 	/// 示例：拾起剑 → 记录位置 (320, 192) 和网格坐标 (5, 3) → 从网格移除
 	/// 算法：1. 记录当前位置 → 2. 计算网格坐标 → 3. 从逻辑网格移除 → 4. 保存状态
-	/// </summary>
 	private void HandleItemPickedUp(Node itemEntity, Control itemControl, GridShapeComponent shapeComponent)
 	{
 		// 1. 记录当前全局位置
@@ -211,7 +197,7 @@ public partial class BackpackInteractionController : Node
 		// 【关键机制】拾取时立即移除，这样放置时不会检测到自己占用的格子
 		if (ViewGrid.IsValidGridPosition(originalGridPos))
 		{
-			LogicGrid.RemoveItem(
+			BackpackGridComp.RemoveItem(
 				new ItemData(shapeComponent.Data?.ItemID ?? "unknown"),
 				shapeComponent.CurrentLocalCells,
 				originalGridPos
@@ -234,12 +220,10 @@ public partial class BackpackInteractionController : Node
 		GD.Print($"物品 {itemEntity.Name} 拾取：原位置 {originalGlobalPos}，网格坐标 {originalGridPos}");
 	}
 	
-	/// <summary>
 	/// 处理物品放置（拖拽结束）
 	/// 目的：验证放置位置，成功则吸附，失败则回弹
 	/// 示例：放置剑到 (400, 256) → 转换为网格 (6, 4) → 检测合法 → 吸附到 (384, 256)
 	/// 算法：1. 获取目标位置 → 2. 检查范围 → 3. 尝试放置 → 4. 吸附或回弹
-	/// </summary>
 	private void HandleItemDropped(Node itemEntity, Control itemControl, GridShapeComponent shapeComponent)
 	{
 		// 检查是否有拖拽状态
@@ -269,7 +253,7 @@ public partial class BackpackInteractionController : Node
 		
 		// 4. 尝试放置到逻辑网格
 		var itemData = new ItemData(shapeComponent.Data?.ItemID ?? "unknown");
-		bool placementSuccess = LogicGrid.TryPlaceItem(
+		bool placementSuccess = BackpackGridComp.TryPlaceItem(
 			itemData,
 			shapeComponent.CurrentLocalCells,
 			targetGridPos
@@ -290,9 +274,7 @@ public partial class BackpackInteractionController : Node
 		_dragStates.Remove(itemEntity);
 	}
 	
-	/// <summary>
 	/// 处理物品旋转
-	/// </summary>
 	private void HandleItemRotated(Node itemEntity, GridShapeComponent shapeComponent)
 	{
 		// 调用形状组件的旋转方法
@@ -308,11 +290,9 @@ public partial class BackpackInteractionController : Node
 	
 	#region Placement Logic
 	
-	/// <summary>
 	/// 执行吸附到网格
 	/// 目的：将物品精确对齐到网格位置
 	/// 算法：1. 计算网格局部坐标 → 2. 转换为全局坐标 → 3. 更新物品位置
-	/// </summary>
 	private void PerformSnapToGrid(Node itemEntity, Control itemControl, Vector2I gridPos)
 	{
 		// 1. 计算网格位置的局部像素坐标
@@ -327,11 +307,9 @@ public partial class BackpackInteractionController : Node
 		GD.Print($"物品 {itemEntity.Name} 吸附到网格 {gridPos}，全局位置 {globalPos}");
 	}
 	
-	/// <summary>
 	/// 执行回弹到原位置
 	/// 目的：放置失败时恢复物品到拾取前的位置
 	/// 算法：1. 恢复全局位置 → 2. 强制放回逻辑网格 → 3. 记录日志
-	/// </summary>
 	private void PerformBounceBack(Node itemEntity, ItemDragState dragState)
 	{
 		// 1. 恢复原始全局位置
@@ -340,7 +318,7 @@ public partial class BackpackInteractionController : Node
 		// 2. 强制放回逻辑网格的原位置
 		// 【关键】这里不检查返回值，因为原位置一定是合法的（拾取前就在那里）
 		var itemData = new ItemData(dragState.ShapeComponent.Data?.ItemID ?? "unknown");
-		LogicGrid.TryPlaceItem(
+		BackpackGridComp.TryPlaceItem(
 			itemData,
 			dragState.ShapeComponent.CurrentLocalCells,
 			dragState.OriginalGridPos
@@ -353,25 +331,19 @@ public partial class BackpackInteractionController : Node
 	
 	#region Helper Methods
 	
-	/// <summary>
 	/// 检查物品是否正在被拖拽
-	/// </summary>
 	public bool IsItemBeingDragged(Node itemEntity)
 	{
 		return _dragStates.ContainsKey(itemEntity);
 	}
 	
-	/// <summary>
 	/// 获取物品的拖拽状态
-	/// </summary>
 	public ItemDragState GetDragState(Node itemEntity)
 	{
 		return _dragStates.TryGetValue(itemEntity, out var state) ? state : null;
 	}
 	
-	/// <summary>
 	/// 清除所有拖拽状态（用于重置）
-	/// </summary>
 	public void ClearAllDragStates()
 	{
 		_dragStates.Clear();
@@ -382,29 +354,19 @@ public partial class BackpackInteractionController : Node
 	
 	#region Inner Classes
 	
-	/// <summary>
 	/// 物品拖拽状态数据
-	/// </summary>
 	public class ItemDragState
 	{
-		/// <summary>
 		/// 原始全局位置（用于回弹）
-		/// </summary>
 		public Vector2 OriginalGlobalPos { get; set; }
 		
-		/// <summary>
 		/// 原始网格坐标（用于回弹时放回逻辑网格）
-		/// </summary>
 		public Vector2I OriginalGridPos { get; set; }
 		
-		/// <summary>
 		/// 形状组件引用（用于获取当前形状）
-		/// </summary>
 		public GridShapeComponent ShapeComponent { get; set; }
 		
-		/// <summary>
 		/// 物品 Control 节点引用（用于设置位置）
-		/// </summary>
 		public Control ItemControl { get; set; }
 	}
 	

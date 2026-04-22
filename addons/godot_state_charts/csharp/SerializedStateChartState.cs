@@ -4,9 +4,7 @@ using Godot;
 
 namespace GodotStateCharts
 {
-    /// <summary>
     /// C# wrapper for the SerializedStateChartState Godot resource.
-    /// </summary>
     public class SerializedStateChartState : ResourceWrapper
     {
         private SerializedStateChartState(Resource wrapped) : base(wrapped)

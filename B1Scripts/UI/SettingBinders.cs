@@ -4,10 +4,6 @@ using System;
 
 namespace GameSettings
 {
-    /// <summary>
-    /// 设置绑定器基类 - 封装所有重复逻辑
-    /// 负责：加载、保存、重置、提供 ReactiveProperty
-    /// </summary>
     public abstract class SettingBinderBase<T>
     {
         protected readonly string Key;
@@ -31,33 +27,18 @@ namespace GameSettings
             Property = new ReactiveProperty<T>(LoadValue());
         }
         
-        /// <summary>
-        /// 获取 ReactiveProperty（只读访问）
-        /// </summary>
         public ReactiveProperty<T> GetProperty() => Property;
         
-        /// <summary>
-        /// 从配置文件加载值（子类实现）
-        /// </summary>
         protected abstract T LoadValue();
         
-        /// <summary>
-        /// 保存值到配置文件（子类实现）
-        /// </summary>
         public abstract void SaveValue();
         
-        /// <summary>
-        /// 重置到默认值
-        /// </summary>
         public void Reset()
         {
             Property.Value = DefaultValue;
         }
     }
     
-    /// <summary>
-    /// Float 类型绑定器（用于滑块）
-    /// </summary>
     public class FloatSettingBinder : SettingBinderBase<float>
     {
         public FloatSettingBinder(
@@ -84,9 +65,6 @@ namespace GameSettings
         }
     }
     
-    /// <summary>
-    /// Bool 类型绑定器（用于开关）
-    /// </summary>
     public class BoolSettingBinder : SettingBinderBase<bool>
     {
         public BoolSettingBinder(
@@ -113,9 +91,6 @@ namespace GameSettings
         }
     }
     
-    /// <summary>
-    /// Int 类型绑定器（用于下拉框）
-    /// </summary>
     public class IntSettingBinder : SettingBinderBase<int>
     {
         public IntSettingBinder(

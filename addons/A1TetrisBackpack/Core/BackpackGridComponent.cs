@@ -2,12 +2,8 @@ using Godot;
 using R3;
 using System;
 
-/// <summary>
-/// 背包网格核心组件 - 纯数据逻辑层
-/// 目的：管理二维网格的物品占用状态，提供放置/移除逻辑，通过 R3 发布响应式事件
-/// 示例：10x6 网格，放置 L 形物品到 (2,3) -> 占用 (2,3), (2,4), (3,4) 三个格子
-/// 算法：1. 一维数组模拟二维网格 -> 2. 检测碰撞 -> 3. 更新占用状态 -> 4. 发布 R3 事件
-/// </summary>
+// 背包网格核心组件 - 纯数据逻辑层
+// 管理二维网格的物品占用状态，提供放置/移除逻辑，通过 R3 发布响应式事件
 [GlobalClass]
 public partial class BackpackGridComponent : Node
 {
@@ -53,12 +49,7 @@ public partial class BackpackGridComponent : Node
 	
 	#region Core Grid Logic
 	
-	/// <summary>
-	/// 检测是否可以放置物品
-	/// 目的：验证目标位置是否有足够空间且不越界
-	/// 示例：L 形物品 [(0,0), (0,1), (1,1)] 放置到 (2,3) -> 检查 (2,3), (2,4), (3,4) 是否都为空
-	/// 算法：1. 遍历物品形状 -> 2. 计算世界坐标 -> 3. 检查越界 -> 4. 检查占用状态
-	/// </summary>
+	// 检测是否可以放置物品：遍历物品形状 -> 计算世界坐标 -> 检查越界 -> 检查占用状态
 	public bool CanPlaceItem(ItemData item, Vector2I[] localShape, Vector2I targetPos)
 	{
 		if (item == null || localShape == null || localShape.Length == 0)
@@ -159,7 +150,6 @@ public partial class BackpackGridComponent : Node
 		return position.Y * Width + position.X;
 	}
 	
-	// 一维索引转二维坐标（调试用）
 	private Vector2I GetPosition(int index)
 	{
 		return new Vector2I(index % Width, index / Width);
@@ -168,7 +158,6 @@ public partial class BackpackGridComponent : Node
 	#endregion
 }
 
-// 物品数据占位符类（实际项目中应扩展添加名称、图标、形状等属性）
 public partial class ItemData : RefCounted
 {
 	public string ItemID { get; set; } = "item_unknown";

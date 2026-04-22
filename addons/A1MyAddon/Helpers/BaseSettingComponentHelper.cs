@@ -1,10 +1,8 @@
 using Godot;
 using System;
 
-/// <summary>
 /// 设置组件Helper基类 - 所有设置UI组件的共同基类
 /// 提供统一的LabelText、Reset和保存/加载功能
-/// </summary>
 [Tool]
 [GlobalClass]
 public abstract partial class BaseSettingComponentHelper : HBoxContainer
@@ -59,9 +57,7 @@ public abstract partial class BaseSettingComponentHelper : HBoxContainer
 		}
 	}
 	
-	/// <summary>
 	/// 初始化共同的节点（Label和ResetButton）
-	/// </summary>
 	private void InitializeCommonNodes()
 	{
 		// 按类型查找第一个Label节点
@@ -83,58 +79,40 @@ public abstract partial class BaseSettingComponentHelper : HBoxContainer
 		}
 	}
 	
-	/// <summary>
 	/// 子类实现：初始化特定的控件节点
-	/// </summary>
 	protected abstract void InitializeSpecificNodes();
 	
-	/// <summary>
 	/// 子类实现：连接特定控件的信号
-	/// </summary>
 	protected abstract void ConnectSignals();
 	
-	/// <summary>
 	/// 更新Label文本
-	/// </summary>
 	protected virtual void UpdateLabel()
 	{
 		if (_label != null)
 			_label.Text = LabelText;
 	}
 	
-	/// <summary>
 	/// 子类实现：更新控件状态
-	/// </summary>
 	protected abstract void UpdateControl();
 	
-	/// <summary>
 	/// Reset按钮按下时调用
-	/// </summary>
 	private void OnResetButtonPressed()
 	{
 		ResetToDefault();
 		ResetRequested?.Invoke();
 	}
 	
-	/// <summary>
 	/// 子类实现：重置到默认值
-	/// </summary>
 	public abstract void ResetToDefault();
 	
-	/// <summary>
 	/// 子类实现：获取当前设置值（用于保存）
 	/// 返回Variant类型以支持不同的值类型
-	/// </summary>
 	public abstract Variant GetSettingValue();
 	
-	/// <summary>
 	/// 子类实现：设置当前值（用于加载）
-	/// </summary>
 	public abstract void SetSettingValue(Variant value);
 	
-	/// <summary>
 	/// 保存设置到ConfigFile
-	/// </summary>
 	public void SaveSetting(ConfigFile config, string section = "Settings")
 	{
 		if (string.IsNullOrEmpty(SettingKey))
@@ -146,9 +124,7 @@ public abstract partial class BaseSettingComponentHelper : HBoxContainer
 		config.SetValue(section, SettingKey, GetSettingValue());
 	}
 	
-	/// <summary>
 	/// 从ConfigFile加载设置
-	/// </summary>
 	public void LoadSetting(ConfigFile config, string section = "Settings")
 	{
 		if (string.IsNullOrEmpty(SettingKey))
@@ -184,8 +160,6 @@ public abstract partial class BaseSettingComponentHelper : HBoxContainer
 		}
 	}
 	
-	/// <summary>
 	/// 子类实现：断开特定控件的信号连接
-	/// </summary>
 	protected abstract void DisconnectSignals();
 }

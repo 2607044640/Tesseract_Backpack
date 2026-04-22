@@ -1,43 +1,29 @@
 using Godot;
 
-/// <summary>
 /// 动画控制器组件 - 仅负责动画播放逻辑
 /// 遵循单一职责原则：只处理动画，不处理输入或移动
-/// </summary>
 [GlobalClass]
 public partial class AnimationControllerComponent : Node
 {
     #region Export Properties (依赖注入)
     
-    /// <summary>
     /// 需要读取状态的物理身体（会自动获取父节点）
-    /// </summary>
     [Export] public CharacterBody3D Body { get; set; }
     
-    /// <summary>
     /// 需要读取移动状态的移动组件（可选）
-    /// </summary>
     [Export] public MovementComponent Movement { get; set; }
     
-    /// <summary>
     /// 角色模型节点路径
-    /// </summary>
     [Export] public NodePath CharacterModelPath { get; set; } = "KunoSkin";
     
-    /// <summary>
     /// AnimationPlayer路径（相对于角色模型）
-    /// </summary>
     [Export] public NodePath AnimationPlayerPath { get; set; } = "AnimationPlayer";
     
-    /// <summary>
     /// 动画过渡时间（秒）
-    /// </summary>
     [Export(PropertyHint.Range, "0.0,1.0,0.05")]
     public float AnimationBlendTime { get; set; } = 0.2f;
     
-    /// <summary>
     /// 动画配置（类似UE的Data Asset）
-    /// </summary>
     [Export] public CharacterAnimationConfig AnimConfig { get; set; }
     
     #endregion
@@ -86,9 +72,7 @@ public partial class AnimationControllerComponent : Node
 
     #region Initialization
     
-    /// <summary>
     /// 初始化动画系统
-    /// </summary>
     private void InitializeAnimation()
     {
         // 获取角色模型节点
@@ -127,9 +111,7 @@ public partial class AnimationControllerComponent : Node
 
     #region Animation Logic
     
-    /// <summary>
     /// 更新动画状态（根据物理状态自动选择动画）
-    /// </summary>
     private void UpdateAnimation()
     {
         if (_animPlayer == null || Body == null) return;

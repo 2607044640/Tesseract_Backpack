@@ -1,10 +1,8 @@
 using Godot;
 using System;
 
-/// <summary>
 /// 选项组件Helper - 用于设置菜单中的下拉选项控件
 /// 支持配置选项列表、默认值等
-/// </summary>
 [Tool]
 [GlobalClass]
 public partial class OptionComponentHelper : BaseSettingComponentHelper

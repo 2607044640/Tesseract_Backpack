@@ -5,10 +5,8 @@ using System.Linq;
 
 // ReSharper disable All
 
-/// <summary>
 /// 组件查找扩展方法 - 简化组件依赖查找
 /// 提供类似 Unity 的 GetComponent API
-/// </summary>
 public static class ComponentExtensions
 {
     #region 基础查找方法

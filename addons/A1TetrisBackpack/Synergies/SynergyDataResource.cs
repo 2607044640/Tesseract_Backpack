@@ -1,7 +1,6 @@
 using Godot;
 using Godot.Collections;
 
-/// <summary>
 /// 羁绊数据资源 - 《Backpack Battles》风格的物品协同配置
 /// 
 /// 用途：
@@ -36,13 +35,11 @@ using Godot.Collections;
 /// 
 /// 在编辑器中创建：
 /// 右键 → 新建资源 → SynergyDataResource → 配置属性 → 保存为 .tres
-/// </summary>
 [GlobalClass]
 public partial class SynergyDataResource : Resource
 {
 	#region Export Properties
 	
-	/// <summary>
 	/// 物品提供的标签列表
 	/// 
 	/// 用途：
@@ -59,10 +56,8 @@ public partial class SynergyDataResource : Resource
 	/// - 使用 PascalCase（首字母大写）
 	/// - 保持简洁（单个单词）
 	/// - 避免重复（如 "FoodItem" 应简化为 "Food"）
-	/// </summary>
 	[Export] public string[] ProvidedTags { get; set; } = System.Array.Empty<string>();
 	
-	/// <summary>
 	/// 星星触发的局部坐标偏移
 	/// 
 	/// 坐标系统：
@@ -93,10 +88,8 @@ public partial class SynergyDataResource : Resource
 	/// - 星星可以在物品外部（负坐标或超出范围）
 	/// - 星星位置会随物品旋转而旋转
 	/// - 配置时使用初始状态的坐标（未旋转）
-	/// </summary>
 	[Export] public Array<Vector2I> StarOffsets { get; set; } = new Array<Vector2I>();
 	
-	/// <summary>
 	/// 激活星星需要的相邻物品标签
 	/// 
 	/// 用途：
@@ -111,10 +104,8 @@ public partial class SynergyDataResource : Resource
 	/// 特殊值：
 	/// - 空字符串或 null：不需要任何标签（总是激活）
 	/// - "Any"：任何物品都可以激活
-	/// </summary>
 	[Export] public string RequiredTag { get; set; } = "";
 	
-	/// <summary>
 	/// 羁绊效果描述或 ID
 	/// 
 	/// 用途：
@@ -136,16 +127,13 @@ public partial class SynergyDataResource : Resource
 	/// - 使用结构化格式（如 JSON）存储复杂效果
 	/// - 或使用枚举 + 参数的方式
 	/// - 或直接在代码中根据 ID 查表
-	/// </summary>
 	[Export] public string SynergyEffect { get; set; } = "";
 	
 	#endregion
 	
 	#region Helper Methods
 	
-	/// <summary>
 	/// 检查是否提供指定标签
-	/// </summary>
 	public bool HasTag(string tag)
 	{
 		if (string.IsNullOrEmpty(tag) || ProvidedTags == null)
@@ -160,17 +148,13 @@ public partial class SynergyDataResource : Resource
 		return false;
 	}
 	
-	/// <summary>
 	/// 获取星星数量
-	/// </summary>
 	public int GetStarCount()
 	{
 		return StarOffsets?.Count ?? 0;
 	}
 	
-	/// <summary>
 	/// 验证配置有效性
-	/// </summary>
 	public bool IsValid()
 	{
 		if (StarOffsets == null || StarOffsets.Count == 0)
