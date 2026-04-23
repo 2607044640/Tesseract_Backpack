@@ -63,8 +63,8 @@ public partial class BackpackGridUIComponent : Control
 	
 	public override void _Ready()
 	{
-		// 延迟初始化以等待 Godot 解析 NodePath
-		CallDeferred(MethodName.InitializeComponent);
+		// NodePath 在 _Ready 时已解析完成，直接初始化
+		InitializeComponent();
 	}
 	
 	/// 延迟初始化组件（在 NodePath 解析完成后）

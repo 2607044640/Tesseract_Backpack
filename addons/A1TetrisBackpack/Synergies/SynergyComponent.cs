@@ -96,11 +96,14 @@ public partial class SynergyComponent : Node
 	
 	#region Godot Lifecycle
 	
+	public override void _EnterTree()
+	{
+		// 【架构修正】在 _EnterTree 中初始化 Subject
+		OnSynergyChangedAsObservable = new Subject<HashSet<Vector2I>>();
+	}
+	
 	public override void _Ready()
 	{
-		// 初始化 R3 Subject
-		OnSynergyChangedAsObservable = new Subject<HashSet<Vector2I>>();
-		
 		// 验证必需引用
 		if (SynergyData == null)
 		{
@@ -113,6 +116,7 @@ public partial class SynergyComponent : Node
 		}
 		
 		// 订阅形状变化事件（用于追踪旋转）
+		// 此时 GridShapeComponent 的 Subject 已在其 _EnterTree 中初始化完成
 		if (GridShapeComponent != null)
 		{
 			GridShapeComponent.OnShapeChangedAsObservable

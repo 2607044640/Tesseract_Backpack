@@ -56,8 +56,6 @@ public partial class ItemCellGroupController : Node
 
 	public override void _Ready()
 	{
-		GD.Print($"[{Name}] ItemCellGroupController._Ready() 开始");
-
 		// 解析NodePath引用
 		_gridShapeComp = GetNodeOrNull<GridShapeComponent>(GridShapeComp_Path);
 		_interactionArea = GetNodeOrNull<Control>(InteractionArea_Path);
@@ -75,36 +73,19 @@ public partial class ItemCellGroupController : Node
 			return;
 		}
 
-		GD.Print($"[{Name}] GridShapeComponent引用有效: {_gridShapeComp.Name}");
-		GD.Print($"[{Name}] InteractionArea引用有效: {_interactionArea.Name}");
-
 		// 【关键架构设计】父容器忽略鼠标，让子GridCellUI独立接收事件
 		_interactionArea.MouseFilter = Control.MouseFilterEnum.Ignore;
-		GD.Print($"[{Name}] InteractionArea.MouseFilter已设置为Ignore");
 
 		// 订阅GridShapeComponent的形状变化事件
 		_gridShapeComp.OnShapeChangedAsObservable
-			.Subscribe(_ =>
-			{
-				GD.Print($"[{Name}] 收到形状变化事件，重建单元格");
-				RebuildCells();
-			})
+			.Subscribe(_ => RebuildCells())
 			.AddTo(_disposables);
-
-		GD.Print($"[{Name}] 已订阅GridShapeComponent.OnShapeChangedAsObservable");
 
 		// 【架构修正】仅在数据已存在时立即构建
 		if (_gridShapeComp.CurrentLocalCells != null)
 		{
-			GD.Print($"[{Name}] 数据已存在，立即构建单元格");
 			RebuildCells();
 		}
-		else
-		{
-			GD.Print($"[{Name}] 数据尚未注入，等待OnShapeChangedAsObservable事件");
-		}
-
-		GD.Print($"[{Name}] ItemCellGroupController._Ready() 完成");
 	}
 
 	public override void _ExitTree()
@@ -126,10 +107,7 @@ public partial class ItemCellGroupController : Node
 	/// 算法：1. 清理旧单元格 -> 2. 遍历局部坐标 -> 3. 实例化GridCellUI并绑定事件 -> 4. 添加到容器
 	private void RebuildCells()
 	{
-		GD.Print($"[{Name}] RebuildCells() 开始");
-
 		// 1. 清理旧单元格
-		GD.Print($"[{Name}] 清理旧单元格，当前数量: {_cells.Count}");
 		foreach (var cell in _cells)
 		{
 			cell.QueueFree();
@@ -143,14 +121,10 @@ public partial class ItemCellGroupController : Node
 			return;
 		}
 
-		GD.Print($"[{Name}] CurrentLocalCells有效，格子数量: {_gridShapeComp.CurrentLocalCells.Length}");
-
 		// 3. 遍历局部坐标生成GridCellUI
 		int cellIndex = 0;
 		foreach (Vector2I cellPos in _gridShapeComp.CurrentLocalCells)
 		{
-			GD.Print($"[{Name}] 生成单元格 {cellIndex}: cellPos=({cellPos.X}, {cellPos.Y})");
-
 			// 实例化GridCellUI
 			var gridCellUI = new GridCellUI
 			{
@@ -159,28 +133,17 @@ public partial class ItemCellGroupController : Node
 				Name = $"GridCell_{cellIndex}"
 			};
 
-			GD.Print($"[{Name}] 单元格 {cellIndex} 属性: Size={gridCellUI.Size}, Position={gridCellUI.Position}");
-
 			// 【关键修复】先添加到场景树，再订阅事件
 			_interactionArea.AddChild(gridCellUI);
 			_cells.Add(gridCellUI);
 
 			// 【事件聚合】将此单元格的输入事件推送到聚合Subject
-			int capturedIndex = cellIndex; // 捕获当前索引，避免闭包问题
 			gridCellUI.OnCellInputAsObservable
-				.Subscribe(inputEvent =>
-				{
-					GD.Print($"[{Name}] 单元格 {capturedIndex} 输入事件: {inputEvent}");
-					_aggregatedInputSubject.OnNext(inputEvent);
-				})
-				.AddTo(gridCellUI); // 订阅生命周期绑定到GridCellUI
+				.Subscribe(inputEvent => _aggregatedInputSubject.OnNext(inputEvent))
+				.AddTo(gridCellUI);
 
-			GD.Print($"[{Name}] 单元格 {cellIndex} 已添加到InteractionArea并订阅事件");
 			cellIndex++;
 		}
-
-		GD.Print($"[{Name}] RebuildCells() 完成，生成 {_cells.Count} 个单元格");
-		GD.Print($"[{Name}] InteractionArea子节点数量: {_interactionArea.GetChildCount()}");
 	}
 
 	#endregion
@@ -197,8 +160,6 @@ public partial class ItemCellGroupController : Node
 		{
 			cell.SetState(state);
 		}
-
-		GD.Print($"[{Name}] 已将整组单元格状态设置为: {state}");
 	}
 
 	/// 重置整组单元格状态为Normal

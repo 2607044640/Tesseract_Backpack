@@ -30,12 +30,16 @@ public partial class BackpackGridComponent : Node
 	
 	#region Godot Lifecycle
 	
-	public override void _Ready()
+	public override void _EnterTree()
 	{
+		// 【架构修正】在 _EnterTree 中初始化核心数据和 Subjects
 		_gridData = new ItemData[Width * Height];
 		OnItemPlacedAsObservable = new Subject<(ItemData, Vector2I)>();
 		OnItemRemovedAsObservable = new Subject<(ItemData, Vector2I)>();
-		
+	}
+	
+	public override void _Ready()
+	{
 		GD.Print($"BackpackGridComponent 初始化完成：{Width}x{Height} = {_gridData.Length} 格子");
 	}
 	

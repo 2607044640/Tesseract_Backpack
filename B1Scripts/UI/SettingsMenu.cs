@@ -39,8 +39,14 @@ public partial class SettingsMenu : Control
 		_musicBusIdx = AudioServer.GetBusIndex("Music");
 		_sfxBusIdx = AudioServer.GetBusIndex("SFX");
 		
-		// 延迟订阅，确保 SettingsManager._Ready() 已执行
-		CallDeferred(MethodName.BindSettingsToUI);
+		// 使用 async/await 替代 CallDeferred
+		BindSettingsToUIAsync();
+	}
+	
+	private async void BindSettingsToUIAsync()
+	{
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		BindSettingsToUI();
 	}
 	
 	public override void _ExitTree()

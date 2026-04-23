@@ -40,8 +40,14 @@ public partial class GameSettingsController : Control
 		_musicBusIdx = AudioServer.GetBusIndex("Music");
 		_sfxBusIdx = AudioServer.GetBusIndex("SFX");
 
-		// 延迟绑定，确保 SettingsManager._Ready() 已执行
-		CallDeferred(MethodName.BindSettings);
+		// 使用 async/await 替代 CallDeferred
+		BindSettingsAsync();
+	}
+	
+	private async void BindSettingsAsync()
+	{
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		BindSettings();
 	}
 
 	public override void _ExitTree()

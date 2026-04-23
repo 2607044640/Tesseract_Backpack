@@ -46,11 +46,14 @@ public partial class GridShapeComponent : Node
 	
 	#region Godot Lifecycle
 	
+	public override void _EnterTree()
+	{
+		// 【架构修正】在 _EnterTree 中初始化 Subject（Top-Down 执行，确保子节点 _Ready 时已存在）
+		OnShapeChangedAsObservable = new Subject<Unit>();
+	}
+	
 	public override void _Ready()
 	{
-		// 【BUG FIX】初始化 R3 Subject（必须在任何订阅之前完成）
-		OnShapeChangedAsObservable = new Subject<Unit>();
-		
 		// 订阅父节点的 DataInitialized 事件（通过接口解耦）
 		var parent = GetParent();
 		if (parent is IItemDataProvider provider)
@@ -64,9 +67,16 @@ public partial class GridShapeComponent : Node
 			
 			if (AutoResizeParent)
 			{
-				CallDeferred(MethodName.UpdateParentSize);
+				UpdateParentSizeAsync();
 			}
 		}
+	}
+	
+	// 替换 CallDeferred 为 async/await
+	private async void UpdateParentSizeAsync()
+	{
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		UpdateParentSize();
 	}
 	
 	public override void _ExitTree()
@@ -101,7 +111,7 @@ public partial class GridShapeComponent : Node
 		// 延迟调整父节点尺寸（确保所有节点初始化完成）
 		if (AutoResizeParent)
 		{
-			CallDeferred(MethodName.UpdateParentSize);
+			UpdateParentSizeAsync();
 		}
 		
 		// 【关键】触发形状变化事件，通知 GridShapeVisualComponent 构建视觉方块

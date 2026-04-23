@@ -57,15 +57,18 @@ public partial class DraggableItemComponent : Node
 	
 	#region Godot Lifecycle
 	
-	public override void _Ready()
+	public override void _EnterTree()
 	{
-		// 初始化 R3 Subjects
+		// 【架构修正】在 _EnterTree 中初始化所有 Subjects
 		OnDragStartedAsObservable = new Subject<Unit>();
 		OnDragEndedAsObservable = new Subject<Unit>();
 		OnRotateRequestedAsObservable = new Subject<Unit>();
-		
-		// 延迟初始化以等待 Godot 解析 NodePath
-		CallDeferred(MethodName.InitializeComponent);
+	}
+	
+	public override void _Ready()
+	{
+		// NodePath 在 _Ready 时已解析完成，直接初始化
+		InitializeComponent();
 	}
 	
 	/// 延迟初始化组件（在 NodePath 解析完成后）
@@ -81,8 +84,6 @@ public partial class DraggableItemComponent : Node
 			return;
 		}
 		
-		GD.Print($"[{Name}] ItemCellGroupController 引用有效: {_itemCellGroupController.Name}");
-		
 		// 订阅 ItemCellGroupController 的聚合输入事件流
 		_itemCellGroupController.OnGroupInputAsObservable
 			.Subscribe(HandleGuiInput)
@@ -94,8 +95,6 @@ public partial class DraggableItemComponent : Node
 			GD.PushError($"[{Name}] StateChart not found: {StateChartPath}");
 			return;
 		}
-		
-		GD.Print($"[{Name}] DraggableItemComponent: 已订阅 ItemCellGroupController 的输入事件流");
 	}
 	
 	public override void _ExitTree()
@@ -152,10 +151,7 @@ public partial class DraggableItemComponent : Node
 		{
 			// 使用可配置的事件名称，避免硬编码
 			StateChart.Call("send_event", DragStartEventName);
-			GD.Print($"DraggableItemComponent: 发送状态事件 '{DragStartEventName}'");
 		}
-		
-		GD.Print("DraggableItemComponent: 拖拽开始");
 	}
 	
 	/// 处理拖拽结束
@@ -169,10 +165,7 @@ public partial class DraggableItemComponent : Node
 		{
 			// 使用可配置的事件名称，避免硬编码
 			StateChart.Call("send_event", DragEndEventName);
-			GD.Print($"DraggableItemComponent: 发送状态事件 '{DragEndEventName}'");
 		}
-		
-		GD.Print("DraggableItemComponent: 拖拽结束");
 	}
 	
 	/// 处理旋转请求
@@ -181,8 +174,6 @@ public partial class DraggableItemComponent : Node
 		// 【R3 响应式】通知订阅者
 		// 注意：旋转是纯动作，不需要通知 StateChart
 		OnRotateRequestedAsObservable.OnNext(Unit.Default);
-		
-		GD.Print("DraggableItemComponent: 请求旋转");
 	}
 	
 	#endregion

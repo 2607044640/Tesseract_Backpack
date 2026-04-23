@@ -83,6 +83,13 @@ public partial class GridCellUI : Panel
 	#endregion
 
 	#region Godot Lifecycle
+	
+	public override void _EnterTree()
+	{
+		// 【架构修正】在 _EnterTree 中初始化 Subjects
+		// 注意：这里使用 readonly 字段初始化器，已经在声明时初始化，无需额外操作
+		// 但为了明确架构意图，保留此方法作为文档说明
+	}
 
 	public override void _Ready()
 	{
