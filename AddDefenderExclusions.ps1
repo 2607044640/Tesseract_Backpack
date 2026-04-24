@@ -22,7 +22,7 @@ Write-Host ""
 $exclusionPaths = @(
     # Godot 项目目录（两个工作区）
     "C:\Godot\3d-practice",
-    "C:\Godot\KiroWorkingSpace",
+    "C:\Godot\AISpace",
     
     # .NET SDK 目录
     "C:\Program Files\dotnet",

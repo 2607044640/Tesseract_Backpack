@@ -3,7 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
-    <RootNamespace>dPractice</RootNamespace>
+    <RootNamespace>TetrisBackpack</RootNamespace>
     
     <!-- 编译性能优化配置 -->
     <!-- 禁用共享编译服务器，防止 dotnet build server 进程残留导致挂起 -->

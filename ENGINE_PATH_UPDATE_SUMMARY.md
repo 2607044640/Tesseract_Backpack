@@ -8,7 +8,7 @@ C:\GodotEngine\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64.exe
 ## ✅ 已更新的文件
 
 ### 1. 配置文件
-- **`KiroWorkingSpace/.kiro/scripts/godot_config.json`**
+- **`AISpace/.kiro/scripts/godot_config.json`**
   - ✅ 更新 `godot_executable` 路径
   - ✅ 更新 `project_root` 为 `C:\Godot\3d-practice`
 
@@ -22,7 +22,7 @@ C:\GodotEngine\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64.exe
   - ✅ 更新引擎路径说明
   - ✅ 更新操作指引
 
-- **`KiroWorkingSpace/.kiro/docs/GodotMCPServer.md`**
+- **`AISpace/.kiro/docs/GodotMCPServer.md`**
   - ✅ 更新配置示例中的引擎路径
   - ✅ 更新故障排查说明
 
@@ -31,9 +31,9 @@ C:\GodotEngine\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64.exe
 以下文档包含 **示例代码** 中的项目路径 `c:/Godot/3d-practice`，这些是 **正确的**，无需修改：
 
 ### Steering 文档（示例代码）
-- `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotUIBuilder_Context.md`
-- `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md`
-- `KiroWorkingSpace/.kiro/scripts/ui_builder/README.md`
+- `AISpace/.kiro/steering/Godot/SceneBuilders/GodotUIBuilder_Context.md`
+- `AISpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md`
+- `AISpace/.kiro/scripts/ui_builder/README.md`
 
 **原因**：这些文档中的 `projectPath="c:/Godot/3d-practice"` 是 MCP 工具调用的示例代码，指向的是 **项目目录**（不是引擎目录），路径是正确的。
 
@@ -43,7 +43,7 @@ C:\GodotEngine\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64.exe
 |------|--------|--------|------|
 | Godot 引擎可执行文件 | `C:\Godot\Godot_v4.6.1-stable_mono_win64\...` | `C:\GodotEngine\Godot_v4.6.1-stable_mono_win64\...` | ✅ 已更新 |
 | 项目根目录 | `C:\Godot\3d-practice` | `C:\Godot\3d-practice` | ✅ 无需更改 |
-| Kiro 工作区 | `C:\Godot\KiroWorkingSpace` | `C:\Godot\KiroWorkingSpace` | ✅ 无需更改 |
+| Kiro 工作区 | `C:\Godot\AISpace` | `C:\Godot\AISpace` | ✅ 无需更改 |
 
 ## 🚀 下一步操作
 
@@ -86,7 +86,7 @@ C:\GodotEngine\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64.exe
 
 如果将来再次更换引擎版本或位置：
 
-1. 编辑 `KiroWorkingSpace/.kiro/scripts/godot_config.json`
+1. 编辑 `AISpace/.kiro/scripts/godot_config.json`
 2. 编辑 `3d-practice/AddDefenderExclusions.ps1`
 3. 以管理员身份重新运行 `AddDefenderExclusions.ps1`
 4. 更新相关文档（如果需要）

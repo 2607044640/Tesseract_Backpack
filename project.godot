@@ -30,7 +30,7 @@ window/stretch/mode="canvas_items"
 
 [dotnet]
 
-project/assembly_name="3dPractice"
+project/assembly_name="TetrisBackpack"
 
 [editor_plugins]
 

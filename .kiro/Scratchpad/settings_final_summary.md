@@ -18,7 +18,7 @@
 
 创建统一的 Godot 文档文件夹：
 ```
-KiroWorkingSpace/.kiro/steering/Godot/
+AISpace/.kiro/steering/Godot/
 ├── GodotInputMap.md
 ├── GodotStateChartBuilder.md
 ├── GodotStateless.md
@@ -147,9 +147,9 @@ BindSlider(_settingsManager.Brightness, BrightnessSlider, value => {
 
 ## 📚 相关文档
 
-- `KiroWorkingSpace/.kiro/steering/Godot/GodotSettingsSystem.md` - 设置系统完整指南
-- `KiroWorkingSpace/.kiro/steering/DesignPatterns.md` - 设计模式规则
-- `KiroWorkingSpace/.kiro/steering/StableOrOther/InstructionDesignPrinciples.md` - 文档编写规范
+- `AISpace/.kiro/steering/Godot/GodotSettingsSystem.md` - 设置系统完整指南
+- `AISpace/.kiro/steering/DesignPatterns.md` - 设计模式规则
+- `AISpace/.kiro/steering/StableOrOther/InstructionDesignPrinciples.md` - 文档编写规范
 
 ---
 

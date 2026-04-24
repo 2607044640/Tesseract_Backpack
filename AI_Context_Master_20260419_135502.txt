@@ -17,7 +17,7 @@
     - **Project**: Tesseract Backpack (TS) - Grid-based inventory system
     - **Code Location**: `3d-practice/addons/A1TetrisBackpack/` (C# components)
     - **Scene Location**: `3d-practice/A1TesseractBackpack/` (TS scenes)
-    - **Rule/Arch Storage**: `KiroWorkingSpace/.kiro/` (ALL steering/instruction files)
+    - **Rule/Arch Storage**: `AISpace/.kiro/` (ALL steering/instruction files)
     - **Build Command**: `dotnet build` (Execute from 3d-practice root)
     - **Log Audit**: `Get-Content "$env:APPDATA\Godot\app_userdata\Tesseract_Backpack\logs\godot.log" -Tail 50`
   </quick_reference>
@@ -490,8 +490,8 @@ foreach (Vector2I cellPos in ShapeData.CurrentLocalCells)
 
 **新增文件**:
 - `3d-practice/addons/A1TetrisBackpack/Items/ItemShapeBlocksComponent.cs`
-- `KiroWorkingSpace/.kiro/Scratchpad/CodeAnalysis_20260418_AABBProblem.md`
-- `KiroWorkingSpace/.kiro/Scratchpad/ComponentDesign_20260418_ShapeBlocks.md`
+- `AISpace/.kiro/Scratchpad/CodeAnalysis_20260418_AABBProblem.md`
+- `AISpace/.kiro/Scratchpad/ComponentDesign_20260418_ShapeBlocks.md`
 
 **下一步**:
 - 集成到 TSItem 场景
@@ -557,7 +557,7 @@ public override void _Ready()
 - `3d-practice/addons/A1TetrisBackpack/Items/GridShapeComponent.cs`
 
 **文档更新**:
-- `KiroWorkingSpace/.kiro/Scratchpad/CodeAnalysis_20260418_ReadyOrder.md` (标记为已解决)
+- `AISpace/.kiro/Scratchpad/CodeAnalysis_20260418_ReadyOrder.md` (标记为已解决)
 
 ## 当前任务：功能扩展与测试
 
@@ -736,10 +736,10 @@ public override void _Ready()
 - **Test Controller**: `3d-practice/Tests/BackpackTestController.cs`
 
 ### 文档
-- **系统文档**: `KiroWorkingSpace/.kiro/steering/Godot/GodotBackpackTesseractSys_Context.md`
-- **设计模式**: `KiroWorkingSpace/.kiro/steering/Always/DesignPatterns.md`
-- **主规则**: `KiroWorkingSpace/.kiro/steering/Always/MainRules.md`
-- **项目规则**: `KiroWorkingSpace/.kiro/ProjectRules.md`
+- **系统文档**: `AISpace/.kiro/steering/Godot/GodotBackpackTesseractSys_Context.md`
+- **设计模式**: `AISpace/.kiro/steering/Always/DesignPatterns.md`
+- **主规则**: `AISpace/.kiro/steering/Always/MainRules.md`
+- **项目规则**: `AISpace/.kiro/ProjectRules.md`
 
 ## 重要教训
 
@@ -757,9 +757,9 @@ public override void _Ready()
 4. **1D 数组网格**: `index = y * Width + x`
 
 ## 启动下一个对话的步骤
-1. 读取 `KiroWorkingSpace/.kiro/docLastConversationState.md`（本文件）
-2. 读取 `KiroWorkingSpace/.kiro/ProjectRules.md`
-3. 读取 `KiroWorkingSpace/.kiro/steering/Godot/GodotBackpackTesseractSys_Context.md`
+1. 读取 `AISpace/.kiro/docLastConversationState.md`（本文件）
+2. 读取 `AISpace/.kiro/ProjectRules.md`
+3. 读取 `AISpace/.kiro/steering/Godot/GodotBackpackTesseractSys_Context.md`
 4. 继续功能扩展和测试工作
 
 
@@ -811,8 +811,8 @@ inclusion: manual
 
     <target_files>
       Read these files to understand the state upon starting a fresh session. Update these exact files when resetting:
-      1. `KiroWorkingSpace/.kiro/docLastConversationState.md`
-      2. `KiroWorkingSpace/.kiro/ProjectRules.md`
+      1. `AISpace/.kiro/docLastConversationState.md`
+      2. `AISpace/.kiro/ProjectRules.md`
     </target_files>
 
     <implementation_guide>
@@ -1316,7 +1316,7 @@ inclusion: always
 
   <quick_reference>
     - **Package Requirements:** Install `R3` and `R3.Godot` via NuGet.
-    - **Rule Storage:** Save and enforce all architectural rules in `KiroWorkingSpace/.kiro/`.
+    - **Rule Storage:** Save and enforce all architectural rules in `AISpace/.kiro/`.
     - **Component Parent Access:** Rely on the auto-generated `parent` property.
     - **Component Dependency Access:** Rely on auto-generated camelCase properties (e.g., `inputComponent`).
   </quick_reference>
@@ -1521,9 +1521,9 @@ inclusion: always
   <quick_reference>
     - Compilation Command: `dotnet build` (Execution directory: `3d-practice/`)
     - Godot Log Path: `$env:APPDATA/Godot/app_userdata/Tesseract_Backpack/logs/godot.log`
-    - Architecture & Steering Path: `KiroWorkingSpace/.kiro/`
+    - Architecture & Steering Path: `AISpace/.kiro/`
     - Project Code Path: `3d-practice/`
-    - Internal State Tracking: `KiroWorkingSpace/.kiro/Scratchpad/`
+    - Internal State Tracking: `AISpace/.kiro/Scratchpad/`
   </quick_reference>
 
   <quickstart_workflow>
@@ -1575,7 +1575,7 @@ inclusion: always
       <rationale>Ensures structured analysis prior to any action execution, verifying assumptions before implementation.</rationale>
     </rule>
     <rule>
-      <description>Store ALL rules, steering files, and architecture documents exclusively in KiroWorkingSpace/.kiro/.</description>
+      <description>Store ALL rules, steering files, and architecture documents exclusively in AISpace/.kiro/.</description>
       <rationale>Maintains strict separation between system/instruction files and the Godot project source code.</rationale>
     </rule>
     <rule>
@@ -1636,7 +1636,7 @@ inclusion: manual
 <layer_1_quick_start>
   <quick_reference>
     - **Project Prefix:** TS (Tesseract)
-    - **Rule Storage:** Store ALL rules in `KiroWorkingSpace/.kiro/`.
+    - **Rule Storage:** Store ALL rules in `AISpace/.kiro/`.
     - **Addon Root (Legacy):** `3d-practice/addons/A1TetrisBackpack/` (旧代码库)
     - **New Project Root:** `3d-practice/A1TesseractBackpack/` (新场景和资源)
     - **Scene Naming:** All scene files use `TS` prefix (e.g., `TSItem.tscn`)
@@ -1925,7 +1925,7 @@ inclusion: manual
 
 <layer_1_quick_start>
   <quick_reference>
-    - **Target Path:** `C:\Godot\KiroWorkingSpace\.kiro\steering\Godot\`
+    - **Target Path:** `C:\Godot\AISpace\.kiro\steering\Godot\`
     - **Target Filename:** `Godot<DomainName>_Context.md` (e.g., `GodotInputMap_Context.md`)
     - **Required Front Matter:** `--- inclusion: manual ---`
   </quick_reference>
@@ -1954,7 +1954,7 @@ inclusion: manual
   <api_reference>
     | Component | Value/Tag | Constraint |
     | :--- | :--- | :--- |
-    | **Output Path** | `C:\Godot\KiroWorkingSpace\.kiro\steering\Godot\` | **MUST** be exact absolute path. |
+    | **Output Path** | `C:\Godot\AISpace\.kiro\steering\Godot\` | **MUST** be exact absolute path. |
     | **Filename Format** | `Godot<DomainName>_Context.md` | **MUST** use PascalCase for domain name. |
     | **YAML Header** | `---` `<newline>` `inclusion: manual` `<newline>` `---` | **MUST** be prepended to every generated file. |
     | **Tag: Context** | `<context>` | **MUST** contain a brief summary of the domain/system functionality. |
@@ -1983,7 +1983,7 @@ inclusion: manual
   <troubleshooting>
     <error symptom="Generated context file is ignored by Kiro workspace or fails to parse">
       <cause>Missing or malformed YAML front matter, or incorrect directory path.</cause>
-      <fix>Verify the file is saved exactly in `C:\Godot\KiroWorkingSpace\.kiro\steering\Godot\` and the first lines are strictly `--- \n inclusion: manual \n ---`.</fix>
+      <fix>Verify the file is saved exactly in `C:\Godot\AISpace\.kiro\steering\Godot\` and the first lines are strictly `--- \n inclusion: manual \n ---`.</fix>
     </error>
     <error symptom="Domain rule file contains excessively long paragraphs and low density">
       <cause>Failure to apply the anti-noise checklist during Step 2 (Compliance and Compression).</cause>
@@ -2016,7 +2016,7 @@ inclusion: manual
   <quick_reference>
     - **UI Path:** `Project > Project Settings > Input Map`
     - **Data Storage:** Serialized under the `[input]` node in `project.godot`
-    - **Rule Storage Constraints:** **MUST** store all rule files within `KiroWorkingSpace/.kiro/`
+    - **Rule Storage Constraints:** **MUST** store all rule files within `AISpace/.kiro/`
   </quick_reference>
   
   <decision_tree>
@@ -2479,7 +2479,7 @@ inclusion: manual
 
   <best_practices>
     - **Performance Constraint**: The system overhead **MUST** maintain ~100 bytes per setting with less than 1ms latency for reactive UI updates.
-    - **File Directory Integrity**: All system configuration files **MUST** be stored in `KiroWorkingSpace/.kiro/`.
+    - **File Directory Integrity**: All system configuration files **MUST** be stored in `AISpace/.kiro/`.
     - **Migration Standard**: **NEVER** use manual event subscriptions (e.g., `_slider.ValueChanged += OnSliderChanged`); **ALWAYS** migrate legacy manual C# events to generic `SettingBinders` to eliminate manual unsubscription lifecycle management.
     - **Payload Discarding**: Streamline logic by chaining `.AsUnitObservable()` when the pipeline only needs to know *when* an event happened, not *what* the payload contained.
     - **State Abstraction**: Use `ReactiveProperty<T>` for discrete, non-continuous state changes so UI elements automatically sync via single-subscription.
@@ -3091,13 +3091,13 @@ inclusion: manual
 ---
 <godot_statechart_module_rules>
   <critical_rule>
-    <rule>MUST explicitly read `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any StateChart builder operations.</rule>
-    <rule>MUST explicitly read `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any StateChart builder operations.</rule>
-    <rule>MUST explicitly read `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any StateChart builder operations.</rule>
+    <rule>MUST explicitly read `AISpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any StateChart builder operations.</rule>
+    <rule>MUST explicitly read `AISpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any StateChart builder operations.</rule>
+    <rule>MUST explicitly read `AISpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any StateChart builder operations.</rule>
   </critical_rule>
   <layer_1_quick_start>
     <quick_reference>
-      <item>Location: `KiroWorkingSpace/builder/modules/statechart.py`</item>
+      <item>Location: `AISpace/builder/modules/statechart.py`</item>
       <item>Dependency: MUST read `#GodotTscnBuilder_Context.md` and requires `godot_state_charts` addon.</item>
       <item>Initialization: `sc = StateChartModule(scene, parent=".")` followed by `sc.add_statechart("StateChart")`.</item>
       <item>Finalization: `sc.resolve_initial_states()` MUST be called before `scene.save()`.</item>
@@ -3471,7 +3471,7 @@ scene.save("SettingsUI.tscn")
   </implementation_guide>
 
   <technical_specifications>
-    - **Framework Location:** `KiroWorkingSpace/builder/`
+    - **Framework Location:** `AISpace/builder/`
     - **Standard Prefab Types:** - `DropdownComponent.tscn`
       - `SliderComponent.tscn`
       - `ToggleComponent.tscn`
@@ -3756,14 +3756,14 @@ inclusion: manual
 ---
 ```xml
 <critical_rule>
-  <rule>MUST explicitly read `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any UI builder operations.</rule>
-  <rule>MUST explicitly read `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any UI builder operations.</rule>
-  <rule>MUST explicitly read `KiroWorkingSpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any UI builder operations.</rule>
+  <rule>MUST explicitly read `AISpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any UI builder operations.</rule>
+  <rule>MUST explicitly read `AISpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any UI builder operations.</rule>
+  <rule>MUST explicitly read `AISpace/.kiro/steering/Godot/SceneBuilders/GodotTscnBuilder_Context.md` before proceeding with any UI builder operations.</rule>
 </critical_rule>
 <layer_1_quick_start>
   <quick_reference>
     <ul>
-      <li>UIModule Location: `KiroWorkingSpace/builder/modules/ui.py`</li>
+      <li>UIModule Location: `AISpace/builder/modules/ui.py`</li>
       <li>Prefabs Directory: `res://A1UIScenes/UIComponents/`</li>
       <li>Gold Standard UI: `res://A1UIScenes/SettingsMenuV2_Fixed.tscn`</li>
       <li>Required MCP Tool: `mcp_godot_get_uid`</li>
@@ -4060,12 +4060,12 @@ inclusion: manual
 </trigger_phrases>
 
 <instructions>
-Generate a status report to `KiroWorkingSpace/.kiro/TempFolder/GeminiReport_YYYY-MM-DD.md`.
+Generate a status report to `AISpace/.kiro/TempFolder/GeminiReport_YYYY-MM-DD.md`.
 
 Extract context from the following sources:
 - Current conversation history
 - `docLastConversationState.md`
-- `KiroWorkingSpace/.kiro/TempFolder/` task notes
+- `AISpace/.kiro/TempFolder/` task notes
 - Modified files in the current session
 
 Prioritize the "Questions for Gemini" section to maximize value. 
@@ -4374,7 +4374,7 @@ Meta-rules for creating, formatting, summarizing, and storing AI instruction fil
 </critical_constraints>
 
 <file_management>
-- Store ALL rules, steering files, and instructions exclusively in `KiroWorkingSpace/.kiro/`.
+- Store ALL rules, steering files, and instructions exclusively in `AISpace/.kiro/`.
 - NEVER store rule files in individual project folders.
 </file_management>
 
@@ -6835,7 +6835,7 @@ All tasks from the implementation plan have been successfully completed and vali
 **Documentation:**
 - `EDITOR_USAGE.md` - Complete usage guide
 - `TEST_RESULTS.md` - Final validation results
-- `KiroWorkingSpace/.kiro/steering/GodotUIBuilder.md` - Updated with TscnEditor section
+- `AISpace/.kiro/steering/GodotUIBuilder.md` - Updated with TscnEditor section
 
 ### Test Results
 
@@ -7153,7 +7153,7 @@ This implementation plan creates a Python library for programmatically reading a
 ## Tasks
 
 - [x] 1. Set up project structure and core type definitions
-  - Create directory `KiroWorkingSpace/.kiro/scripts/ui_builder/tscn_editor_tools/`
+  - Create directory `AISpace/.kiro/scripts/ui_builder/tscn_editor_tools/`
   - Create `__init__.py` to make it a Python package
   - Create `types.py` with all data classes (Header, ExtResource, Node, PropertyValue types, Error types)
   - Implement PropertyValue type classes (Color, Vector2, NodePath, ExtResourceRef) with `__str__` methods
@@ -7365,7 +7365,7 @@ This implementation plan creates a Python library for programmatically reading a
     - Export error classes (ParseError, EditorError)
   
   - [ ] 9.2 Review InstructionDesignPrinciples.md
-    - Read KiroWorkingSpace/.kiro/specs/tscn-editor-tools/InstructionDesignPrinciples.md if it exists
+    - Read AISpace/.kiro/specs/tscn-editor-tools/InstructionDesignPrinciples.md if it exists
     - Ensure implementation follows any documented principles
   
   - [ ] 9.3 Update GodotUIBuilder.md documentation
@@ -7385,7 +7385,7 @@ This implementation plan creates a Python library for programmatically reading a
 
 - Tasks marked with `*` are optional and can be skipped for faster MVP
 - Implementation uses Python with type hints for clarity and safety
-- All file operations target `KiroWorkingSpace/.kiro/scripts/ui_builder/tscn_editor_tools/`
+- All file operations target `AISpace/.kiro/scripts/ui_builder/tscn_editor_tools/`
 - SettingsMenuV2.tscn (10,800 chars) serves as primary validation test case
 - Round-trip property (parse → print → parse) is critical for correctness
 - Preservation of UIDs and formatting ensures Godot compatibility
@@ -8490,7 +8490,7 @@ Update `A1UIScenes/SettingsUI.tscn` to connect raw controls to SettingsMenu expo
 
 创建统一的 Godot 文档文件夹：
 ```
-KiroWorkingSpace/.kiro/steering/Godot/
+AISpace/.kiro/steering/Godot/
 ├── GodotInputMap.md
 ├── GodotStateChartBuilder.md
 ├── GodotStateless.md
@@ -8619,9 +8619,9 @@ BindSlider(_settingsManager.Brightness, BrightnessSlider, value => {
 
 ## 📚 相关文档
 
-- `KiroWorkingSpace/.kiro/steering/Godot/GodotSettingsSystem.md` - 设置系统完整指南
-- `KiroWorkingSpace/.kiro/steering/DesignPatterns.md` - 设计模式规则
-- `KiroWorkingSpace/.kiro/steering/StableOrOther/InstructionDesignPrinciples.md` - 文档编写规范
+- `AISpace/.kiro/steering/Godot/GodotSettingsSystem.md` - 设置系统完整指南
+- `AISpace/.kiro/steering/DesignPatterns.md` - 设计模式规则
+- `AISpace/.kiro/steering/StableOrOther/InstructionDesignPrinciples.md` - 文档编写规范
 
 ---
 

@@ -34,7 +34,7 @@
 - **执行方式**: 右键 PowerShell → "以管理员身份运行" → 执行脚本
 - **排除路径**:
   - `C:\Godot\3d-practice`
-  - `C:\Godot\KiroWorkingSpace`
+  - `C:\Godot\AISpace`
   - `C:\Program Files\dotnet`
   - `C:\GodotEngine\Godot_v4.6.1-stable_mono_win64` (Godot 编辑器)
 

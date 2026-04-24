@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "3dPractice", "3dPractice.csproj", "{DD7C1466-B89A-4981-A30A-7636DC326D61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetrisBackpack", "TetrisBackpack.csproj", "{DD7C1466-B89A-4981-A30A-7636DC326D61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

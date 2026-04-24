@@ -10,7 +10,7 @@ echo 🎯 目标: G:\My Drive\Kiro_Godot_Brain
 echo 🔧 模式: 纯代码提取（过滤图片/音频/模型）
 echo.
 
-python "%~dp0..\KiroWorkingSpace\.kiro\CloudSync_Workflow\kiro_sync_to_drive.py"
+python "%~dp0..\AISpace\CloudSync_Workflow\kiro_sync_to_drive.py"
 
 echo.
 echo ========================================
