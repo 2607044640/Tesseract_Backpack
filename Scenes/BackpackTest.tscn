@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://dkk5driwga8ql" path="res://addons/A1TetrisBackpack/Core/BackpackGridUIComponent.cs" id="2_res"]
 [ext_resource type="Script" uid="uid://1rgai2oppf42" path="res://addons/A1TetrisBackpack/Core/BackpackGridComponent.cs" id="3_res"]
-[ext_resource type="Script" uid="uid://drof8dtjnyqs3" path="res://addons/A1TetrisBackpack/Core/BackpackInteractionController.cs" id="4_res"]
 [ext_resource type="Resource" uid="uid://3sq18o0ahb7f" path="res://new_resource.tres" id="6_0xep6"]
 [ext_resource type="PackedScene" uid="uid://bof44aeoq7w74" path="res://A1TesseractBackpack/TSItem.tscn" id="12_5hnf3"]
 
@@ -22,18 +21,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.12, 1)
-
-[node name="BackpackGridUIComponent" type="Control" parent="." unique_id=1753053724]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("2_res")
-BackpackGridComponentPath = NodePath("../ScreenMargin/MainVBox/BackpackPanel/BackpackGridComponent")
-metadata/_custom_type_script = "uid://dkk5driwga8ql"
 
 [node name="ScreenMargin" type="MarginContainer" parent="." unique_id=632711132]
 layout_mode = 1
@@ -68,10 +55,6 @@ script = ExtResource("2_res")
 [node name="BackpackGridComponent" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel" unique_id=155700214]
 unique_name_in_owner = true
 script = ExtResource("3_res")
-
-[node name="BackpackInteractionController" type="Node" parent="ScreenMargin/MainVBox/BackpackPanel" unique_id=365038659]
-unique_name_in_owner = true
-script = ExtResource("4_res")
 
 [node name="ItemsContainer" type="Control" parent="ScreenMargin/MainVBox/BackpackPanel" unique_id=822530628]
 anchors_preset = 0

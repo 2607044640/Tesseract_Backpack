@@ -210,7 +210,7 @@ draggable.OnRotateRequestedAsObservable
   - `BackpackGridUIComponent.cs` - 背包网格 UI
 
 - **架构文档**：
-  - `.kiro/steering/Always/DesignPatterns.md` - 设计模式规范
+  - `.agent/steering/Always/DesignPatterns.md` - 设计模式规范
 
 ---
 

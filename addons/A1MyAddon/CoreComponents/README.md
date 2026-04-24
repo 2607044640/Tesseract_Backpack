@@ -535,7 +535,7 @@ public partial class MyComponent : Node
 
 - **Godot.Composition GitHub**: https://github.com/MysteriousMilk/Godot.Composition
 - **本项目示例**: `Examples/` 目录
-- **迁移指南**: `.kiro/TempFolder/GodotComposition_Migration_Guide.md`
+- **迁移指南**: `.agent/TempFolder/GodotComposition_Migration_Guide.md`
 
 ---
 

@@ -87,6 +87,11 @@ public partial class BackpackGridUIComponent : Control
 				MouseFilter = MouseFilterEnum.Ignore
 			};
 			AddChild(_backgroundCanvas);
+			// 【Ghost Node 防护】编辑器运行 [Tool] 脚本时，Owner=null 防止序列化到 .tscn
+			if (Engine.IsEditorHint())
+			{
+				_backgroundCanvas.Owner = null;
+			}
 		}
 		else
 		{
@@ -211,10 +216,14 @@ public partial class BackpackGridUIComponent : Control
 		if (BackpackGridComp == null || _backgroundCanvas == null)
 			return;
 		
-		// 【CRITICAL】清除所有旧子节点，防止双重循环
+		// 【CRITICAL】类型过滤清理：仅 QueueFree 已有的 GridCellUI 子节点
+		// 防止 [Tool] 脚本多次执行累积 + 防止 .tscn 中残留的 Ghost Node
 		foreach (Node child in _backgroundCanvas.GetChildren())
 		{
-			child.QueueFree();
+			if (child is GridCellUI)
+			{
+				child.QueueFree();
+			}
 		}
 		_backgroundCells.Clear();
 		
@@ -236,6 +245,11 @@ public partial class BackpackGridUIComponent : Control
 				};
 				
 				_backgroundCanvas.AddChild(gridCellUI);
+				// 【Ghost Node 防护】编辑器运行时 Owner=null，防止序列化到 .tscn
+				if (Engine.IsEditorHint())
+				{
+					gridCellUI.Owner = null;
+				}
 				_backgroundCells.Add(gridCellUI);
 				
 				gridCellUI.SetState(GridCellUI.CellState.Normal);

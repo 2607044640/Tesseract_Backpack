@@ -107,10 +107,14 @@ public partial class ItemCellGroupController : Node
 	/// 算法：1. 清理旧单元格 -> 2. 遍历局部坐标 -> 3. 实例化GridCellUI并绑定事件 -> 4. 添加到容器
 	private void RebuildCells()
 	{
-		// 1. 清理旧单元格
-		foreach (var cell in _cells)
+		// 1. 清理旧单元格 —— 类型过滤扫描 InteractionArea 所有子节点
+		// 覆盖两种情况：(a) 本控制器追踪的 _cells 列表；(b) .tscn 中可能残留的 Ghost GridCellUI
+		foreach (Node child in _interactionArea.GetChildren())
 		{
-			cell.QueueFree();
+			if (child is GridCellUI)
+			{
+				child.QueueFree();
+			}
 		}
 		_cells.Clear();
 
@@ -135,6 +139,11 @@ public partial class ItemCellGroupController : Node
 
 			// 【关键修复】先添加到场景树，再订阅事件
 			_interactionArea.AddChild(gridCellUI);
+			// 【Ghost Node 防护】编辑器热重载时 Owner=null，防止序列化到 .tscn
+			if (Engine.IsEditorHint())
+			{
+				gridCellUI.Owner = null;
+			}
 			_cells.Add(gridCellUI);
 
 			// 【事件聚合】将此单元格的输入事件推送到聚合Subject

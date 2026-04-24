@@ -12,7 +12,7 @@
 ## 项目结构
 
 ```
-3d-practice/
+TetrisBackpack/
 ├── Scripts/                          # C# 脚本
 │   ├── Animation/                    # 动画系统
 │   │   ├── AnimationSet.cs          # 动画集资源（包含所有动画和速度配置）
@@ -39,8 +39,8 @@
 │   └── Player_CharacterAnimationConfig.tres  # 玩家动画配置
 │
 ├── project.godot                     # Godot 项目配置
-├── 3dPractice.sln                   # Visual Studio 解决方案
-└── 3dPractice.csproj                # C# 项目文件
+├── TetrisBackpack.sln                   # Visual Studio 解决方案
+└── TetrisBackpack.csproj                # C# 项目文件
 ```
 
 ## 核心组件系统
@@ -185,7 +185,7 @@ JumpStartAnimationSpeed: 1.5
 ### 1. 克隆项目
 ```bash
 git clone <repository-url>
-cd 3d-practice
+cd TetrisBackpack
 ```
 
 ### 2. 打开项目
@@ -194,7 +194,7 @@ cd 3d-practice
 
 ### 3. 构建 C# 项目
 ```bash
-dotnet build 3dPractice.sln
+dotnet build TetrisBackpack.sln
 ```
 
 ### 4. 运行项目

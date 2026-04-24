@@ -21,7 +21,7 @@ Write-Host ""
 # 定义需要排除的路径
 $exclusionPaths = @(
     # Godot 项目目录（两个工作区）
-    "C:\Godot\3d-practice",
+    "C:\Godot\TetrisBackpack",
     "C:\Godot\AISpace",
     
     # .NET SDK 目录
