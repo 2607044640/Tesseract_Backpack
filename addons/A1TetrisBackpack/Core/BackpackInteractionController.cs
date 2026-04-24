@@ -69,6 +69,9 @@ public partial class BackpackInteractionController : Node
 	/// Value: 拖拽状态信息
 	private Dictionary<Node, ItemDragState> _dragStates = new Dictionary<Node, ItemDragState>();
 	
+	/// CompositeDisposable - 管理所有订阅
+	private CompositeDisposable _disposables = new CompositeDisposable();
+	
 	#endregion
 	
 	#region Godot Lifecycle
@@ -90,6 +93,44 @@ public partial class BackpackInteractionController : Node
 		}
 		
 		GD.Print("BackpackInteractionController: 初始化完成");
+	}
+	
+	public override void _Process(double delta)
+	{
+		// 遍历所有正在拖拽的物品，实时更新预览
+		foreach (var kvp in _dragStates)
+		{
+			var itemEntity = kvp.Key;
+			var dragState = kvp.Value;
+			
+			// 获取当前鼠标位置
+			Vector2 mousePos = ViewGrid.GetGlobalMousePosition();
+			
+			// 检查是否在背包范围内
+			if (!ViewGrid.GetGlobalRect().HasPoint(mousePos))
+			{
+				// 鼠标不在背包内，清除预览
+				ViewGrid.ClearPreview();
+				continue;
+			}
+			
+			// 转换为网格坐标
+			Vector2I targetGridPos = ViewGrid.GlobalToGridPosition(mousePos);
+			
+			// 评估放置预览
+			var previewData = BackpackGridComp.EvaluatePlacementPreview(
+				dragState.ShapeComponent.CurrentLocalCells,
+				targetGridPos
+			);
+			
+			// 显示预览
+			ViewGrid.ShowPreview(previewData);
+		}
+	}
+	
+	public override void _ExitTree()
+	{
+		_disposables?.Dispose();
 	}
 	
 	#endregion
@@ -226,6 +267,9 @@ public partial class BackpackInteractionController : Node
 	/// 算法：1. 获取目标位置 → 2. 检查范围 → 3. 尝试放置 → 4. 吸附或回弹
 	private void HandleItemDropped(Node itemEntity, Control itemControl, GridShapeComponent shapeComponent)
 	{
+		// 清除预览
+		ViewGrid.ClearPreview();
+		
 		// 检查是否有拖拽状态
 		if (!_dragStates.TryGetValue(itemEntity, out var dragState))
 		{

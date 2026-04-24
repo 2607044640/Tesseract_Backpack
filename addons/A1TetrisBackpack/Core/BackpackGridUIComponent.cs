@@ -1,21 +1,27 @@
 using Godot;
+using System.Collections.Generic;
 
-/// 背包网格 UI 组件 - 视图层坐标转换器
+/// 背包网格 UI 组件 - 视图层坐标转换器 + GridCellUI 工厂
 /// 
 /// 职责：
 /// - 桥接逻辑层（网格坐标）与 UI 层（像素坐标）
 /// - 提供双向坐标转换方法
 /// - 自动调整 UI 尺寸匹配逻辑网格
-/// - 绘制调试网格线
+/// - 生成静态背景网格（使用 GridCellUI 实例，统一视觉语言）
 /// 
 /// 架构定位：
 /// - 纯视图层：不包含业务逻辑（放置/移除物品）
 /// - 工具类：提供坐标映射服务
+/// - 工厂模式：生成背景 GridCellUI 网格
 /// - 可视化容器：作为物品 UI 的父节点
 /// 
 /// 使用场景：
 /// ```
 /// BackpackPanel (BackpackGridUIComponent)
+/// ├── GridContainer (MouseFilter=Ignore, 包含背景 GridCellUI)
+/// │   ├── GridCellUI (0,0)
+/// │   ├── GridCellUI (0,1)
+/// │   └── ...
 /// ├── Item1 (Control) - 通过 GridToLocalPosition 定位
 /// ├── Item2 (Control)
 /// └── ...
@@ -37,6 +43,7 @@ using Godot;
 /// // 获取格子中心（用于居中显示）
 /// item.Position = backpackUI.GetCellCenterPosition(new Vector2I(2, 3));
 /// ```
+[Tool]
 [GlobalClass]
 public partial class BackpackGridUIComponent : Control
 {
@@ -51,18 +58,50 @@ public partial class BackpackGridUIComponent : Control
 	/// 单个网格的像素尺寸
 	[Export] public Vector2 CellSize { get; set; } = new Vector2(64, 64);
 	
-	/// 是否绘制调试网格线
-	[Export] public bool DrawDebugLines { get; set; } = true;
+	#endregion
 	
-	/// 网格线颜色
-	[Export] public Color GridColor { get; set; } = new Color(1, 1, 1, 0.3f);
+	#region Private Fields
+	
+	/// 背景网格容器引用
+	private Control _backgroundCanvas;
+	
+	/// 跟踪所有生成的背景 GridCellUI 实例
+	private readonly List<GridCellUI> _backgroundCells = new();
 	
 	#endregion
 	
 	#region Godot Lifecycle
 	
+	public override void _EnterTree()
+	{
+		// 设置鼠标过滤为Ignore，防止阻挡物品输入
+		this.MouseFilter = MouseFilterEnum.Ignore;
+		
+		// 自动创建 BackgroundCanvas 容器
+		_backgroundCanvas = GetNodeOrNull<Control>("BackgroundCanvas");
+		if (_backgroundCanvas == null)
+		{
+			_backgroundCanvas = new Control
+			{
+				Name = "BackgroundCanvas",
+				MouseFilter = MouseFilterEnum.Ignore
+			};
+			AddChild(_backgroundCanvas);
+		}
+		else
+		{
+			_backgroundCanvas.MouseFilter = MouseFilterEnum.Ignore;
+		}
+	}
+	
 	public override void _Ready()
 	{
+		// 只在有效配置时初始化
+		if (BackpackGridComponentPath == null || BackpackGridComponentPath.IsEmpty)
+		{
+			return;
+		}
+		
 		// NodePath 在 _Ready 时已解析完成，直接初始化
 		InitializeComponent();
 	}
@@ -80,18 +119,10 @@ public partial class BackpackGridUIComponent : Control
 		// 根据逻辑网格尺寸自动调整 UI 大小
 		UpdateUISize();
 		
-		// 触发初始绘制
-		QueueRedraw();
+		// 生成背景网格
+		GenerateBackgroundGrid();
 		
 		GD.Print($"BackpackGridUIComponent: 初始化完成 ({BackpackGridComp.Width}x{BackpackGridComp.Height} 网格，{CellSize} 像素/格)");
-	}
-	
-	public override void _Draw()
-	{
-		if (!DrawDebugLines || BackpackGridComp == null)
-			return;
-		
-		DrawGridLines();
 	}
 	
 	#endregion
@@ -174,45 +205,79 @@ public partial class BackpackGridUIComponent : Control
 		GD.Print($"BackpackGridUIComponent: UI 尺寸设置为 {totalSize}");
 	}
 	
-	/// 绘制调试网格线
-	private void DrawGridLines()
+	/// 生成背景网格（使用 GridCellUI 实例）
+	private void GenerateBackgroundGrid()
 	{
-		if (BackpackGridComp == null)
+		if (BackpackGridComp == null || _backgroundCanvas == null)
 			return;
 		
-		float totalWidth = BackpackGridComp.Width * CellSize.X;
-		float totalHeight = BackpackGridComp.Height * CellSize.Y;
-		
-		// 绘制横线
-		for (int y = 0; y <= BackpackGridComp.Height; y++)
+		// 【CRITICAL】清除所有旧子节点，防止双重循环
+		foreach (Node child in _backgroundCanvas.GetChildren())
 		{
-			float yPos = y * CellSize.Y;
-			DrawLine(
-				new Vector2(0, yPos),
-				new Vector2(totalWidth, yPos),
-				GridColor,
-				1.0f
-			);
+			child.QueueFree();
+		}
+		_backgroundCells.Clear();
+		
+		// 【安全检查】防止编辑器崩溃
+		if (BackpackGridComp.Width <= 0 || BackpackGridComp.Height <= 0)
+			return;
+		
+		// 2. 嵌套循环生成 GridCellUI
+		for (int y = 0; y < BackpackGridComp.Height; y++)
+		{
+			for (int x = 0; x < BackpackGridComp.Width; x++)
+			{
+				var gridCellUI = new GridCellUI
+				{
+					Size = CellSize,
+					Position = new Vector2(x * CellSize.X, y * CellSize.Y),
+					Name = $"BackgroundCell_{x}_{y}",
+					MouseFilter = MouseFilterEnum.Pass
+				};
+				
+				_backgroundCanvas.AddChild(gridCellUI);
+				_backgroundCells.Add(gridCellUI);
+				
+				gridCellUI.SetState(GridCellUI.CellState.Normal);
+			}
 		}
 		
-		// 绘制竖线
-		for (int x = 0; x <= BackpackGridComp.Width; x++)
-		{
-			float xPos = x * CellSize.X;
-			DrawLine(
-				new Vector2(xPos, 0),
-				new Vector2(xPos, totalHeight),
-				GridColor,
-				1.0f
-			);
-		}
+		GD.Print($"BackpackGridUIComponent: 生成背景网格 {BackpackGridComp.Width}x{BackpackGridComp.Height} = {_backgroundCells.Count} 个 GridCellUI");
 	}
 	
 	/// 刷新网格显示（属性变化后调用）
 	public void RefreshGrid()
 	{
 		UpdateUISize();
-		QueueRedraw();
+		GenerateBackgroundGrid();
+	}
+	
+	/// 清除预览状态
+	public void ClearPreview()
+	{
+		foreach (var cell in _backgroundCells)
+		{
+			cell.SetState(GridCellUI.CellState.Normal);
+		}
+	}
+	
+	/// 显示放置预览
+	public void ShowPreview(System.Collections.Generic.List<(Vector2I GridPos, GridCellUI.CellState State)> previewData)
+	{
+		// 先清除所有预览
+		ClearPreview();
+		
+		// 应用新预览数据
+		foreach (var item in previewData)
+		{
+			// 只处理在网格范围内的位置
+			if (item.GridPos.X >= 0 && item.GridPos.X < BackpackGridComp.Width &&
+			    item.GridPos.Y >= 0 && item.GridPos.Y < BackpackGridComp.Height)
+			{
+				int index = item.GridPos.Y * BackpackGridComp.Width + item.GridPos.X;
+				_backgroundCells[index].SetState(item.State);
+			}
+		}
 	}
 	
 	#endregion
@@ -259,13 +324,6 @@ public partial class BackpackGridUIComponent : Control
 	{
 		CellSize = newSize;
 		RefreshGrid();
-	}
-	
-	/// 切换调试网格线显示
-	public void ToggleDebugLines(bool enabled)
-	{
-		DrawDebugLines = enabled;
-		QueueRedraw();
 	}
 	
 	#endregion

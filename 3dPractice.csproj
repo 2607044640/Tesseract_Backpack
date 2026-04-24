@@ -4,6 +4,18 @@
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>dPractice</RootNamespace>
+    
+    <!-- 编译性能优化配置 -->
+    <!-- 禁用共享编译服务器，防止 dotnet build server 进程残留导致挂起 -->
+    <UseSharedCompilation>false</UseSharedCompilation>
+    <!-- 开启并行编译，充分利用多核 CPU -->
+    <BuildInParallel>true</BuildInParallel>
+    <!-- 关闭不必要的分析器，加快增量编译速度 -->
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <!-- 关闭 XML 文档生成（开发阶段不需要） -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- 关闭 nullable 警告提示（可选，减少编译检查量） -->
+    <!-- <Nullable>disable</Nullable> -->
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Chickensoft.AutoInject" Version="2.12.7" />

@@ -5,6 +5,7 @@ using R3;
 /// 目的：提供"透明体+发光边框"的专业视觉效果，支持状态切换和输入事件聚合
 /// 示例：Normal状态=半透明白边框，Valid状态=绿色发光边框，Hover状态=高亮边框
 /// 算法：1. 使用StyleBoxFlat渲染边框 -> 2. 状态切换更新颜色 -> 3. R3 Subject发布输入事件
+[Tool]
 [GlobalClass]
 public partial class GridCellUI : Panel
 {

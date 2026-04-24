@@ -142,6 +142,10 @@ public partial class ItemCellGroupController : Node
 				.Subscribe(inputEvent => _aggregatedInputSubject.OnNext(inputEvent))
 				.AddTo(gridCellUI);
 
+			// 【Hover 效果】订阅鼠标进入/离开事件
+			gridCellUI.MouseEntered += () => SetGroupState(GridCellUI.CellState.Hover);
+			gridCellUI.MouseExited += () => ResetGroupState();
+
 			cellIndex++;
 		}
 	}

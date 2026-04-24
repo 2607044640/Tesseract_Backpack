@@ -50,6 +50,7 @@ delay_in_seconds = "0.0"
 [node name="FollowMouseUIComponent" type="Node" parent="StateChart/Root/Dragging" unique_id=163747275]
 script = ExtResource("follow_mouse_script")
 TargetUIPath = NodePath("../../../..")
+GrabOffset = Vector2(-2, -2)
 
 [node name="GridShapeComponent" type="Node" parent="." unique_id=801240277]
 unique_name_in_owner = true

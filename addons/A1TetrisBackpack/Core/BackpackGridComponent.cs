@@ -144,6 +144,43 @@ public partial class BackpackGridComponent : Node
 		GD.Print("网格已清空");
 	}
 	
+	// 评估放置预览：返回每个格子的详细状态，不短路
+	public System.Collections.Generic.List<(Vector2I GridPos, GridCellUI.CellState State)> EvaluatePlacementPreview(Vector2I[] localShape, Vector2I targetPos)
+	{
+		var result = new System.Collections.Generic.List<(Vector2I, GridCellUI.CellState)>();
+		
+		if (localShape == null || localShape.Length == 0)
+		{
+			return result;
+		}
+		
+		foreach (var localOffset in localShape)
+		{
+			Vector2I worldPos = targetPos + localOffset;
+			
+			// 越界检查
+			if (worldPos.X < 0 || worldPos.X >= Width || worldPos.Y < 0 || worldPos.Y >= Height)
+			{
+				result.Add((worldPos, GridCellUI.CellState.Invalid));
+			}
+			// 占用检查
+			else
+			{
+				int index = GetIndex(worldPos);
+				if (_gridData[index] != null)
+				{
+					result.Add((worldPos, GridCellUI.CellState.Invalid));
+				}
+				else
+				{
+					result.Add((worldPos, GridCellUI.CellState.Valid));
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	#endregion
 	
 	#region Helper Methods
