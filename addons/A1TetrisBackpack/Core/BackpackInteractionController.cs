@@ -57,6 +57,9 @@ public partial class BackpackInteractionController : Node
 	/// UI 网格视图组件引用（View 层）
 	[Export] public NodePath ViewGridPath { get; set; } = "%BackpackGridUIComponent";
 	
+	/// 物品容器路径，_Ready() 时自动注册其所有子节点
+	[Export] public NodePath ItemsContainerPath { get; set; } = "";
+	
 	#endregion
 	
 	#region Private Fields
@@ -90,6 +93,21 @@ public partial class BackpackInteractionController : Node
 		{
 			GD.PushError($"[{Name}] ViewGrid not found: {ViewGridPath}");
 			return;
+		}
+		
+		// 自动注册 ItemsContainer 内所有物品
+		if (!string.IsNullOrEmpty(ItemsContainerPath))
+		{
+			var container = GetNodeOrNull(ItemsContainerPath);
+			if (container != null)
+			{
+				foreach (Node child in container.GetChildren())
+					RegisterItem(child);
+			}
+			else
+			{
+				GD.PushWarning($"[{Name}] ItemsContainer not found: {ItemsContainerPath}");
+			}
 		}
 		
 		GD.Print("BackpackInteractionController: 初始化完成");

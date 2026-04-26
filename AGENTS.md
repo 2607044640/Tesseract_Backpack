@@ -34,18 +34,26 @@ trigger: always_on
 - RUN SCENE: ALWAYS specify the exact scene (e.g., `A1TesseractBackpack/TSBackpack.tscn`) when using `mcp_godot_run_project`. DO NOT blindly run the default scene.
 </system_reminder>
 
-## 4. Architecture & R3
-- **Strictness**: Composition > Inheritance. Components do ONE thing. No unrequested features.
-- **Blueprints**: Execute formulas/hotfixes EXACTLY. DO NOT generalize into `[Export]` unless commanded.
-- **Naming**: Component vars MUST match Type names.
-- **Tool Mode**: `[Tool] + _Draw() + QueueRedraw()`. NEVER `[Tool] + AddChild()` (Why: Ghost Nodes).
+## 4. Architecture & R3 Strictness
+
+<prime_directive>
+  <description>CRITICAL: Execution Strictness, KISS & Anti-Over-Engineering</description>
+  <rationale>While component-based design is required, over-engineering breaks pixel-perfect layouts and ruins the Architect's intent.</rationale>
+  <rules>
+    1. EXACT BLUEPRINT OBEDIENCE: Execute hotfixes EXACTLY. Do NOT generalize into `[Export]` unless commanded.
+    2. KISS & YAGNI: Keep It Simple. Never invent abstractions that complicate straightforward tasks.
+    3. COMPONENT STRICTNESS: Composition > Inheritance. Components do ONE thing.
+    4. NAMING ENFORCEMENT: Injected component variables MUST match their Type names.
+  </rules>
+</prime_directive>
 
 <complex_pattern>
-  <description>Lifecycle & Initialization</description>
+  <description>CRITICAL: Godot Lifecycle (_EnterTree vs _Ready) & Initialization</description>
+  <rationale>Godot executes _EnterTree Top-Down but _Ready Bottom-Up. Using _Ready for parent data init causes NullReference in children.</rationale>
   <rules>
-    1. INIT: Instantiate `Subject<T>` in Parent's `_EnterTree()`.
-    2. SAFE READY: Children subscribe in `_Ready()`.
-    3. TIMING: Use `await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame)` instead of `CallDeferred`.
+    1. INIT IN ENTER_TREE: All `Subject<T>` instantiations and core data (`new Subject<T>()`) MUST be done in the Parent's `public override void _EnterTree()`.
+    2. SAFE CHILD READY: Children can safely subscribe to Parent Subjects in their own `_Ready()` because the Parent's `_EnterTree()` has already executed.
+    3. TIMING: Use `await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);` instead of `CallDeferred`.
   </rules>
 </complex_pattern>
 
@@ -54,23 +62,28 @@ trigger: always_on
 - **Memory**: `CompositeDisposable _disposables` -> Dispose in `_ExitTree()`.
 - **Perf**: `ValueTuples (a, b)` in `EveryUpdate` to prevent GC.
 - **Streams**:
-  - Velocity: `Observable.EveryPhysicsUpdate()`
-  - UI: `.ObserveOn(GodotProvider.MainThread)`
-  - Clicks: `.ThrottleFirst(TimeSpan)` (NEVER `.Throttle()`)
-  - Sliders: `.Debounce(TimeSpan)`
-  - State: `ReactiveProperty<T>`
-  - Discard: `.AsUnitObservable()`
+  - Physics (Velocity): `Observable.EveryPhysicsUpdate()`
+  - UI Updates: Append `.ObserveOn(GodotProvider.MainThread)`
+  - Button Clicks: `.ThrottleFirst(TimeSpan)` (NEVER `.Throttle()`)
+  - Continuous I/O (Sliders): `.Debounce(TimeSpan)`
+  - State Flags: Use `ReactiveProperty<T>`
+  - Discard Payload: Chain `.AsUnitObservable()`
 
 <workflow>
 **Implementation Steps:**
-1. `[Entity]` -> `InitializeEntity()` in `_Ready()`.
-2. `[Component(typeof(Parent))]` -> `InitializeComponent()` in `_Ready()`.
-3. Dependencies: `[ComponentDependency(typeof(T))]`. Access via `parent` / `camelCase` props.
+1. `[Entity]` -> call `InitializeEntity()` in `_Ready()`.
+2. `[Component(typeof(Parent))]` -> call `InitializeComponent()` in `_Ready()`.
+3. Dependencies: Request via `[ComponentDependency(typeof(T))]`. Access via auto-generated `parent` and `camelCase` properties.
 4. Subscribe: In `OnEntityReady()`. Append `.AddTo(_disposables)`.
 </workflow>
 
 ## 5. Coding Standards
+
+### Naming & Access
 - **[Export]**: `TypeName_Purpose` (e.g., `OptionButton_Theme`).
 - **Private**: `_camelCase`.
 - **Nodes**: `%Name` -> `GetNodeOrNull<T>` + `GD.PushError`.
-- **Comments**: NO standard lifecycle/XML comments. MANDATORY Chinese `//` comments for custom Rx/math/complex logic.
+
+### Documentation Rules
+- **FORBIDDEN**: XML comments (`/// <summary>`) or inline comments for standard Godot lifecycle (`_Ready`, `_Process`).
+- **MANDATORY**: Inline `//` comments (in Chinese) explaining WHY for custom Rx streams, math formulas, and complex logic.

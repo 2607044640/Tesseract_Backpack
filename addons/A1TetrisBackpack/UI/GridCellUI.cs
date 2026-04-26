@@ -87,16 +87,13 @@ public partial class GridCellUI : Panel
 	
 	public override void _EnterTree()
 	{
-		// 【架构修正】在 _EnterTree 中初始化 Subjects
-		// 注意：这里使用 readonly 字段初始化器，已经在声明时初始化，无需额外操作
-		// 但为了明确架构意图，保留此方法作为文档说明
+		// 【架构修正】在 _EnterTree 中初始化 StyleBox
+		// 确保在 AddChild() 后立即调用 SetState() 时 _styleBox 已就绪
+		_styleBox ??= new StyleBoxFlat();
 	}
 
 	public override void _Ready()
 	{
-		// 创建StyleBoxFlat实例
-		_styleBox = new StyleBoxFlat();
-
 		// 配置StyleBox基础属性
 		_styleBox.DrawCenter = true; // 绘制中心背景
 
@@ -191,11 +188,8 @@ public partial class GridCellUI : Panel
 		}
 
 		// 更新StyleBox颜色
-		if (_styleBox != null)
-		{
-			_styleBox.BgColor = backgroundColor;
-			_styleBox.BorderColor = borderColor;
-		}
+		_styleBox.BgColor = backgroundColor;
+		_styleBox.BorderColor = borderColor;
 	}
 
 	/// 获取当前状态

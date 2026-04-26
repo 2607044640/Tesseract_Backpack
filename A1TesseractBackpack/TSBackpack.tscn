@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://1rgai2oppf42" path="res://addons/A1TetrisBackpack/Core/BackpackGridComponent.cs" id="2_ovaqc"]
 [ext_resource type="PackedScene" uid="uid://bof44aeoq7w74" path="res://A1TesseractBackpack/TSItem.tscn" id="3_bkm53"]
 [ext_resource type="Script" uid="uid://lelpt5ux6h0d" path="res://addons/A1TetrisBackpack/Items/ItemDataResource.cs" id="4_5mic1"]
+[ext_resource type="Script" uid="uid://drof8dtjnyqs3" path="res://addons/A1TetrisBackpack/Core/BackpackInteractionController.cs" id="5_bic01"]
 
 [sub_resource type="AnimatedTexture" id="AnimatedTexture_5ysrk"]
 
@@ -40,6 +41,10 @@ script = ExtResource("1_7o1w7")
 BackpackGridComponentPath = NodePath("../BackpackGridComponent")
 GridBackground = NodePath("../ScreenMargin/MainVBox/BackpackVisuals/GridBackground")
 InteractionArea = NodePath("../ScreenMargin/MainVBox/BackpackVisuals")
+
+[node name="BackpackInteractionController" type="Node" parent="." unique_id=863928779]
+script = ExtResource("5_bic01")
+ItemsContainerPath = NodePath("../ScreenMargin/MainVBox/BackpackVisuals/ItemsContainer")
 
 [node name="ScreenMargin" type="MarginContainer" parent="." unique_id=632711132]
 layout_mode = 1
