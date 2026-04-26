@@ -129,12 +129,13 @@ public partial class ItemCellGroupController : Node
 		int cellIndex = 0;
 		foreach (Vector2I cellPos in _gridShapeComp.CurrentLocalCells)
 		{
-			// 实例化GridCellUI
+			// 实例化GridCellUI，AddChild 前显式设 Pass 确保 Godot GUI hit-test 可找到
 			var gridCellUI = new GridCellUI
 			{
 				Size = new Vector2(CellSize, CellSize),
 				Position = new Vector2(cellPos.X * CellSize, cellPos.Y * CellSize),
-				Name = $"GridCell_{cellIndex}"
+				Name = $"GridCell_{cellIndex}",
+				MouseFilter = Control.MouseFilterEnum.Pass
 			};
 
 			// 【关键修复】先添加到场景树，再订阅事件

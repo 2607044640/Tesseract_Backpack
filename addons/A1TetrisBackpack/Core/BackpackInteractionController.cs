@@ -55,7 +55,7 @@ public partial class BackpackInteractionController : Node
 	[Export] public NodePath BackpackGridComponentPath { get; set; } = "%BackpackGridComponent";
 	
 	/// UI 网格视图组件引用（View 层）
-	[Export] public NodePath ViewGridPath { get; set; } = "%BackpackPanel";
+	[Export] public NodePath ViewGridPath { get; set; } = "%BackpackGridUIComponent";
 	
 	#endregion
 	

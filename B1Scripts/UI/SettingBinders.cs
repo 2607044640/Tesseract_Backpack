@@ -23,7 +23,7 @@ namespace GameSettings
             Config = config;
             Section = section;
             
-            // 从配置文件加载或使用默认值
+            // 从配置文件读取值，若不存在则使用默认值
             Property = new ReactiveProperty<T>(LoadValue());
         }
         

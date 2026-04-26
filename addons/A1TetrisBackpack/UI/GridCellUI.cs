@@ -191,8 +191,11 @@ public partial class GridCellUI : Panel
 		}
 
 		// 更新StyleBox颜色
-		_styleBox.BgColor = backgroundColor;
-		_styleBox.BorderColor = borderColor;
+		if (_styleBox != null)
+		{
+			_styleBox.BgColor = backgroundColor;
+			_styleBox.BorderColor = borderColor;
+		}
 	}
 
 	/// 获取当前状态
