@@ -63,6 +63,7 @@ unique_name_in_owner = true
 script = ExtResource("controller_script")
 
 [node name="DraggableItemComponent" type="Node" parent="." unique_id=1027640510]
+unique_name_in_owner = true
 script = ExtResource("draggable_script")
 
 [node name="InteractionArea" type="Control" parent="." unique_id=860289969]

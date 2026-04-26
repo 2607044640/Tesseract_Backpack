@@ -67,10 +67,8 @@ public partial class BackpackInteractionController : Node
 	private BackpackGridComponent BackpackGridComp;
 	private BackpackGridUIComponent ViewGrid;
 	
-	/// 物品拖拽状态字典
-	/// Key: 物品实体节点
-	/// Value: 拖拽状态信息
-	private Dictionary<Node, ItemDragState> _dragStates = new Dictionary<Node, ItemDragState>();
+	// 当前拖拽状态（单一物品，玩家只有一个鼠标）
+	private ItemDragState _currentDrag;
 	
 	/// CompositeDisposable - 管理所有订阅
 	private CompositeDisposable _disposables = new CompositeDisposable();
@@ -113,38 +111,6 @@ public partial class BackpackInteractionController : Node
 		GD.Print("BackpackInteractionController: 初始化完成");
 	}
 	
-	public override void _Process(double delta)
-	{
-		// 遍历所有正在拖拽的物品，实时更新预览
-		foreach (var kvp in _dragStates)
-		{
-			var itemEntity = kvp.Key;
-			var dragState = kvp.Value;
-			
-			// 获取当前鼠标位置
-			Vector2 mousePos = ViewGrid.GetGlobalMousePosition();
-			
-			// 检查是否在背包范围内
-			if (!ViewGrid.GetGlobalRect().HasPoint(mousePos))
-			{
-				// 鼠标不在背包内，清除预览
-				ViewGrid.ClearPreview();
-				continue;
-			}
-			
-			// 转换为网格坐标
-			Vector2I targetGridPos = ViewGrid.GlobalToGridPosition(mousePos);
-			
-			// 评估放置预览
-			var previewData = BackpackGridComp.EvaluatePlacementPreview(
-				dragState.ShapeComponent.CurrentLocalCells,
-				targetGridPos
-			);
-			
-			// 显示预览
-			ViewGrid.ShowPreview(previewData);
-		}
-	}
 	
 	public override void _ExitTree()
 	{
@@ -202,7 +168,7 @@ public partial class BackpackInteractionController : Node
 		// 【关键】使用 .AddTo(itemEntity) 确保物品销毁时自动取消订阅
 		
 		draggable.OnDragStartedAsObservable
-			.Subscribe(_ => HandleItemPickedUp(itemEntity, itemControl, shapeComponent))
+			.Subscribe(_ => HandleItemPickedUp(itemEntity, itemControl, shapeComponent, draggable))
 			.AddTo(itemEntity);
 		
 		draggable.OnDragEndedAsObservable
@@ -212,17 +178,6 @@ public partial class BackpackInteractionController : Node
 		draggable.OnRotateRequestedAsObservable
 			.Subscribe(_ => HandleItemRotated(itemEntity, shapeComponent))
 			.AddTo(itemEntity);
-		
-		// 3. 【内存安全】监听物品销毁事件，防止字典持有悬空引用
-		// 如果物品在拖拽过程中被销毁（如背包着火），立即从字典中移除
-		itemEntity.TreeExited += () =>
-		{
-			if (_dragStates.ContainsKey(itemEntity))
-			{
-				_dragStates.Remove(itemEntity);
-				GD.Print($"物品 {itemEntity.Name} 意外销毁，已从拖拽状态中清理");
-			}
-		};
 		
 		GD.Print($"BackpackInteractionController: 已注册物品 {itemEntity.Name}");
 	}
@@ -241,19 +196,14 @@ public partial class BackpackInteractionController : Node
 	#region Drag Event Handlers
 	
 	/// 处理物品拾取（拖拽开始）
-	/// 目的：记录原始状态并从网格移除，防止"自我占用"
-	/// 示例：拾起剑 → 记录位置 (320, 192) 和网格坐标 (5, 3) → 从网格移除
-	/// 算法：1. 记录当前位置 → 2. 计算网格坐标 → 3. 从逻辑网格移除 → 4. 保存状态
-	private void HandleItemPickedUp(Node itemEntity, Control itemControl, GridShapeComponent shapeComponent)
+	/// 目的：记录原始状态并从网格移除，防止"自我占用"；启动 R3 预览流
+	/// 算法：1. 记录位置 → 2. 从网格移除 → 3. 保存状态 → 4. 启动预览流（TakeUntil 自动停止）
+	private void HandleItemPickedUp(Node itemEntity, Control itemControl, GridShapeComponent shapeComponent, DraggableItemComponent draggable)
 	{
-		// 1. 记录当前全局位置
 		Vector2 originalGlobalPos = itemControl.GlobalPosition;
-		
-		// 2. 计算当前网格坐标
 		Vector2I originalGridPos = ViewGrid.GlobalToGridPosition(originalGlobalPos);
 		
-		// 3. 从逻辑网格移除（防止"自我占用"）
-		// 【关键机制】拾取时立即移除，这样放置时不会检测到自己占用的格子
+		// 从逻辑网格移除，防止"自我占用"
 		if (ViewGrid.IsValidGridPosition(originalGridPos))
 		{
 			BackpackGridComp.RemoveItem(
@@ -261,12 +211,9 @@ public partial class BackpackInteractionController : Node
 				shapeComponent.CurrentLocalCells,
 				originalGridPos
 			);
-			
-			GD.Print($"物品 {itemEntity.Name} 已从网格 {originalGridPos} 移除");
 		}
 		
-		// 4. 保存拖拽状态
-		var dragState = new ItemDragState
+		_currentDrag = new ItemDragState
 		{
 			OriginalGlobalPos = originalGlobalPos,
 			OriginalGridPos = originalGridPos,
@@ -274,46 +221,55 @@ public partial class BackpackInteractionController : Node
 			ItemControl = itemControl
 		};
 		
-		_dragStates[itemEntity] = dragState;
+		// R3 预览流：鼠标跨格才触发计算，TakeUntil 在拖拽结束时自动停止流
+		Observable.EveryUpdate()
+			.Select(_ => ViewGrid.GetGlobalMousePosition())
+			.Select(mousePos => (
+				inBounds: ViewGrid.GetGlobalRect().HasPoint(mousePos),
+				gridPos: ViewGrid.GlobalToGridPosition(mousePos)
+			))
+			.DistinctUntilChanged()
+			.TakeUntil(draggable.OnDragEndedAsObservable)
+			.Subscribe(state =>
+			{
+				if (!state.inBounds)
+					ViewGrid.ClearPreview();
+				else
+					ViewGrid.ShowPreview(BackpackGridComp.EvaluatePlacementPreview(
+						shapeComponent.CurrentLocalCells, state.gridPos));
+			})
+			.AddTo(itemEntity);
 		
 		GD.Print($"物品 {itemEntity.Name} 拾取：原位置 {originalGlobalPos}，网格坐标 {originalGridPos}");
 	}
 	
 	/// 处理物品放置（拖拽结束）
 	/// 目的：验证放置位置，成功则吸附，失败则回弹
-	/// 示例：放置剑到 (400, 256) → 转换为网格 (6, 4) → 检测合法 → 吸附到 (384, 256)
-	/// 算法：1. 获取目标位置 → 2. 检查范围 → 3. 尝试放置 → 4. 吸附或回弹
+	/// 算法：1. 清除预览 → 2. 检查范围 → 3. 尝试放置 → 4. 吸附或回弹
 	private void HandleItemDropped(Node itemEntity, Control itemControl, GridShapeComponent shapeComponent)
 	{
-		// 清除预览
 		ViewGrid.ClearPreview();
 		
-		// 检查是否有拖拽状态
-		if (!_dragStates.TryGetValue(itemEntity, out var dragState))
+		if (_currentDrag == null)
 		{
 			GD.PushWarning($"物品 {itemEntity.Name} 没有拖拽状态记录");
 			return;
 		}
 		
-		// 1. 获取当前鼠标位置
-		// 使用 ViewGrid.GetGlobalMousePosition() 而非 GetViewport().GetMousePosition()
-		// 原因：自动处理 Camera2D 移动和 CanvasLayer 缩放，确保坐标准确
-		Vector2 mousePos = ViewGrid.GetGlobalMousePosition();
+		var dragState = _currentDrag;
+		_currentDrag = null;
 		
-		// 2. 检查鼠标是否在背包 UI 范围内
+		// 使用 ViewGrid.GetGlobalMousePosition() 确保在 Camera2D/CanvasLayer 下坐标准确
+		Vector2 mousePos = ViewGrid.GetGlobalMousePosition();
 		bool isInBackpack = ViewGrid.GetGlobalRect().HasPoint(mousePos);
 		
 		if (!isInBackpack)
 		{
-			// 【回弹机制】鼠标不在背包内，回弹到原位置
 			PerformBounceBack(itemEntity, dragState);
 			return;
 		}
 		
-		// 3. 计算目标网格坐标
 		Vector2I targetGridPos = ViewGrid.GlobalToGridPosition(mousePos);
-		
-		// 4. 尝试放置到逻辑网格
 		var itemData = new ItemData(shapeComponent.Data?.ItemID ?? "unknown");
 		bool placementSuccess = BackpackGridComp.TryPlaceItem(
 			itemData,
@@ -322,18 +278,9 @@ public partial class BackpackInteractionController : Node
 		);
 		
 		if (placementSuccess)
-		{
-			// 【吸附机制】放置成功，对齐到网格
 			PerformSnapToGrid(itemEntity, itemControl, targetGridPos);
-		}
 		else
-		{
-			// 【回弹机制】放置失败（碰撞或越界），回弹到原位置
 			PerformBounceBack(itemEntity, dragState);
-		}
-		
-		// 清理拖拽状态
-		_dragStates.Remove(itemEntity);
 	}
 	
 	/// 处理物品旋转
@@ -393,24 +340,8 @@ public partial class BackpackInteractionController : Node
 	
 	#region Helper Methods
 	
-	/// 检查物品是否正在被拖拽
-	public bool IsItemBeingDragged(Node itemEntity)
-	{
-		return _dragStates.ContainsKey(itemEntity);
-	}
-	
-	/// 获取物品的拖拽状态
-	public ItemDragState GetDragState(Node itemEntity)
-	{
-		return _dragStates.TryGetValue(itemEntity, out var state) ? state : null;
-	}
-	
-	/// 清除所有拖拽状态（用于重置）
-	public void ClearAllDragStates()
-	{
-		_dragStates.Clear();
-		GD.Print("BackpackInteractionController: 已清除所有拖拽状态");
-	}
+	/// 检查当前是否有物品正在被拖拽
+	public bool IsItemBeingDragged() => _currentDrag != null;
 	
 	#endregion
 	
