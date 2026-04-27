@@ -9,6 +9,9 @@ using R3;
 [GlobalClass]
 public partial class GridCellUI : Panel
 {
+	/// <summary>单元格在物品形状数组中的索引</summary>
+	public int CellIndex { get; set; }
+
 	#region State Enum
 
 	/// 单元格状态枚举

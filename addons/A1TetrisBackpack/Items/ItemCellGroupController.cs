@@ -38,7 +38,7 @@ public partial class ItemCellGroupController : Node
 	private readonly List<GridCellUI> _cells = new();
 
 	/// R3 Subject - 聚合所有单元格的输入事件
-	private readonly Subject<InputEvent> _aggregatedInputSubject = new();
+	private readonly Subject<(InputEvent Event, int CellIndex)> _aggregatedInputSubject = new();
 
 	/// CompositeDisposable - 管理所有订阅
 	private readonly CompositeDisposable _disposables = new();
@@ -48,7 +48,7 @@ public partial class ItemCellGroupController : Node
 	#region Public Interface
 
 	/// 暴露聚合后的输入事件流（供DraggableItemComponent订阅）
-	public Observable<InputEvent> OnGroupInputAsObservable => _aggregatedInputSubject;
+	public Observable<(InputEvent Event, int CellIndex)> OnGroupInputAsObservable => _aggregatedInputSubject;
 
 	#endregion
 
@@ -107,7 +107,31 @@ public partial class ItemCellGroupController : Node
 	/// 算法：1. 清理旧单元格 -> 2. 遍历局部坐标 -> 3. 实例化GridCellUI并绑定事件 -> 4. 添加到容器
 	private void RebuildCells()
 	{
-		// 1. 清理旧单元格 —— 类型过滤扫描 InteractionArea 所有子节点
+		// 1. 验证数据源有效性
+		if (_gridShapeComp.CurrentLocalCells == null)
+		{
+			GD.PushWarning($"[{Name}] CurrentLocalCells is null, skipping cell generation.");
+			return;
+		}
+
+		// 【核心修复：松开失效 Bug】复用机制防止鼠标焦点丢失
+		// 当物品在拖拽中被旋转时，用户正按住鼠标左键（鼠标事件被某个 GridCellUI 捕获）
+		// 如果此时执行 QueueFree，焦点将被强制打断，导致后续的松开事件 (Mouse Button Released) 永远不会触发！
+		// 解决方案：如果单元格数量不变（如单纯旋转），仅更新位置，不销毁节点，保持焦点完好！
+		if (_cells.Count > 0 && _cells.Count == _gridShapeComp.CurrentLocalCells.Length)
+		{
+			for (int i = 0; i < _cells.Count; i++)
+			{
+				_cells[i].Position = new Vector2(
+					_gridShapeComp.CurrentLocalCells[i].X * CellSize, 
+					_gridShapeComp.CurrentLocalCells[i].Y * CellSize
+				);
+				_cells[i].CellIndex = i; // 确保索引同步
+			}
+			return;
+		}
+
+		// 2. 清理旧单元格 —— 类型过滤扫描 InteractionArea 所有子节点
 		// 覆盖两种情况：(a) 本控制器追踪的 _cells 列表；(b) .tscn 中可能残留的 Ghost GridCellUI
 		foreach (Node child in _interactionArea.GetChildren())
 		{
@@ -117,13 +141,6 @@ public partial class ItemCellGroupController : Node
 			}
 		}
 		_cells.Clear();
-
-		// 2. 验证数据源有效性
-		if (_gridShapeComp.CurrentLocalCells == null)
-		{
-			GD.PushWarning($"[{Name}] CurrentLocalCells is null, skipping cell generation.");
-			return;
-		}
 
 		// 3. 遍历局部坐标生成GridCellUI
 		int cellIndex = 0;
@@ -135,7 +152,8 @@ public partial class ItemCellGroupController : Node
 				Size = new Vector2(CellSize, CellSize),
 				Position = new Vector2(cellPos.X * CellSize, cellPos.Y * CellSize),
 				Name = $"GridCell_{cellIndex}",
-				MouseFilter = Control.MouseFilterEnum.Pass
+				MouseFilter = Control.MouseFilterEnum.Pass,
+				CellIndex = cellIndex
 			};
 
 			// 【关键修复】先添加到场景树，再订阅事件
@@ -149,7 +167,7 @@ public partial class ItemCellGroupController : Node
 
 			// 【事件聚合】将此单元格的输入事件推送到聚合Subject
 			gridCellUI.OnCellInputAsObservable
-				.Subscribe(inputEvent => _aggregatedInputSubject.OnNext(inputEvent))
+				.Subscribe(inputEvent => _aggregatedInputSubject.OnNext((inputEvent, gridCellUI.CellIndex)))
 				.AddTo(gridCellUI);
 
 			// 【Hover 效果】订阅鼠标进入/离开事件

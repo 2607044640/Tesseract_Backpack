@@ -53,6 +53,8 @@ public partial class DraggableItemComponent : Node
 	/// - 订阅者需要自行判断是否在拖拽状态下响应旋转
 	public Subject<Unit> OnRotateRequestedAsObservable { get; private set; }
 	
+
+	
 	#endregion
 	
 	#region Godot Lifecycle
@@ -86,7 +88,7 @@ public partial class DraggableItemComponent : Node
 		
 		// 订阅 ItemCellGroupController 的聚合输入事件流
 		_itemCellGroupController.OnGroupInputAsObservable
-			.Subscribe(HandleGuiInput)
+			.Subscribe(x => HandleGuiInput(x.Event))
 			.AddTo(this);
 		
 		StateChart = GetNodeOrNull<Node>(StateChartPath);
