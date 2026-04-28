@@ -60,6 +60,9 @@ public partial class BackpackInteractionController : Node
 	/// 物品容器路径，_Ready() 时自动注册其所有子节点
 	[Export] public NodePath ItemsContainerPath { get; set; } = "";
 
+	/// 生成战利品的区域路径
+	[Export] public NodePath LootSpawnAreaPath { get; set; } = "";
+
 	#endregion
 
 	#region Private Fields
@@ -200,14 +203,23 @@ public partial class BackpackInteractionController : Node
 	/// 算法：1. 记录位置 → 2. 从网格移除 → 3. 保存状态 → 4. 启动预览流（TakeUntil 自动停止）
 	private void HandleItemPickedUp(Node itemEntity, Control itemControl, GridShapeComponent shapeComponent, DraggableItemComponent draggable)
 	{
+		var itemPhysics = itemEntity.GetNodeOrNull<ItemPhysicsComponent>("%PhysicsProxy");
+		if (itemPhysics != null)
+		{
+			itemPhysics.DisablePhysics();
+		}
+
 		Vector2 originalGlobalPos = itemControl.GlobalPosition;
 		Vector2I originalGridPos = BackpackGridUIComp.GlobalToGridPosition(originalGlobalPos);
 
 		// 从逻辑网格移除，防止"自我占用"
-		if (BackpackGridUIComp.IsValidGridPosition(originalGridPos))
+		// CRITICAL CLAMP FIX: Do NOT blindly trust GlobalToGridPosition as it clamps!
+		// Only call RemoveItem IF the item was actually inside the grid.
+		bool wasInBackpack = BackpackGridUIComp.GetGlobalRect().HasPoint(originalGlobalPos);
+		if (wasInBackpack && BackpackGridUIComp.IsValidGridPosition(originalGridPos))
 		{
 			BackpackGridComp.RemoveItem(
-				new ItemData(shapeComponent.Data?.ItemID ?? "unknown"),
+				GetItemData(shapeComponent),
 				shapeComponent.CurrentLocalCells,
 				originalGridPos
 			);
@@ -222,8 +234,7 @@ public partial class BackpackInteractionController : Node
 		};
 
 		// 【架构重构】在拾取瞬间预计算被抓取的单元格索引
-		var followComp = itemEntity.GetNodeOrNull<FollowMouseUIComponent>("%FollowMouseUIComponent")
-			?? itemEntity.FindChild("FollowMouseUIComponent", true, false) as FollowMouseUIComponent;
+		var followComp = GetFollowComp(itemEntity);
 
 		if (followComp != null && shapeComponent.CurrentLocalCells != null)
 		{
@@ -247,25 +258,22 @@ public partial class BackpackInteractionController : Node
 			_currentDrag.GrabbedCellIndex = grabbedIndex;
 		}
 
+		// 【视觉修正】锁定 Hover 状态，防止拖拽时闪烁白光
+		var itemGroupCtrl = GetItemGroupCtrl(itemEntity);
+		if (itemGroupCtrl != null)
+		{
+			itemGroupCtrl.IsDragging = true;
+			itemGroupCtrl.ResetCellsVisualState();
+		}
+
 		// ── 预览流：双管齐下，Merge 位置流 + 形状流 ──────────────────────────────
 		// posStream：鼠标跨越网格边界时触发（DistinctUntilChanged 过滤亚格子抖动）
 		var posStream = Observable.EveryUpdate()
 			.Select(_ => BackpackGridUIComp.GetGlobalMousePosition())
 			.Select(mousePos => {
-				// 1. 获取鼠标当前所在的网格单元格
 				Vector2I mouseGridPos = BackpackGridUIComp.GlobalToGridPosition(mousePos);
-				
-				// 2. 获取当前被抓取单元格的逻辑坐标偏移
-				Vector2I grabbedCellLogical = Vector2I.Zero;
-				if (_currentDrag != null && shapeComponent.CurrentLocalCells != null 
-					&& _currentDrag.GrabbedCellIndex >= 0 
-					&& _currentDrag.GrabbedCellIndex < shapeComponent.CurrentLocalCells.Length)
-				{
-					grabbedCellLogical = shapeComponent.CurrentLocalCells[_currentDrag.GrabbedCellIndex];
-				}
-
-				// 3. 纯数学计算：左上角坐标 = 鼠标网格坐标 - 抓取点的逻辑偏移
-				Vector2I targetTopLeftGridPos = mouseGridPos - grabbedCellLogical;
+				// 纯数学计算：目标位置 = 鼠标所在格子 - 被抓格子的逻辑偏移
+				Vector2I targetTopLeftGridPos = mouseGridPos - GetGrabbedCellLogicalOffset(_currentDrag, shapeComponent);
 
 				return (
 					inBounds: BackpackGridUIComp.GetGlobalRect().HasPoint(mousePos),
@@ -281,33 +289,40 @@ public partial class BackpackInteractionController : Node
 			{
 				var mp = BackpackGridUIComp.GetGlobalMousePosition();
 				Vector2I mouseGridPos = BackpackGridUIComp.GlobalToGridPosition(mp);
-				
-				Vector2I grabbedCellLogical = Vector2I.Zero;
-				if (_currentDrag != null && shapeComponent.CurrentLocalCells != null 
-					&& _currentDrag.GrabbedCellIndex >= 0 
-					&& _currentDrag.GrabbedCellIndex < shapeComponent.CurrentLocalCells.Length)
-				{
-					grabbedCellLogical = shapeComponent.CurrentLocalCells[_currentDrag.GrabbedCellIndex];
-				}
-
-				Vector2I targetTopLeftGridPos = mouseGridPos - grabbedCellLogical;
+				Vector2I targetTopLeftGridPos = mouseGridPos - GetGrabbedCellLogicalOffset(_currentDrag, shapeComponent);
 
 				return (
-					inBounds: BackpackGridUIComp.GetGlobalRect().HasPoint(mp),
+					inBounds: BackpackGridUIComp.IsPointInside(mp),
 					gridPos:  targetTopLeftGridPos
 				);
 			});
 
 		// 合并：任一流发射 → 执行同一段预览逻辑
+
+
 		Observable.Merge(posStream, shapeStream)
 			.TakeUntil(draggable.OnDragEndedAsObservable)
 			.Subscribe(state =>
 			{
 				if (!state.inBounds)
+				{
 					BackpackGridUIComp.ClearPreview();
+					itemGroupCtrl?.ResetCellsVisualState();
+				}
 				else
-					BackpackGridUIComp.ShowPreview(BackpackGridComp.EvaluatePlacementPreview(
-						shapeComponent.CurrentLocalCells, state.gridPos));
+				{
+					var previewData = BackpackGridComp.EvaluatePlacementPreview(
+						shapeComponent.CurrentLocalCells, state.gridPos);
+					
+					BackpackGridUIComp.ShowPreview(previewData);
+					
+					// 同步更新物品自己的格子颜色
+					var cellStates = new GridCellUI.CellState[previewData.Count];
+					for (int i = 0; i < previewData.Count; i++) {
+						cellStates[i] = previewData[i].State;
+					}
+					itemGroupCtrl?.UpdateCellsVisualState(cellStates);
+				}
 			})
 			.AddTo(itemEntity);
 
@@ -321,6 +336,15 @@ public partial class BackpackInteractionController : Node
 	{
 		BackpackGridUIComp.ClearPreview();
 
+		// 【视觉修正】解锁 Hover 状态
+		var itemGroupCtrl = GetItemGroupCtrl(itemEntity);
+		if (itemGroupCtrl != null)
+		{
+			itemGroupCtrl.IsDragging = false;
+			itemGroupCtrl.ResetCellsVisualState();
+		}
+
+
 		if (_currentDrag == null)
 		{
 			GD.PushWarning($"物品 {itemEntity.Name} 没有拖拽状态记录");
@@ -332,27 +356,25 @@ public partial class BackpackInteractionController : Node
 
 		// 使用 ViewGrid.GetGlobalMousePosition() 确保在 Camera2D/CanvasLayer 下坐标准确
 		Vector2 mousePos = BackpackGridUIComp.GetGlobalMousePosition();
-		bool isInBackpack = BackpackGridUIComp.GetGlobalRect().HasPoint(mousePos);
+		bool isInBackpack = BackpackGridUIComp.IsPointInside(mousePos);
 
 		if (!isInBackpack)
 		{
-			PerformBounceBack(itemEntity, dragState);
+			// Dropped OUTSIDE: Do NOT bounce back.
+			itemControl.GlobalPosition = mousePos;
+			var itemPhysics = itemEntity.GetNodeOrNull<ItemPhysicsComponent>("%PhysicsProxy");
+			if (itemPhysics != null)
+			{
+				itemPhysics.EnablePhysics();
+			}
 			return;
 		}
 
 		Vector2I mouseGridPos = BackpackGridUIComp.GlobalToGridPosition(mousePos);
 		
 		// 纯数学逻辑计算左上角网格坐标
-		Vector2I grabbedCellLogical = Vector2I.Zero;
-		if (dragState != null && shapeComponent.CurrentLocalCells != null 
-			&& dragState.GrabbedCellIndex >= 0 
-			&& dragState.GrabbedCellIndex < shapeComponent.CurrentLocalCells.Length)
-		{
-			grabbedCellLogical = shapeComponent.CurrentLocalCells[dragState.GrabbedCellIndex];
-		}
-
-		Vector2I targetGridPos = mouseGridPos - grabbedCellLogical;
-		var itemData = new ItemData(shapeComponent.Data?.ItemID ?? "unknown");
+		Vector2I targetGridPos = mouseGridPos - GetGrabbedCellLogicalOffset(dragState, shapeComponent);
+		var itemData = GetItemData(shapeComponent);
 		bool placementSuccess = BackpackGridComp.TryPlaceItem(
 			itemData,
 			shapeComponent.CurrentLocalCells,
@@ -360,56 +382,59 @@ public partial class BackpackInteractionController : Node
 		);
 
 		if (placementSuccess)
+		{
 			PerformSnapToGrid(itemEntity, itemControl, targetGridPos);
+		}
 		else
-			PerformBounceBack(itemEntity, dragState);
+		{
+			bool originallyInBackpack = BackpackGridUIComp.GetGlobalRect().HasPoint(dragState.OriginalGlobalPos);
+			if (originallyInBackpack)
+			{
+				PerformBounceBack(itemEntity, dragState);
+			}
+			else
+			{
+				var itemPhysics = itemEntity.GetNodeOrNull<ItemPhysicsComponent>("%PhysicsProxy");
+				if (itemPhysics != null)
+				{
+					itemPhysics.EnablePhysics();
+				}
+			}
+		}
 	}
-    /// 处理物品旋转
-    private void HandleItemRotated(Node itemEntity, GridShapeComponent shapeComponent)
-    {
-        if (_currentDrag == null) return;
 
-        // 1. 获取组件 (防御性编程非常棒，进一步简写)
-        var followComp = itemEntity.GetNodeOrNull<FollowMouseUIComponent>("%FollowMouseUIComponent")
-                         ?? itemEntity.FindChild("FollowMouseUIComponent", true, false) as FollowMouseUIComponent;
-        var interactionArea = itemEntity.GetNodeOrNull<Control>("%InteractionArea");
+	/// 处理物品旋转
+	/// 职责：仅作为指挥官发送逻辑指令（Rotate90）和动画指令（AnimateRotation90）
+	private void HandleItemRotated(Node itemEntity, GridShapeComponent shapeComponent)
+	{
+		if (_currentDrag == null) return;
 
-        if (followComp == null || interactionArea == null)
-        {
-            GD.PushWarning($"[Rotation] 缺少必要组件！");
-            return;
-        }
+		// 1. 获取必需组件
+		var followComp = GetFollowComp(itemEntity);
+		var tweenComp = GetTweenComp(itemEntity);
+		var interactionArea = itemEntity.GetNodeOrNull<Control>("%InteractionArea");
 
-        // 2. 执行底层逻辑旋转 (矩阵变换 + 归一化)
-        shapeComponent.Rotate90();
+		if (followComp == null || tweenComp == null || interactionArea == null)
+		{
+			GD.PushWarning($"[Rotation] {itemEntity.Name} 缺少必要动画、跟随或交互组件！");
+			return;
+		}
 
-        // 3. 计算当前鼠标抓着的那个格子，在【新矩阵】中的局部中心坐标
-        Vector2I newGrabbedCell = shapeComponent.CurrentLocalCells[_currentDrag.GrabbedCellIndex];
-        float cellSize = BackpackGridUIComp.CellSize.X; // 假定长宽一致
-        Vector2 newGrabbedCellLocalPos = new Vector2(
-            (newGrabbedCell.X * cellSize) + (cellSize / 2f),
-            (newGrabbedCell.Y * cellSize) + (cellSize / 2f)
-        );
+		// 2. 指令 A：执行底层逻辑旋转
+		shapeComponent.Rotate90();
 
-        // 4. 同步父节点的抓取偏移 (这一步会让父节点在物理空间瞬间跳变，对齐新网格锚点)
-        followComp.GrabOffset = -newGrabbedCellLocalPos;
+		// 3. 准备数据：计算新的抓取点中心坐标 (空间换算交给 ViewGrid)
+		Vector2I newGrabbedCell = shapeComponent.CurrentLocalCells[_currentDrag.GrabbedCellIndex];
+		Vector2 newPivot = BackpackGridUIComp.GetCellCenterLocalPos(newGrabbedCell);
 
-        // 5. 视觉补偿动画 (【核心魔法】：利用 PivotOffset 彻底消灭 Position 补间)
-        // 把旋转轴心死死钉在当前鼠标抓取的位置上
-        interactionArea.PivotOffset = newGrabbedCellLocalPos;
+		// 4. 指令 B：同步物理抓取偏移 (消除坐标跳变)
+		followComp.GrabOffset = -newPivot;
 
-        // 父节点跳变后，我们让子节点绕着鼠标逆向旋转 90 度 (-Pi/2)
-        // 此时画面绝对完美重合在上一帧，不差一个像素！完全不需要改 Position！
-        interactionArea.Rotation = -Mathf.Pi / 2f;
+		// 5. 指令 C：执行视觉补间动画 (底层补间魔法由 TweenComp 处理)
+		tweenComp.PlayRotationAnimation(interactionArea, newPivot);
 
-        // 6. 仅需平滑还原角度到 0 即可 (极致丝滑的指尖自转)
-        var tween = interactionArea.GetTree().CreateTween();
-        tween.TweenProperty(interactionArea, "rotation", 0f, 0.15f)
-            .SetTrans(Tween.TransitionType.Sine)
-            .SetEase(Tween.EaseType.Out);
-
-        GD.Print($"[{itemEntity.Name}] 丝滑旋转触发：绕点 {newGrabbedCellLocalPos} 旋转");
-    }
+		GD.Print($"[{itemEntity.Name}] 指令：逻辑旋转 + 视觉补间 (Pivot: {newPivot})");
+	}
 	#endregion
 
 	#region Placement Logic
@@ -441,7 +466,7 @@ public partial class BackpackInteractionController : Node
 
 		// 2. 强制放回逻辑网格的原位置
 		// 【关键】这里不检查返回值，因为原位置一定是合法的（拾取前就在那里）
-		var itemData = new ItemData(dragState.ShapeComponent.Data?.ItemID ?? "unknown");
+		var itemData = GetItemData(dragState.ShapeComponent);
 		BackpackGridComp.TryPlaceItem(
 			itemData,
 			dragState.ShapeComponent.CurrentLocalCells,
@@ -455,8 +480,67 @@ public partial class BackpackInteractionController : Node
 
 	#region Helper Methods
 
+	public async void SpawnLootItem(ItemData itemData)
+	{
+		var lootArea = GetNodeOrNull<Control>(LootSpawnAreaPath);
+		if (lootArea == null) return;
+
+		var scene = GD.Load<PackedScene>("res://A1TesseractBackpack/TSItem.tscn");
+		if (scene == null) return;
+
+		var itemInstance = scene.Instantiate<Control>();
+		lootArea.AddChild(itemInstance);
+		
+		// Spawn somewhere near top-center of the screen
+		itemInstance.GlobalPosition = new Vector2(GetViewport().GetVisibleRect().Size.X / 2f, 100);
+
+		RegisterItem(itemInstance);
+
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+		var itemPhysics = itemInstance.GetNodeOrNull<ItemPhysicsComponent>("%PhysicsProxy");
+		if (itemPhysics != null)
+		{
+			itemPhysics.EnablePhysics();
+		}
+	}
+
 	/// 检查当前是否有物品正在被拖拽
 	public bool IsItemBeingDragged() => _currentDrag != null;
+
+	// 获取跟随鼠标组件 (带有容错兜底)
+	private FollowMouseUIComponent GetFollowComp(Node itemEntity) =>
+		itemEntity.GetNodeOrNull<FollowMouseUIComponent>("%FollowMouseUIComponent")
+		?? itemEntity.FindChild("FollowMouseUIComponent", true, false) as FollowMouseUIComponent;
+
+	// 获取补间动画组件 (带有容错兜底)
+	private UITweenInteractComponent GetTweenComp(Node itemEntity) =>
+		itemEntity.GetNodeOrNull<UITweenInteractComponent>("%UITweenInteractComponent")
+		?? itemEntity.FindChild("UITweenInteractComponent", true, false) as UITweenInteractComponent;
+
+	// 安全获取或构造 ItemData
+	private ItemData GetItemData(GridShapeComponent shape) =>
+		new ItemData(shape.Data?.ItemID ?? "unknown");
+
+	// 获取单元格组控制器
+	private ItemCellGroupController GetItemGroupCtrl(Node itemEntity) =>
+		itemEntity.GetNodeOrNull<ItemCellGroupController>("%ItemCellGroupController")
+		?? itemEntity.FindChild("ItemCellGroupController", true, false) as ItemCellGroupController;
+
+	// 计算当前被抓取单元格相对于物品逻辑原点 (0,0) 的逻辑偏移
+	private Vector2I GetGrabbedCellLogicalOffset(ItemDragState dragState, GridShapeComponent shapeComponent)
+	{
+		if (dragState == null || shapeComponent.CurrentLocalCells == null)
+			return Vector2I.Zero;
+
+		int index = dragState.GrabbedCellIndex;
+		if (index >= 0 && index < shapeComponent.CurrentLocalCells.Length)
+		{
+			return shapeComponent.CurrentLocalCells[index];
+		}
+
+		return Vector2I.Zero;
+	}
 
 	#endregion
 

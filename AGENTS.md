@@ -8,6 +8,7 @@ trigger: always_on
 - **Build**: `dotnet build` (Dir: `TetrisBackpack/`)
 - **Logs**: `$env:APPDATA/Godot/app_userdata/Tesseract_Backpack/logs/godot.log`
 - **Context**: `C:\Users\26070\My Drive\Agent_Godot_Brain\AI_Context_Changes.md`
+- **Master Sync**: `AISpace\SyncMasterCopy\AI_Context_Master_Latest.txt` (full AI-ready bundle of useful project files, rules, and recent changes)
 - **Paths**: Code=`TetrisBackpack/`, Rules/Arch=`AISpace/` (Single source: `AGENTS.md`)
 - **Steering**: `BugInvestigation.md` (Escalation), `_RulesSystem.md` (Infrastructure)
 
@@ -20,6 +21,7 @@ trigger: always_on
 
 ## 2. API & Workspace
 - **Docs MCP**: `context7` (Lookup `R3`, `NuGet`)
+- **OpenAI Docs MCP**: Use `openaiDeveloperDocs` for OpenAI API, ChatGPT Apps SDK, and Codex questions without waiting for an explicit request.
 - **MCPs**: `mcp_godot_launch_editor`, `run_project`, `get_debug_output`, `create_scene`, `add_node`, `save_scene`, `load_sprite`, `export_mesh_library`, `get_uid`, `update_project_uids`
 - **Temp Files**: `AISpace\temp\` (analysis), `TetrisBackpack\temp\` (test scripts). Strictly disposable. NEVER scatter `test_*` or `*.bak` in main dirs.
 

@@ -217,17 +217,38 @@ public partial class UITweenInteractComponent : Node
 		_currentTween.TweenProperty(VisualTarget, "scale", targetScale, TweenDuration);
 	}
 	
+	/// 执行 90 度平滑旋转补间 (Counter-Transform 模式)
+	/// 目的：实现绕特定轴心（通常是鼠标位置）的丝滑补间旋转
+	/// 算法：1. 立即设置逆向角度补偿偏移 → 2. 设置轴心 → 3. 补间回归 0
+	public void PlayRotationAnimation(Control targetNode, Vector2 pivotOffset, float duration = 0.15f)
+	{
+		if (targetNode == null) return;
+
+		// 1. 杀死当前可能的旋转动画（如果正在快速连续旋转）
+		_currentTween?.Kill();
+
+		// 2. 设置轴心并立即执行逆向补偿 (使视觉上保持不动)
+		targetNode.PivotOffset = pivotOffset;
+		targetNode.Rotation = -Mathf.Pi / 2f;
+
+		// 3. 创建补间平滑还原到 0
+		_currentTween = GetTree().CreateTween();
+		_currentTween.TweenProperty(targetNode, "rotation", 0f, duration)
+			.SetTrans(Tween.TransitionType.Sine)
+			.SetEase(Tween.EaseType.Out);
+	}
+
 	/// 更新 PivotOffset 为中心点
 	/// 确保缩放从中心进行，而不是左上角
 	private void UpdatePivotOffset()
 	{
 		if (VisualTarget == null)
 			return;
-		
+
 		// 设置为尺寸的一半（中心点）
 		VisualTarget.PivotOffset = VisualTarget.Size / 2;
 	}
-	
+
 	#endregion
 	
 	#region Public Methods

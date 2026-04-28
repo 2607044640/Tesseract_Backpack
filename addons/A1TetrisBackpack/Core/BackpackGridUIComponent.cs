@@ -114,7 +114,7 @@ public partial class BackpackGridUIComponent : Node
 	}
 
 	/// 网格坐标 → 局部像素坐标（中心点，相对于 InteractionArea）
-	public Vector2 GetCellCenterPosition(Vector2I gridPos)
+	public Vector2 GetCellCenterLocalPos(Vector2I gridPos)
 	{
 		Vector2 topLeft = GridToLocalPosition(gridPos);
 		return topLeft + CellSize / 2;
@@ -220,6 +220,9 @@ public partial class BackpackGridUIComponent : Node
 	public Vector2 GlobalPosition => InteractionArea?.GlobalPosition ?? Vector2.Zero;
 
 	public Vector2 GetGlobalMousePosition() => InteractionArea?.GetGlobalMousePosition() ?? Vector2.Zero;
+
+	/// 检查全局点是否在网格范围内
+	public bool IsPointInside(Vector2 globalPos) => GetGlobalRect().HasPoint(globalPos);
 
 	public Rect2 GetCellRect(Vector2I gridPos)
 	{

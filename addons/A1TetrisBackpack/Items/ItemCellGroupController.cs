@@ -43,6 +43,21 @@ public partial class ItemCellGroupController : Node
 	/// CompositeDisposable - 管理所有订阅
 	private readonly CompositeDisposable _disposables = new();
 
+	private bool _isDragging = false;
+
+	/// 是否正在拖拽
+	/// 【架构升级】设置时自动同步 ZIndex (视觉置顶)，并作为悬停逻辑屏蔽的状态锁
+	public bool IsDragging 
+	{
+		get => _isDragging;
+		set 
+		{
+			if (_isDragging == value) return;
+			_isDragging = value;
+			OnDraggingStateChanged(_isDragging);
+		}
+	}
+
 	#endregion
 
 	#region Public Interface
@@ -98,6 +113,16 @@ public partial class ItemCellGroupController : Node
 	}
 
 	#endregion
+
+	private void OnDraggingStateChanged(bool isDragging)
+	{
+		// 【视觉层级管理 (Z-Index)】
+		// 将物品根节点置顶，确保拖拽时不会被其他物品遮挡
+		if (GetParent() is Control rootControl)
+		{
+			rootControl.ZIndex = isDragging ? 100 : 0;
+		}
+	}
 
 	#region Cell Management
 
@@ -170,9 +195,9 @@ public partial class ItemCellGroupController : Node
 				.Subscribe(inputEvent => _aggregatedInputSubject.OnNext((inputEvent, gridCellUI.CellIndex)))
 				.AddTo(gridCellUI);
 
-			// 【Hover 效果】订阅鼠标进入/离开事件
-			gridCellUI.MouseEntered += () => SetGroupState(GridCellUI.CellState.Hover);
-			gridCellUI.MouseExited += () => ResetGroupState();
+			// 【Hover 效果】订阅鼠标进入/离开事件 (拖拽期间逻辑屏蔽)
+			gridCellUI.MouseEntered += () => { if (!IsDragging) SetGroupState(GridCellUI.CellState.Hover); };
+			gridCellUI.MouseExited += () => { if (!IsDragging) ResetGroupState(); };
 
 			cellIndex++;
 		}
@@ -185,7 +210,7 @@ public partial class ItemCellGroupController : Node
 	/// 设置整组单元格的状态
 	/// 目的：统一控制所有单元格的视觉状态（用于拖拽反馈）
 	/// 示例：SetGroupState(GridCellUI.CellState.Valid) -> 所有单元格显示绿色发光边框
-	/// 算法：遍历_cells列表，调用每个GridCellUI的SetState方法
+	/// 算法：遍历_cells列表，调用每个GridCellUI.SetState方法
 	public void SetGroupState(GridCellUI.CellState state)
 	{
 		foreach (var cell in _cells)
@@ -194,10 +219,30 @@ public partial class ItemCellGroupController : Node
 		}
 	}
 
+	/// 接收来自 Controller 的状态数组，逐个更新自身格子的颜色
+	public void UpdateCellsVisualState(GridCellUI.CellState[] states)
+	{
+		if (_cells == null || _cells.Count == 0) return;
+		
+		for (int i = 0; i < _cells.Count && i < states.Length; i++)
+		{
+			// 视觉优化：如果格子是有效的 (Valid)，物品自身保持 Normal (白光)
+			// 只有在无效 (Invalid) 时才变红，避免背景绿+物品绿导致的视觉杂乱
+			var finalState = states[i] == GridCellUI.CellState.Valid ? GridCellUI.CellState.Normal : states[i];
+			_cells[i].SetState(finalState); 
+		}
+	}
+
 	/// 重置整组单元格状态为Normal
 	public void ResetGroupState()
 	{
 		SetGroupState(GridCellUI.CellState.Normal);
+	}
+
+	/// 恢复所有格子到默认/拖拽状态
+	public void ResetCellsVisualState()
+	{
+		ResetGroupState();
 	}
 
 	#endregion

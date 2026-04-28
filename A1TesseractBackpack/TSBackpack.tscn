@@ -14,6 +14,9 @@ Icon = SubResource("AnimatedTexture_5ysrk")
 BaseShape = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(0, 3)])
 metadata/_custom_type_script = "uid://lelpt5ux6h0d"
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(5000, 100)
+
 [node name="TSBackpack" type="Control" unique_id=1221362850]
 layout_mode = 3
 anchors_preset = 15
@@ -45,6 +48,7 @@ InteractionArea = NodePath("../ScreenMargin/MainVBox/BackpackVisuals")
 [node name="BackpackInteractionController" type="Node" parent="." unique_id=863928779]
 script = ExtResource("5_bic01")
 ItemsContainerPath = NodePath("../ScreenMargin/MainVBox/BackpackVisuals/ItemsContainer")
+LootSpawnAreaPath = NodePath("../LootSpawnArea")
 
 [node name="ScreenMargin" type="MarginContainer" parent="." unique_id=632711132]
 layout_mode = 1
@@ -110,3 +114,20 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Left Click: Drag | Right Click: Rotate | Drop in backpack to place"
 horizontal_alignment = 1
+
+[node name="LootSpawnArea" type="Control" parent="." unique_id=599388111]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FloorStaticBody" type="StaticBody2D" parent="LootSpawnArea" unique_id=599388112]
+position = Vector2(565, 648)
+collision_layer = 16
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LootSpawnArea/FloorStaticBody" unique_id=599388113]
+shape = SubResource("RectangleShape2D_floor")
