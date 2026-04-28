@@ -14,6 +14,9 @@ public partial class ItemPhysicsComponent : RigidBody2D
         this.TopLevel = true; // Break the infinite translation feedback loop by detaching from parent transform
         _rootControl = GetParent<Control>();
         
+        // CRITICAL JUICE: Make items slippery so they slide off each other instead of stacking perfectly
+        this.PhysicsMaterialOverride = new PhysicsMaterial { Friction = 0.0f, Bounce = 0.15f };
+
         if (_rootControl != null)
         {
             _gridShapeComp = _rootControl.GetNodeOrNull<GridShapeComponent>("%GridShapeComponent");
